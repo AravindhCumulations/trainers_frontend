@@ -8,7 +8,7 @@ interface NavBarProps {
     bgColor?: string;
 }
 
-export default function NavBar({ bgColor = "bg-white" }: NavBarProps) {
+const NavBar = ({ bgColor = "bg-white" }: NavBarProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [credit, setCredit] = useState(0);
     const [logged_in, setLogged_in] = useState(false);
@@ -128,4 +128,6 @@ export default function NavBar({ bgColor = "bg-white" }: NavBarProps) {
             </header>
         </>
     );
-} 
+}
+
+export default NavBar; 
