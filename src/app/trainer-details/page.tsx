@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Star } from "lucide-react";
 import NavBar from "../nav-bar/page";
 import EditWorkshopPage from "../edit-workshop/page";
+import { useRouter } from "next/navigation";
 
 interface WorkshopFormData {
     title: string;
@@ -19,19 +20,24 @@ interface WorkshopFormData {
 
 interface OverlayProps {
     isOpen: boolean;
-    onClose: () => void;
     type: 'details' | 'edit' | null;
 }
 
 // Workshop Details Component
-const WorkshopDetails = ({ onClose }: { onClose: () => void }) => {
+const WorkshopDetails = () => {
+    const router = useRouter();
+
+    const handleClose = () => {
+        router.back();
+    };
+
     return (
         <div className="w-[1024px] flex flex-col mt-4 gap-3 p-6 bg-white  rounded-2xl workshop-details">
             <div className="flex justify-between items-center">
                 <p className="text-[36px] font-bold">Soft Skills Enhancement Workshop</p>
                 <button
                     className=" text-gray-500 hover:text-gray-800 text-xl font-bold"
-                    onClick={() => onClose()}
+                    onClick={handleClose}
                     aria-label="Close"
                 >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -90,7 +96,6 @@ const WorkshopDetails = ({ onClose }: { onClose: () => void }) => {
                 </div>
             </div>
         </div>
-
     );
 };
 
@@ -196,16 +201,16 @@ const WorkshopEditForm = ({ onClose }: { onClose: () => void }) => {
 };
 
 // Dynamic Overlay Component
-const Overlay = ({ isOpen, onClose, type }: OverlayProps) => {
+const Overlay = ({ isOpen, type }: OverlayProps) => {
     if (!isOpen) return null;
 
     return (
-        <div className="absolute edit-overlay top-0 left-0 w-full h-full bg-black/40 z-30 flex justify-center items-start" onClick={onClose}>
-            <div onClick={(e: React.MouseEvent) => e.stopPropagation()} className="w-full max-w-7xl">
-                {type === 'details' && <WorkshopDetails onClose={onClose} />}
+        <div className="absolute edit-overlay top-0 left-0 w-full h-full bg-black/40 z-30 flex justify-center items-start">
+            <div className="w-full max-w-7xl">
+                {type === 'details' && <WorkshopDetails />}
                 {type === 'edit' && (
                     <div className="bg-white rounded-2xl mt-4">
-                        <EditWorkshopPage onClose={onClose} />
+                        <EditWorkshopPage />
                     </div>
                 )}
             </div>
@@ -228,12 +233,14 @@ export default function TrainerDetails() {
         type: null
     });
 
-    const handleOverlayClose = () => {
-        setOverlayState({ isOpen: false, type: null });
-    };
-
     const handleWorkshopClick = (type: 'details' | 'edit') => {
         setOverlayState({ isOpen: true, type });
+    };
+
+    const router = useRouter();
+
+    const handleEditWorkshop = (workshopId: string) => {
+        router.push(`/edit-workshop?id=${workshopId}`);
     };
 
     return (
@@ -245,7 +252,6 @@ export default function TrainerDetails() {
             <main className="mx-auto px-4 py-8 bg-blue-100 rounded-t-2xl relative">
                 <Overlay
                     isOpen={overlayState.isOpen}
-                    onClose={handleOverlayClose}
                     type={overlayState.type}
                 />
 
