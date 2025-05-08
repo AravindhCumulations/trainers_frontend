@@ -14,53 +14,54 @@ export default function LoginPage() {
 
     const handleLogin = useCallback(async (e) => {
         e.preventDefault();
-
-        try {
-            const response = await fetch('/api/method/trainer.api.customLogin', {
-                method: "POST",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ "usr": username, "pwd": password }),
-                credentials: 'include'
-            });// use global axios setup
-
-            const data = await response.json();
-
-            if (data.user_details && data.key_details) {
-
-                localStorage.setItem("user_details", JSON.stringify(data.user_details));
-                localStorage.setItem("auth", JSON.stringify(data.key_details));
-            }
-            if (data.user_details.role_user == "Trainer") {
-                const response1 = await fetch(
-                    `/api/resource/Trainer?filters=${JSON.stringify({ trainer: data.user_details.email })}`,
-                    {
-                        method: "GET",
-                        headers: {
-                            'Authorization': `token ${data.key_details.api_key}:${data.key_details.api_secret}`,
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
+        window.location.href = "/";
 
 
-                // Convert response to JSON
-                const responseData = await response1.json();
-                const trainerName = responseData.data[0].name;
-                console.log("dfadf", responseData.data[0].name);
+        // try {
+        //     const response = await fetch('/api/method/trainer.api.customLogin', {
+        //         method: "POST",
+        //         headers: {
+        //             'Accept': 'application/json',
+        //             'Content-Type': 'application/json'
+        //         },
+        //         body: JSON.stringify({ "usr": username, "pwd": password })
+        //     });// use global axios setup
 
-                router.push(`/trainer-profile?${trainerName}`);
-            }
-            else {
-                router.push("/afterlogin");
-            }
+        //     const data = await response.json();
 
-        } catch (error) {
-            console.error("Login failed:", error);
-        }
+        //     if (data.user_details && data.key_details) {
+
+        //         localStorage.setItem("user_details", JSON.stringify(data.user_details));
+        //         localStorage.setItem("auth", JSON.stringify(data.key_details));
+        //     }
+        //     if (data.user_details.role_user == "Trainer") {
+        //         const response1 = await fetch(
+        //             `/api/resource/Trainer?filters=${JSON.stringify({ trainer: data.user_details.email })}`,
+        //             {
+        //                 method: "GET",
+        //                 headers: {
+        //                     'Authorization': `token ${data.key_details.api_key}:${data.key_details.api_secret}`,
+        //                     'Accept': 'application/json',
+        //                     'Content-Type': 'application/json'
+        //                 }
+        //             }
+        //         );
+
+
+        //         // Convert response to JSON
+        //         const responseData = await response1.json();
+        //         const trainerName = responseData.data[0].name;
+        //         console.log("dfadf", responseData.data[0].name);
+
+        //         router.push(`/trainer-profile?${trainerName}`);
+        //     }
+        //     else {
+        //         router.push("/afterlogin");
+        //     }
+
+        // } catch (error) {
+        //     console.error("Login failed:", error);
+        // }
     }, [username, password]);
     return (
         <div className="flex justify-center items-center h-screen bg-blue-100 to-purple-100 translate-transform">
@@ -118,6 +119,7 @@ export default function LoginPage() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className="w-full bg-[#3B82F6] text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                        onClick={handleLogin}
                     >
                         Login
                     </motion.button>

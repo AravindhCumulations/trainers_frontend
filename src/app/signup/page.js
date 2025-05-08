@@ -17,7 +17,7 @@ export default function SignupPage() {
     if (role === 'trainer') {
       window.location.href = '/trainer-details'
     } else {
-      router.push('/company-dashboard');
+      window.location.href = '/'
     }
   };
 
