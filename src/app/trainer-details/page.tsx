@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Star } from "lucide-react";
-import NavBar from "../nav-bar/page";
+import NavBar from "../../components/Navbar";
 import EditWorkshopPage from "../edit-workshop/page";
 import { useRouter } from "next/navigation";
 

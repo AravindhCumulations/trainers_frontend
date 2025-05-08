@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import NavBar from '../nav-bar/page';
+import NavBar from '../../components/Navbar';
 
 export default function TrainerDetailsPage() {
     const router = useRouter();

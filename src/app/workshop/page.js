@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trash2, Plus, Edit } from 'lucide-react';
 import Image from 'next/image';
-import NavBar from '../nav-bar/page';
+import NavBar from '../../components/Navbar';
 
 // Dummy workshops data with images
 const initialWorkshops = [
@@ -14,7 +14,7 @@ const initialWorkshops = [
     description: 'Learn the basics of physical fitness and create a strong foundation for your health journey.',
     price: 99.99,
     targetAudience: 'Beginners',
-    format:'virtual',
+    format: 'virtual',
     image: '/assets/w1.jpg'
   },
   {
@@ -23,7 +23,7 @@ const initialWorkshops = [
     description: 'Deep dive into nutrition science, meal planning, and optimal dietary strategies.',
     price: 149.99,
     targetAudience: 'Intermediate',
-    format:'In-Person',
+    format: 'In-Person',
     image: '/assets/w2.jpg'
   },
   {
@@ -32,7 +32,7 @@ const initialWorkshops = [
     description: 'Techniques for stress management, mindfulness, and improving mental health.',
     price: 129.99,
     targetAudience: 'All Levels',
-    format:'virtual',
+    format: 'virtual',
     image: '/assets/w3.jpg'
   },
   {
@@ -41,7 +41,7 @@ const initialWorkshops = [
     description: 'Intensive workout strategies for maximum fitness results and performance.',
     price: 199.99,
     targetAudience: 'Advanced',
-    format:'In-Person',
+    format: 'In-Person',
     image: '/assets/w4.jpg'
   }
 ];
@@ -62,7 +62,7 @@ export default function WorkshopsPage() {
 
   const handleAddWorkshop = (e) => {
     e.preventDefault();
-    
+
     // Validate inputs
     if (!currentWorkshop.title || !currentWorkshop.description || !currentWorkshop.price || !currentWorkshop.targetAudience || !currentWorkshop.image) {
       alert('Please fill in all fields');
@@ -80,7 +80,7 @@ export default function WorkshopsPage() {
     };
 
     setWorkshops([...workshops, workshopToAdd]);
-    
+
     // Reset form and close modal
     setCurrentWorkshop({
       id: '',
@@ -96,7 +96,7 @@ export default function WorkshopsPage() {
 
   const handleEditWorkshop = (e) => {
     e.preventDefault();
-    
+
     // Validate inputs
     if (!currentWorkshop.title || !currentWorkshop.description || !currentWorkshop.price || !currentWorkshop.targetAudience || !currentWorkshop.image) {
       alert('Please fill in all fields');
@@ -104,20 +104,20 @@ export default function WorkshopsPage() {
     }
 
     // Update the workshop
-    setWorkshops(workshops.map(workshop => 
-      workshop.id === currentWorkshop.id 
+    setWorkshops(workshops.map(workshop =>
+      workshop.id === currentWorkshop.id
         ? {
-            ...workshop,
-            title: currentWorkshop.title,
-            description: currentWorkshop.description,
-            price: parseFloat(currentWorkshop.price),
-            targetAudience: currentWorkshop.targetAudience,
-            image: currentWorkshop.image,
-            format: currentWorkshop.format
-          }
+          ...workshop,
+          title: currentWorkshop.title,
+          description: currentWorkshop.description,
+          price: parseFloat(currentWorkshop.price),
+          targetAudience: currentWorkshop.targetAudience,
+          image: currentWorkshop.image,
+          format: currentWorkshop.format
+        }
         : workshop
     ));
-    
+
     // Close edit modal
     setIsEditModalOpen(false);
   };
@@ -142,7 +142,7 @@ export default function WorkshopsPage() {
   const renderWorkshopModal = (isEdit) => (
     <AnimatePresence>
       {(isEdit ? isEditModalOpen : isAddModalOpen) && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -156,7 +156,7 @@ export default function WorkshopsPage() {
           >
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">{isEdit ? 'Edit Workshop' : 'Create New Workshop'}</h2>
-              <button 
+              <button
                 onClick={() => isEdit ? setIsEditModalOpen(false) : setIsAddModalOpen(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
@@ -167,10 +167,10 @@ export default function WorkshopsPage() {
             <form onSubmit={isEdit ? handleEditWorkshop : handleAddWorkshop} className="space-y-4">
               <div>
                 <label className="block text-gray-700 mb-2">Workshop Title</label>
-                <input 
+                <input
                   type="text"
                   value={currentWorkshop.title}
-                  onChange={(e) => setCurrentWorkshop({...currentWorkshop, title: e.target.value})}
+                  onChange={(e) => setCurrentWorkshop({ ...currentWorkshop, title: e.target.value })}
                   placeholder="Enter workshop title"
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   required
@@ -179,9 +179,9 @@ export default function WorkshopsPage() {
 
               <div>
                 <label className="block text-gray-700 mb-2">Description</label>
-                <textarea 
+                <textarea
                   value={currentWorkshop.description}
-                  onChange={(e) => setCurrentWorkshop({...currentWorkshop, description: e.target.value})}
+                  onChange={(e) => setCurrentWorkshop({ ...currentWorkshop, description: e.target.value })}
                   placeholder="Describe your workshop"
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 h-24"
                   required
@@ -190,10 +190,10 @@ export default function WorkshopsPage() {
 
               <div>
                 <label className="block text-gray-700 mb-2">Price</label>
-                <input 
+                <input
                   type="number"
                   value={currentWorkshop.price}
-                  onChange={(e) => setCurrentWorkshop({...currentWorkshop, price: e.target.value})}
+                  onChange={(e) => setCurrentWorkshop({ ...currentWorkshop, price: e.target.value })}
                   placeholder="Enter workshop price"
                   min="0"
                   step="0.01"
@@ -206,7 +206,7 @@ export default function WorkshopsPage() {
                 <label className="block text-gray-700 mb-2">Target Audience</label>
                 <select
                   value={currentWorkshop.targetAudience}
-                  onChange={(e) => setCurrentWorkshop({...currentWorkshop, targetAudience: e.target.value})}
+                  onChange={(e) => setCurrentWorkshop({ ...currentWorkshop, targetAudience: e.target.value })}
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   required
                 >
@@ -222,7 +222,7 @@ export default function WorkshopsPage() {
                 <label className="block text-gray-700 mb-2">Format</label>
                 <select
                   value={currentWorkshop.format}
-                  onChange={(e) => setCurrentWorkshop({...currentWorkshop, format: e.target.value})}
+                  onChange={(e) => setCurrentWorkshop({ ...currentWorkshop, format: e.target.value })}
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   required
                 >
@@ -234,17 +234,17 @@ export default function WorkshopsPage() {
 
               <div>
                 <label className="block text-gray-700 mb-2">Image URL</label>
-                <input 
+                <input
                   type="text"
                   value={currentWorkshop.image}
-                  onChange={(e) => setCurrentWorkshop({...currentWorkshop, image: e.target.value})}
+                  onChange={(e) => setCurrentWorkshop({ ...currentWorkshop, image: e.target.value })}
                   placeholder="Enter image URL"
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   required
                 />
               </div>
 
-              <button 
+              <button
                 type="submit"
                 className="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition"
               >
@@ -259,11 +259,11 @@ export default function WorkshopsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-orange-200 to-purple-200 p-8">
-      <NavBar/>
+      <NavBar />
       <div className="container mx-auto mt-20">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800">My Workshops</h1>
-          <button 
+          <button
             onClick={() => {
               // Reset current workshop and open add modal
               setCurrentWorkshop({
@@ -291,7 +291,7 @@ export default function WorkshopsPage() {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {workshops.map((workshop) => (
-              <motion.div 
+              <motion.div
                 key={workshop.id}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -299,21 +299,21 @@ export default function WorkshopsPage() {
                 className="bg-white rounded-xl shadow-lg overflow-hidden"
               >
                 <div className="relative h-48 w-full">
-                  <Image 
-                    src={workshop.image} 
+                  <Image
+                    src={workshop.image}
                     alt={workshop.title}
                     layout="fill"
                     objectFit="cover"
                     className="absolute inset-0"
                   />
                   <div className="absolute top-2 right-2 flex space-x-2">
-                    <button 
+                    <button
                       onClick={() => openEditModal(workshop)}
                       className="bg-orange-500 text-white p-2 rounded-full hover:bg-orange-600 transition"
                     >
                       <Edit />
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleDeleteWorkshop(workshop.id)}
                       className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition"
                     >
@@ -341,7 +341,7 @@ export default function WorkshopsPage() {
 
         {/* Workshop Creation Modal */}
         {renderWorkshopModal(false)}
-        
+
         {/* Workshop Edit Modal */}
         {renderWorkshopModal(true)}
       </div>

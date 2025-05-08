@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { SquareMinus, SquarePlus, CreditCard, Coins, Info } from "lucide-react";
-import NavBar from "../nav-bar/page";
+import NavBar from "../../components/Navbar";
 
 export default function SubscriptionPlans() {
   const [input, setInput] = useState("");
