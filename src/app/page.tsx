@@ -1,6 +1,14 @@
 "use client";
 
+import Navbar from '@/components/Navbar';
+import { useRouter } from 'next/navigation';
+
 export default function Home() {
+  const router = useRouter();
+
+  const handleTrainerClick = (trainerId: number) => {
+    router.push(`/trainer-details?id=${trainerId}`);
+  };
 
   const locations = [
     { name: 'Hyderabad', image: 'assets/hydrabad.jpg' },
@@ -17,13 +25,7 @@ export default function Home() {
       <section className="relative w-full mx-auto flex flex-col items-center header-hero-section">
         <div className="w-full bg-gradient-to-b  from-blue-400 to-blue-600 text-white pb-10 px-0 flex flex-col items-center rounded-b-[40px] relative z-10 header-hero-bg">
           {/* Header */}
-          <nav className="w-full max-w-7xl mx-auto flex items-center justify-between pt-7 pb-2 px-6 header-navbar">
-            <div className="text-[24px] font-bold tracking-tight header-logo font-sans">Trainer's Mart</div>
-            <div className="flex items-center gap-4 header-nav-actions">
-              <button className="text-white font-medium text-base header-login-btn">Login</button>
-              <button className="bg-white text-blue-600 px-5 py-1.5 rounded-full font-semibold text-base shadow-sm hover:bg-blue-50 transition header-signup-btn">Sign Up</button>
-            </div>
-          </nav>
+          <Navbar bgColor="transparent" />
           {/* Hero Content */}
           <div className="flex flex-col gap-3 items-center h-[40vh] w-full  mt-6 px-4 hero-content">
             <h1 className=" text-5xl font-extrabold mb-2 text-center leading-tight hero-title">Find & Hire Soft Skills Trainers</h1>
@@ -112,9 +114,13 @@ export default function Home() {
       {/* Popular Trainers Section */}
       <section className="w-full max-w-[1352px] mx-auto flex flex-col mx-auto px-4 py-10 trainer-list-section">
         <h2 className="text-[30px] font-bold mb-6 text-gray-800 trainer-list-title">Discover Our Popular Trainers</h2>
-        <div className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-7 trainer-list-grid">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-7 trainer-list-grid">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <div key={i} className="bg-white rounded-2xl border border-gray-200 shadow-sm px-6 py-4 flex flex-col items-center min-h-[320px] max-w-[300px] mx-auto trainer-card">
+            <div
+              key={i}
+              className="bg-white rounded-2xl border border-gray-200 shadow-sm px-6 py-4 flex flex-col items-center min-h-[320px] max-w-[300px] mx-auto trainer-card cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => handleTrainerClick(i)}
+            >
               {/* Trainer image with heart button overlay */}
               <div className="rounded-2xl overflow-hidden mb-3 flex items-center justify-center bg-gray-100 relative  min-h-[230px]  max-w-[260px] trainer-card-avatar">
                 <img

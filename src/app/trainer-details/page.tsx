@@ -21,14 +21,15 @@ interface WorkshopFormData {
 interface OverlayProps {
     isOpen: boolean;
     type: 'details' | 'edit' | null;
+    setOverlayState: (state: { isOpen: boolean; type: 'details' | 'edit' | null }) => void;
 }
 
 // Workshop Details Component
-const WorkshopDetails = () => {
+const WorkshopDetails = ({ setOverlayState }: { setOverlayState: (state: { isOpen: boolean; type: 'details' | 'edit' | null }) => void }) => {
     const router = useRouter();
 
     const handleClose = () => {
-        router.back();
+        setOverlayState({ isOpen: false, type: null });
     };
 
     return (
@@ -201,15 +202,15 @@ const WorkshopEditForm = ({ onClose }: { onClose: () => void }) => {
 };
 
 // Dynamic Overlay Component
-const Overlay = ({ isOpen, type }: OverlayProps) => {
+const Overlay = ({ isOpen, type, setOverlayState }: OverlayProps) => {
     if (!isOpen) return null;
 
     return (
         <div className="absolute edit-overlay top-0 left-0 w-full h-full bg-black/40 z-30 flex justify-center items-start">
-            <div className="w-full max-w-7xl">
-                {type === 'details' && <WorkshopDetails />}
+            <div className="w-full max-w-7xl flex justify-around items-center">
+                {type === 'details' && <WorkshopDetails setOverlayState={setOverlayState} />}
                 {type === 'edit' && (
-                    <div className="bg-white rounded-2xl mt-4">
+                    <div className="bg-white w-full rounded-2xl mt-4">
                         <EditWorkshopPage />
                     </div>
                 )}
@@ -253,6 +254,7 @@ export default function TrainerDetails() {
                 <Overlay
                     isOpen={overlayState.isOpen}
                     type={overlayState.type}
+                    setOverlayState={setOverlayState}
                 />
 
                 <div className="flex max-w-7xl mx-auto gap-4">
@@ -387,9 +389,9 @@ export default function TrainerDetails() {
                                 <p className={`border-b-2 border-blue-500 text-xl font-semibold pb-3 ${user_role === "Trainer" && logged_in ? '' : 'w-full'}`}>Workshops</p>
                                 {user_role == "Trainer" && logged_in && (
                                     <div className="flex items-center gap-2 cursor-pointer">
-                                        <div className="border-1 rounded-lg py-1 px-2 text-blue-600 font-thin" onClick={() => handleWorkshopClick('details')}>
+                                        {/* <div className="border-1 rounded-lg py-1 px-2 text-blue-600 font-thin" onClick={() => handleWorkshopClick('details')}>
                                             view all
-                                        </div>
+                                        </div> */}
                                         <div className="workshop-edit" onClick={() => handleWorkshopClick('edit')}>
                                             <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#1549e6"><path d="M456.36-290h50.25v-162.98H670v-50.25H506.61V-670h-50.25v166.77H290v50.25h166.36V-290Zm23.88 190q-78.91 0-147.99-29.92-69.09-29.92-120.74-81.54-51.64-51.63-81.58-120.73Q100-401.3 100-480.27q0-78.71 29.92-147.97 29.92-69.27 81.54-120.58 51.63-51.31 120.73-81.25Q401.3-860 480.27-860q78.71 0 147.97 29.92 69.27 29.92 120.58 81.21 51.31 51.29 81.25 120.63Q860-558.9 860-480.24q0 78.91-29.92 147.99-29.92 69.09-81.21 120.61-51.29 51.53-120.63 81.58Q558.9-100 480.24-100Zm.09-50.26q137.46 0 233.44-96.18 95.97-96.18 95.97-233.89 0-137.46-95.85-233.44-95.85-95.97-233.89-95.97-137.38 0-233.56 95.85T150.26-480q0 137.38 96.18 233.56t233.89 96.18ZM480-480Z" /></svg>
                                         </div>
@@ -398,7 +400,7 @@ export default function TrainerDetails() {
                             </div>
                             <div className="flex gap-4 px-4 py-8 overflow-auto scrollbar-hidden">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className="relative min-h-[176px] min-w-[280px] rounded-xl bg-gray-100 overflow-hidden flex justify-center items-center">
+                                    <div key={i} className="relative min-h-[176px] min-w-[280px] rounded-xl bg-gray-100 overflow-hidden flex justify-center items-center cursor-pointer">
                                         <img src={`assets/w${i}.jpg`} alt={`Workshop ${i}`} className="w-full h-full object-cover" />
                                         <div className="absolute inset-0 bg-black/40 text-white flex justify-center items-end p-2" onClick={() => handleWorkshopClick('details')}>
                                             <div className="text-center font-light">
