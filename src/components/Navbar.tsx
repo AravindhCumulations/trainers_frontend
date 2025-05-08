@@ -103,12 +103,12 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
             <header className={`w-full mx-auto px-0 flex flex-col items-center relative z-10 ${bgColor}`}>
                 <nav className="w-full max-w-[calc(100%-172px)] mx-auto flex items-center justify-between py-4 px-6">
                     <div className={`text-[24px] font-extrabold tracking-tight ${textColor}`}>Trainer's Mart</div>
-                    {logged_in ? (
-                        <div className="flex items-center gap-4">
-                            <button className={`font-medium text-base cursor-pointer ${textColor}`} onClick={handleLogin}>Login</button>
-                            <button className={`${bgColor === "bg-white" ? "bg-blue-600 text-white" : "bg-white text-blue-600"} px-5 py-1.5 rounded-full font-semibold text-base shadow-sm hover:bg-blue-50 transition cursor-pointer`} onClick={handleSignup}>Sign Up</button>
-                        </div>
-                    ) : (
+                    {/* {logged_in ? ( */}
+                    <div className="flex items-center gap-4">
+                        <button className={`font-medium text-base cursor-pointer ${textColor}`} onClick={handleLogin}>Login</button>
+                        <button className={`${bgColor === "bg-white" ? "bg-blue-600 text-white" : "bg-white text-blue-600"} px-5 py-1.5 rounded-full font-semibold text-base shadow-sm hover:bg-blue-50 transition cursor-pointer`} onClick={handleSignup}>Sign Up</button>
+                    </div>
+                    {/* ) : (
                         <div className="flex justify-between items-center gap-4">
                             <div className="flex items-start gap-2">
                                 <svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -126,7 +126,7 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                                 </div>
                             </div>
                         </div>
-                    )}
+                    )} */}
                 </nav>
             </header>
         </>
