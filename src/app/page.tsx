@@ -2,13 +2,81 @@
 
 import Navbar from '@/components/Navbar';
 import { useRouter } from 'next/navigation';
+import TrainerGrid from '@/components/TrainerGrid';
+import Footer from '@/components/Footer';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const router = useRouter();
+  const [trainers, setTrainers] = useState([]);
+  const [unlockedTrainers, setUnlockedTrainers] = useState([]);
+  const [wishlistedTrainers, setWishlistedTrainers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState(null);
+  const [isTrainer, setIsTrainer] = useState(false);
+  const [isCompany, setIsCompany] = useState(false);
+  const [isLoggedIn, setIsloggedIn] = useState(false);
 
-  const handleTrainerClick = (trainerId: number) => {
-    router.push(`/trainer-details?id=${trainerId}`);
-  };
+
+
+  useEffect(() => {
+    const role = localStorage.getItem("user_details");
+    try {
+      const userDetails = role ? JSON.parse(role) : null;
+
+      if (userDetails && userDetails.role_user) {
+        const Role = userDetails.role_user;
+        setUserRole(Role);
+        setIsTrainer(Role === "Trainer");
+        // setIsCompany(Role === "Company");
+      } else {
+        console.warn("No user role found.");
+        setUserRole(null);
+        setIsTrainer(false);
+      }
+      const userEmail = userDetails?.email;
+
+      if (!userEmail) {
+        console.warn("User email not found.");
+        setLoading(false);
+        return;
+      }
+      fetch(`/api/method/trainer.api.get_all_trainers?user=${userEmail}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `token a6d10becfd9dfd8:e0881f66419822c`,
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          setTrainers(data.message.All_trainers || []);
+          setUnlockedTrainers(data.message.unlocked_trainers || []);
+          setWishlistedTrainers(data.message.wishlist_trainers || []);
+          setLoading(false);
+
+        })
+        .catch(error => {
+          console.error('Error fetching trainers:', error);
+          setLoading(false);
+        });
+
+
+    } catch (error) {
+      console.error("Failed to parse user_details from localStorage", error);
+      setUserRole(null);
+      setIsTrainer(false);
+    }
+  }, []);
+
+
+  const [activeTab, setActiveTab] = useState('All');
+  const tabs = ['All', 'Unlocked', 'Wish listed'];
+
+
+
+
+
 
   const locations = [
     { name: 'Hyderabad', image: 'assets/hydrabad.jpg' },
@@ -85,113 +153,104 @@ export default function Home() {
           </div>
         </div>
         {/* Are you a Trainer? Section - overlapping upward */}
-        <section className="relative -top-[50px] w-[100%]  z-1 are-you-a-trainer-section">
-          <div className="relative w-full h-[390px] flex items-center justify-start overflow-hidden are-you-a-trainer-bg shadow-lg">
-            <img
-              src="/assets/hero.jpg"
-              alt="Trainer background"
-              className="absolute inset-0 w-full h-full object-cover object-top z-0 are-you-a-trainer-img"
-            />
+        {
+          !isLoggedIn && (
+            <section className="relative -top-[50px] w-[100%]  z-1 are-you-a-trainer-section">
+              <div className="relative w-full h-[390px] flex items-center justify-start overflow-hidden are-you-a-trainer-bg shadow-lg">
+                <img
+                  src="/assets/hero.jpg"
+                  alt="Trainer background"
+                  className="absolute inset-0 w-full h-full object-cover object-top z-0 are-you-a-trainer-img"
+                />
 
-            <div className="absolute inset-0 bg-black/40 h-[220px] z-10 are-you-a-trainer-overlay flex flex-row justify-around px-[100px] items-center  self-end">
+                <div className="absolute inset-0 bg-black/40 h-[220px] z-10 are-you-a-trainer-overlay flex flex-row justify-around px-[100px] items-center  self-end">
 
 
-              <div className="flex flex-col w-[50%] text-white">
-                <div className="font-arial font-bold text-[36px] leading-[54px] tracking-[0] are-you-a-trainer-title">Are you a Trainer?</div>
-                <div className="font-arial font-normal text-[32px] leading-[48px] tracking-[0]">Make your FREE Profile and get discovered by Corporate Businesse</div>
+                  <div className="flex flex-col w-[50%] text-white">
+                    <div className="font-arial font-bold text-[36px] leading-[54px] tracking-[0] are-you-a-trainer-title">Are you a Trainer?</div>
+                    <div className="font-arial font-normal text-[32px] leading-[48px] tracking-[0]">Make your FREE Profile and get discovered by Corporate Businesse</div>
+
+                  </div>
+                  <button className="w-fit h-[60px] border border-white text-white px-6 py-2 rounded-2xl font-semibold text-base bg-transparent hover:bg-white hover:text-blue-700 text-lg transition are-you-a-trainer-btn">Create a Profile</button>
+
+
+                </div>
 
               </div>
-              <button className="w-fit h-[60px] border border-white text-white px-6 py-2 rounded-2xl font-semibold text-base bg-transparent hover:bg-white hover:text-blue-700 text-lg transition are-you-a-trainer-btn">Create a Profile</button>
 
-
-            </div>
-
-          </div>
-
-        </section>
+            </section>
+          )
+        }
       </section>
 
       {/* Popular Trainers Section */}
-      <section className="w-full max-w-[1352px] mx-auto flex flex-col mx-auto px-4 py-10 trainer-list-section">
-        <h2 className="text-[30px] font-bold mb-6 text-gray-800 trainer-list-title">Discover Our Popular Trainers</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-7 trainer-list-grid">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <div
-              key={i}
-              className="bg-white rounded-2xl border border-gray-200 shadow-sm px-6 py-4 flex flex-col items-center min-h-[320px] max-w-[300px] mx-auto trainer-card cursor-pointer hover:shadow-md transition-shadow"
-              onClick={() => handleTrainerClick(i)}
-            >
-              {/* Trainer image with heart button overlay */}
-              <div className="rounded-2xl overflow-hidden mb-3 flex items-center justify-center bg-gray-100 relative  min-h-[230px]  max-w-[260px] trainer-card-avatar">
-                <img
-                  src={`/assets/trainer${((i - 1) % 4) + 1}.jpg`}
-                  alt="Trainer"
-                  className="object-cover w-full h-full"
-                />
-
-                <button className="absolute top-2 right-2 bg-white/80 rounded-full p-1 shadow hover:bg-red-100 transition trainer-card-fav-btn">
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
+      {isCompany ? (
+        <div className="flex space-x-6 border-b border-gray-200 my-6 w-full">
+          <div className="flex flex-col max-w-7xl mx-auto items-center">
+            <div className="tabs">
+              {tabs.map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`pb-2 text-lg font-medium w-[200px] ${activeTab === tab
+                    ? 'border-b-2 border-blue-500 text-blue-600'
+                    : 'text-gray-500'
+                    }`}
+                >
+                  {tab}
                 </button>
-              </div>
-              <div className="text-left">
-                <span className="text-[18px] flex gap-2 font-bold text-gray-900 mb-0.5 trainer-card-name">{i === 1 ? 'Sanya Gupta' : i === 2 ? 'Rahul Verma' : i === 3 ? 'Anjali Mehta' : i === 4 ? 'Kiran Rao' : i === 5 ? 'Sanya Gupta' : i === 6 ? 'Rahul Verma' : i === 7 ? 'Anjali Mehta' : 'Kiran Rao'}
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3.84922 8.6201C3.70326 7.96262 3.72567 7.27894 3.91437 6.63244C4.10308 5.98593 4.45196 5.39754 4.92868 4.92182C5.40541 4.4461 5.99453 4.09844 6.64142 3.91109C7.28832 3.72374 7.97205 3.70276 8.62922 3.8501C8.99093 3.2844 9.48922 2.81886 10.0782 2.49638C10.6671 2.17391 11.3278 2.00488 11.9992 2.00488C12.6707 2.00488 13.3313 2.17391 13.9203 2.49638C14.5092 2.81886 15.0075 3.2844 15.3692 3.8501C16.0274 3.70212 16.7123 3.72301 17.3602 3.91081C18.0081 4.09862 18.598 4.44724 19.0751 4.92425C19.5521 5.40126 19.9007 5.99117 20.0885 6.6391C20.2763 7.28703 20.2972 7.97193 20.1492 8.6301C20.7149 8.99181 21.1805 9.4901 21.5029 10.079C21.8254 10.668 21.9944 11.3286 21.9944 12.0001C21.9944 12.6715 21.8254 13.3322 21.5029 13.9211C21.1805 14.5101 20.7149 15.0084 20.1492 15.3701C20.2966 16.0273 20.2756 16.711 20.0882 17.3579C19.9009 18.0048 19.5532 18.5939 19.0775 19.0706C18.6018 19.5473 18.0134 19.8962 17.3669 20.0849C16.7204 20.2736 16.0367 20.2961 15.3792 20.1501C15.018 20.718 14.5193 21.1855 13.9293 21.5094C13.3394 21.8333 12.6772 22.0032 12.0042 22.0032C11.3312 22.0032 10.669 21.8333 10.0791 21.5094C9.48914 21.1855 8.99045 20.718 8.62922 20.1501C7.97205 20.2974 7.28832 20.2765 6.64142 20.0891C5.99453 19.9018 5.40541 19.5541 4.92868 19.0784C4.45196 18.6027 4.10308 18.0143 3.91437 17.3678C3.72567 16.7213 3.70326 16.0376 3.84922 15.3801C3.27917 15.0193 2.80963 14.5203 2.48426 13.9293C2.1589 13.3384 1.98828 12.6747 1.98828 12.0001C1.98828 11.3255 2.1589 10.6618 2.48426 10.0709C2.80963 9.47992 3.27917 8.98085 3.84922 8.6201Z" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M9 12L11 14L15 10" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-
-                </span>
-                <span className="text-[#EAB308]">★★★★☆</span>
-                <span className="text-[14px] font-semibold text-gray-600 mb-0.5 flex items-center gap-1 trainer-card-skills">{i === 1 ? 'Conflict Resolution, Team Building' : i === 2 ? 'Public Speaking, Leadership' : i === 3 ? 'Emotional Intelligence, Life Coaching' : i === 4 ? 'Time Management, Career Growth' : i === 5 ? 'Conflict Resolution, Team Building' : i === 6 ? 'Public Speaking, Leadership' : i === 7 ? 'Emotional Intelligence, Life Coaching' : 'Time Management, Career Growth'}</span>
-                <span className="text-xs text-gray-500 mb-0.5 trainer-card-exp">{i === 1 ? '12 years • Pune' : i === 2 ? '10 years • Delhi' : i === 3 ? '8 years • Mumbai' : i === 4 ? '6 years • Bengaluru' : i === 5 ? '12 years • Pune' : i === 6 ? '10 years • Delhi' : i === 7 ? '8 years • Mumbai' : '6 years • Bengaluru'}</span>
-                <span className="text-xs text-gray-500 mb-0.5 trainer-card-lang">Languages spoken: English, Hindi, Tamil</span>
-
-              </div>
-
-              <div className="flex items-center w-full justify-between mt-1 pt-1 border-t border-gray-100 trainer-card-bottom">
-                <span className="text-[14px] font-semibold trainer-card-price">{i === 1 ? '₹1800/hour' : i === 2 ? '₹2500/hour' : i === 3 ? '₹2200/hour' : i === 4 ? '₹1800/hour' : i === 5 ? '₹1800/hour' : i === 6 ? '₹2500/hour' : i === 7 ? '₹2200/hour' : '₹1800/hour'}</span>
-                <span className="flex items-center text-xs text-gray-400 trainer-card-views"><svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="4" /></svg>1.2k</span>
-              </div>
+              ))}
             </div>
-          ))}
+            <div className="trainer-list min-h-[350px] flex flex-col items-center justify-between">
+              {activeTab === 'All' && <TrainerGrid trainers={trainers} />}
+              {activeTab === 'Unlocked' && <TrainerGrid trainers={unlockedTrainers} />}
+              {activeTab === 'Wish listed' && <TrainerGrid trainers={wishlistedTrainers} />}
+            </div>
+          </div>
         </div>
-        <div className="flex justify-center mt-8 trainer-list-viewall">
-          <a href="#" className="text-blue-600 font-semibold hover:underline">View All Profiles</a>
-        </div>
-      </section>
+      ) : (
+        <TrainerGrid trainers={trainers} />
+      )}
+
+
 
       {/* Hire Trainers in Single Click Section - 3 cards, fixed size, exact spacing */}
-      <section className="w-full max-w-7xl mx-auto px-4 py-10">
-        <div className="grid grid-cols-4 gap-6">
-          <div className="flex flex-col justify-between py-10">
-            <p className="text-[30px] font-bold mb-4 ">Hire Trainers in 3 simple Steps </p>
-            <p className=" text-[16px] font-normal  mb-2">Hiring soft skills trainers is quick and hassle-free. Simply share your requirements, review curated trainer profiles and make your choice with ease--all in just three simple steps.</p>
-            <p className="font-semibold text-[16px]">it's that Easy</p>
-          </div>
-          <div className="flex flex-col justify-center items-center bg-blue-50 rounded-2xl text-center gap-2 py-6">
+      {
+        !isLoggedIn && (
+          <section className="w-full max-w-7xl mx-auto px-4 py-10">
+            <div className="grid grid-cols-4 gap-6">
+              <div className="flex flex-col justify-between py-10">
+                <p className="text-[30px] font-bold mb-4 ">Hire Trainers in 3 simple Steps </p>
+                <p className=" text-[16px] font-normal  mb-2">Hiring soft skills trainers is quick and hassle-free. Simply share your requirements, review curated trainer profiles and make your choice with ease--all in just three simple steps.</p>
+                <p className="font-semibold text-[16px]">it's that Easy</p>
+              </div>
+              <div className="flex flex-col justify-center items-center bg-blue-50 rounded-2xl text-center gap-2 py-6">
 
-            <div className="w-[200px] h-[200px]"><img src="assets/Profiling-pana 1.png" alt="" /></div>
-            <p className="text-[24px] font-normal"><span className="font-semibold">Browse</span> trainers profiles from across India</p>
-          </div>
-          <div className="flex flex-col justify-center items-center  bg-blue-50 rounded-2xl text-center gap-2 py-6">
-            <div className="w-[200px] h-[200px]"><img src="assets/Key-pana 1.png" alt="" /></div>
+                <div className="w-[200px] h-[200px]"><img src="assets/Profiling-pana 1.png" alt="" /></div>
+                <p className="text-[24px] font-normal"><span className="font-semibold">Browse</span> trainers profiles from across India</p>
+              </div>
+              <div className="flex flex-col justify-center items-center  bg-blue-50 rounded-2xl text-center gap-2 py-6">
+                <div className="w-[200px] h-[200px]"><img src="assets/Key-pana 1.png" alt="" /></div>
 
-            <p className="text-[24px] font-normal"><span className="font-semibold">Unlock</span> contact details using credits. </p>
-          </div>
-          <div className="flex flex-col justify-center items-center bg-blue-50 rounded-2xl text-center gap-2 py-6">
-            <div className="w-[200px] h-[200px]"><img src="assets/Calling-pana 1.png" alt="" /></div>
-            <p className="text-[24px] font-normal"><span className="font-semibold">Connect directly--</span>no commisions, no hassle!</p>
-          </div>
+                <p className="text-[24px] font-normal"><span className="font-semibold">Unlock</span> contact details using credits. </p>
+              </div>
+              <div className="flex flex-col justify-center items-center bg-blue-50 rounded-2xl text-center gap-2 py-6">
+                <div className="w-[200px] h-[200px]"><img src="assets/Calling-pana 1.png" alt="" /></div>
+                <p className="text-[24px] font-normal"><span className="font-semibold">Connect directly--</span>no commisions, no hassle!</p>
+              </div>
 
-        </div>
-      </section>
+            </div>
+          </section>
+        )
+      }
 
       {/* Browse Trainers by Location Section - 2 rows, 3 columns, fixed size */}
+
       <section className="w-full max-w-7xl mx-auto px-4 py-10">
         <p className="text-[30px] font-bold mb-4">Browse Trainers by Locations</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {locations.map((city, index) => (
-            <div key={index} className="flex flex-col relative max-w-[424px] h-[300px] px-1">
+            <div key={index} className="flex flex-col relative max-w-[424px] h-[300px] px-1 hover:px-0">
               <img
                 src={city.image}
                 alt={city.name}
@@ -217,48 +276,57 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Info Section with Blue Background - 1 row, 2 columns, left text, right 3 cards */}
-      <section className="w-full max-w-7xl mx-auto  rounded-2xl bg-blue-50 p-4 ">
-        <div className="max-w-7xl mx-auto flex flex-row items-center ">
-          <div className="flex-1 min-w-[320px]">
-            <h2 className="text-[30px] font-bold mb-2">No Middlemen, No Commission!</h2>
-            <p className="text-[24px] font-normal text-gray-700 ">Our platform lets corporate clients connect directly with experienced soft skills trainers. No intermediaries—just access trainer contact details and hire on your terms!. Trainers get an opportunity to get discovered by Corporate Clients in no time. More project, more training assignments and better earning.</p>
-          </div>
-        </div>
-      </section>
 
-      {/* Hire Trainers in 3 simple Steps Section - 1 row, 2 columns, left text, right 3 cards */}
-      <section className="w-full max-w-7xl mx-auto px-4 py-10">
-        <div className="grid grid-cols-4 gap-6">
-          <div className="flex flex-col justify-between items-start py-10">
-            <p className="text-[30px] font-bold mb-4 ">Trainers Get Discovered & Land Corporate Clients </p>
-            <p className="text-[16px] font-normal mb-2">🎯 Showcase Your Expertise to Leading Companies</p>
-            <button className="bg-blue-600 rounded-xl text-white px-4 py-2">Create your free profile</button>
-          </div>
-          <div className="flex flex-col justify-center items-center bg-blue-50 rounded-2xl text-center gap-2 py-6">
 
-            <div className="w-[200px] h-[200px]"><img src="assets/Checklist-pana 1.png" alt="" /></div>
-            <p className="text-[24px] font-normal"><span className="font-semibold">List your profile</span> with expertise and experience</p>
-          </div>
-          <div className="flex flex-col justify-center items-center  bg-blue-50 rounded-2xl text-center gap-2 py-6">
-            <div className="w-[200px] h-[200px]"><img src="assets/Calling-pana 1.png" alt="" /></div>
+      {
+        !isLoggedIn && (
+          <>
+            {/* Hire Trainers in 3 simple Steps Section - 1 row, 2 columns, left text, right 3 cards */}
 
-            <p className="text-[24px] font-normal"><span className="font-semibold">Get contacted</span>directly by potential clients</p>
-          </div>
-          <div className="flex flex-col justify-center items-center bg-blue-50 rounded-2xl text-center gap-2 py-6">
-            <div className="w-[200px] h-[200px]"><img src="assets/Mobile Marketing-pana 1.png" alt="" /></div>
-            <p className="text-[24px] font-normal"><span className="font-semibold">Gain visibility </span>among people looking for trainers.</p>
-          </div>
+            <section className="w-full max-w-7xl mx-auto px-4 py-10">
+              <div className="grid grid-cols-4 gap-6">
+                <div className="flex flex-col justify-between items-start py-10">
+                  <p className="text-[30px] font-bold mb-4 ">Trainers Get Discovered & Land Corporate Clients </p>
+                  <p className="text-[16px] font-normal mb-2">🎯 Showcase Your Expertise to Leading Companies</p>
+                  <button className="bg-blue-600 rounded-xl text-white px-4 py-2">Create your free profile</button>
+                </div>
+                <div className="flex flex-col justify-center items-center bg-blue-50 rounded-2xl text-center gap-2 py-6">
 
-        </div>
-      </section>
+                  <div className="w-[200px] h-[200px]"><img src="assets/Checklist-pana 1.png" alt="" /></div>
+                  <p className="text-[24px] font-normal"><span className="font-semibold">List your profile</span> with expertise and experience</p>
+                </div>
+                <div className="flex flex-col justify-center items-center  bg-blue-50 rounded-2xl text-center gap-2 py-6">
+                  <div className="w-[200px] h-[200px]"><img src="assets/Calling-pana 1.png" alt="" /></div>
 
-      <section className="w-full max-w-7xl mx-auto ">
-        <div className="flex items-center gap-5">
-          <p className="text-blue-500">👥 Join the Netwoek & Grow you training Buisness 👉 </p>
-          <button className="bg-blue-600 rounded-xl text-white px-4 py-2">Sign Up as a Trainer</button>
-        </div>
-      </section>
+                  <p className="text-[24px] font-normal"><span className="font-semibold">Get contacted</span>directly by potential clients</p>
+                </div>
+                <div className="flex flex-col justify-center items-center bg-blue-50 rounded-2xl text-center gap-2 py-6">
+                  <div className="w-[200px] h-[200px]"><img src="assets/Mobile Marketing-pana 1.png" alt="" /></div>
+                  <p className="text-[24px] font-normal"><span className="font-semibold">Gain visibility </span>among people looking for trainers.</p>
+                </div>
+
+              </div>
+            </section>
+            {/* Info Section with Blue Background - 1 row, 2 columns, left text, right 3 cards */}
+            <section className="w-full max-w-7xl mx-auto  rounded-2xl bg-blue-50 p-4 ">
+              <div className="max-w-7xl mx-auto flex flex-row items-center ">
+                <div className="flex-1 min-w-[320px]">
+                  <h2 className="text-[30px] font-bold mb-2">No Middlemen, No Commission!</h2>
+                  <p className="text-[24px] font-normal text-gray-700 ">Our platform lets corporate clients connect directly with experienced soft skills trainers. No intermediaries—just access trainer contact details and hire on your terms!. Trainers get an opportunity to get discovered by Corporate Clients in no time. More project, more training assignments and better earning.</p>
+                </div>
+              </div>
+            </section>
+            <section className="w-full max-w-7xl mx-auto ">
+              <div className="flex items-center gap-5">
+                <p className="text-blue-500">👥 Join the Netwoek & Grow you training Buisness 👉 </p>
+                <button className="bg-blue-600 rounded-xl text-white px-4 py-2">Sign Up as a Trainer</button>
+              </div>
+            </section>
+          </>
+        )
+      }
+
+
 
       {/* How it Works Section - 2 columns, left stepper, right image */}
       <section className="w-full max-w-7xl mx-auto px-4 py-16">
@@ -355,16 +423,7 @@ export default function Home() {
 
 
       {/* Footer - 3 columns, fixed height, exact spacing */}
-      <footer className="w-full bg-blue-700 text-white py-6 mt-10">
-        <div className="max-w-7xl mx-auto flex flex-row items-center justify-between px-4 gap-4">
-          <div className="text-sm"> <span className="font-semibold text-lg">Trainer's Mart.</span> <br /> Bridging the gap between talent and opportunities.</div>
-          <div className="flex gap-6 text-sm">
-            <a href="#" className="hover:underline">Privacy Policy</a>
-            <a href="#" className="hover:underline">Terms and Conditions</a>
-            <a href="#" className="hover:underline">Support</a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

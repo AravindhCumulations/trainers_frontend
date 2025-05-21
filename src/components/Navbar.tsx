@@ -1,8 +1,9 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
+import Link from 'next/link';
+
 import { ChevronDownIcon, LogOutIcon, UserIcon, WalletIcon } from "lucide-react";
-import { style } from "framer-motion/client";
 
 interface NavBarProps {
     bgColor?: string;
@@ -12,10 +13,37 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [credit, setCredit] = useState(0);
     const [logged_in, setLogged_in] = useState(false);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [userRole, setUserRole] = useState(null);
+    const [isTrainer, setIsTrainer] = useState(false);
+
+    useEffect(() => {
+        const role = localStorage.getItem("user_details");
+        try {
+            const userDetails = role ? JSON.parse(role) : null;
+
+            if (userDetails && userDetails.role_user) {
+                const Role = userDetails.role_user;
+                setUserRole(Role);
+                setIsTrainer(Role === "Trainer");
+            } else {
+                console.warn("No user role found.");
+                setUserRole(null);
+                setIsTrainer(false);
+            }
+        } catch (error) {
+            console.error("Failed to parse user_details from localStorage", error);
+            setUserRole(null);
+            setIsTrainer(false);
+        }
+    }, []);
+
     const url = "http://3.94.205.118:8000";
 
-    // Determine text color based on background color
+    // Determine text and border color based on background color
     const textColor = bgColor === "bg-white" ? "text-blue-600" : "text-white";
+    const borderColor = bgColor === "bg-white" ? "border-blue-600" : "border-white";
+    const hoverColor = bgColor === "bg-white" ? "bg-blue-100" : "bg-white/20";
 
     useEffect(() => {
         // Check if user is logged in on component mount
@@ -30,105 +58,184 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
     }, []);
 
     const handleSubscription = () => {
-        window.location.href = "/subscription"
-    }
+        window.location.href = "/subscription";
+    };
 
     const handleLogin = () => {
         window.location.href = "/login";
-    }
+    };
 
     const handleSignup = () => {
         window.location.href = "/signup";
-    }
+    };
 
     const handleLogout = () => {
-        localStorage.removeItem('user_details');
-        localStorage.removeItem('auth');
+        localStorage.removeItem("user_details");
+        localStorage.removeItem("auth");
         setLogged_in(false);
-        window.location.href = '/';
+        window.location.href = "/";
     };
+
+    const handleCredits = () => {
+        window.location.href = "/manage-credits";
+    }
 
     const handleProfile = () => {
         window.location.href = "/profile";
-    }
+    };
 
     const credits = () => {
         try {
-            const user = JSON.parse(localStorage.getItem("user_details") || '{}');
+            const user = JSON.parse(localStorage.getItem("user_details") || "{}");
             if (!user || !user.email) return;
 
-            fetch(`/api/resource/Credits?fields=["credits"]&filters=${encodeURIComponent(JSON.stringify({ "user": user.email }))}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `token a6d10becfd9dfd8:e0881f66419822c`,
-                    'Content-Type': 'application/json'
+            fetch(
+                `/api/resource/Credits?fields=["credits"]&filters=${encodeURIComponent(
+                    JSON.stringify({ user: user.email })
+                )}`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `token a6d10becfd9dfd8:e0881f66419822c`,
+                        "Content-Type": "application/json",
+                    },
                 }
-            })
-                .then(response => response.json())
-                .then(data => {
+            )
+                .then((response) => response.json())
+                .then((data) => {
                     if (data && data.data && data.data.length > 0) {
                         setCredit(data.data[0].credits);
                     }
                 })
-                .catch(error => {
-                    console.error('Error fetching credits:', error);
+                .catch((error) => {
+                    console.error("Error fetching credits:", error);
                 });
         } catch (error) {
-            console.error('Error parsing user details:', error);
+            console.error("Error parsing user details:", error);
         }
-    }
+    };
 
-    const handleHome = () => {
-        if (!logged_in) {
-            window.location.href = '/';
-            return;
-        }
-
-        try {
-            const user = JSON.parse(localStorage.getItem("user_details") || '{}');
-            if (user && user.user_type === "Trainer") {
-                window.location.href = '/details-page';
-            } else {
-                window.location.href = '/afterlogin';
-            }
-        } catch (error) {
-            console.error('Error parsing user details:', error);
-            window.location.href = '/';
-        }
-    }
 
     return (
         <>
             {/* Navbar */}
-            <header className={`w-full mx-auto px-0 flex flex-col items-center relative z-10 ${bgColor}`}>
-                <nav className="w-full max-w-[calc(100%-172px)] mx-auto flex items-center justify-between py-4 px-6">
-                    <div className={`text-[24px] font-extrabold tracking-tight ${textColor}`}>Trainer's Mart</div>
-                    {/* {logged_in ? ( */}
-                    <div className="flex items-center gap-4">
-                        <button className={`font-medium text-base cursor-pointer ${textColor}`} onClick={handleLogin}>Login</button>
-                        <button className={`${bgColor === "bg-white" ? "bg-blue-600 text-white" : "bg-white text-blue-600"} px-5 py-1.5 rounded-full font-semibold text-base shadow-sm hover:bg-blue-50 transition cursor-pointer`} onClick={handleSignup}>Sign Up</button>
-                    </div>
-                    {/* ) : (
-                        <div className="flex justify-between items-center gap-4">
-                            <div className="flex items-start gap-2">
-                                <svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 19.7116L0.25 14.8558V5.14433L9 0.288574L17.75 5.14433V14.8558L9 19.7116ZM6.148 7.55783C6.51217 7.14499 6.941 6.82383 7.4345 6.59433C7.92817 6.36483 8.45 6.25008 9 6.25008C9.55 6.25008 10.0718 6.36483 10.5655 6.59433C11.059 6.82383 11.4878 7.14499 11.852 7.55783L15.4098 5.57508L9 2.01158L2.59025 5.57508L6.148 7.55783ZM8.25 17.5731V13.6828C7.36917 13.4878 6.649 13.0481 6.0895 12.3636C5.52983 11.6789 5.25 10.8911 5.25 10.0001C5.25 9.79757 5.26317 9.60749 5.2895 9.42983C5.31567 9.25233 5.36017 9.07058 5.423 8.88458L1.75 6.82708V13.9693L8.25 17.5731ZM9 12.2501C9.627 12.2501 10.1588 12.0318 10.5953 11.5953C11.0317 11.1588 11.25 10.6271 11.25 10.0001C11.25 9.37308 11.0317 8.84132 10.5953 8.40483C10.1588 7.96833 9.627 7.75008 9 7.75008C8.373 7.75008 7.84125 7.96833 7.40475 8.40483C6.96825 8.84132 6.75 9.37308 6.75 10.0001C6.75 10.6271 6.96825 11.1588 7.40475 11.5953C7.84125 12.0318 8.373 12.2501 9 12.2501ZM9.75 17.5731L16.25 13.9693V6.82708L12.577 8.88458C12.6398 9.07058 12.6843 9.25233 12.7105 9.42983C12.7368 9.60749 12.75 9.79757 12.75 10.0001C12.75 10.8911 12.4702 11.6789 11.9105 12.3636C11.351 13.0481 10.6308 13.4878 9.75 13.6828V17.5731Z" fill={bgColor === "bg-white" ? "#5F8AFA" : "#FFFFFF"} />
-                                </svg>
+            <header
+                className={`w-full mx-auto px-[80px] flex flex-col items-center relative z-10 ${bgColor} ${textColor} `}
+            >
+                <nav className="w-full mx-auto flex items-center justify-between py-4">
+                    <Link href="/" className={`text-2xl font-extrabold tracking-tight ${textColor}`}>
+                        Trainer's Mart
+                    </Link>
 
-                                <p className={textColor}>30 Credits Available</p>
-                            </div>
-                            <div className="rounded-4xl flex border-1 border-blue-500 px-[8px] py-[4px] gap-[4px] justify-center items-center">
-                                <div className="rounded-full w-[36px] h-[36px]">
-                                    <img src="assets/prof-1.jpeg" alt="" className="w-full h-full object-cover rounded-full" />
+                    {logged_in ? (
+
+                        <div className="relative flex justify-center items-center gap-[20px]">
+
+                            {!isTrainer &&
+                                (
+                                    <div onClick={handleCredits} className={` h-[44px] p-1 px-2 flex  justify-around items-center hover:cursor-pointer hover:${hoverColor} rounded-[36px]`}>
+                                        <svg
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className={`fill-current ${textColor} transition-transform ${showDropdown ? 'rotate-180' : ''}`}
+                                        >
+
+                                            <mask id="mask0_171_5475" style={{ maskType: 'alpha' }} maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+                                                <rect width="24" height="24" fill="#D9D9D9" />
+                                            </mask>
+                                            <g mask="url(#mask0_171_5475)">
+                                                <path d="M12 21.7116L3.25 16.8558V7.14433L12 2.28857L20.75 7.14433V16.8558L12 21.7116ZM9.148 9.55783C9.51217 9.14499 9.941 8.82383 10.4345 8.59433C10.9282 8.36483 11.45 8.25008 12 8.25008C12.55 8.25008 13.0718 8.36483 13.5655 8.59433C14.059 8.82383 14.4878 9.14499 14.852 9.55783L18.4098 7.57508L12 4.01158L5.59025 7.57508L9.148 9.55783ZM11.25 19.5731V15.6828C10.3692 15.4878 9.649 15.0481 9.0895 14.3636C8.52983 13.6789 8.25 12.8911 8.25 12.0001C8.25 11.7976 8.26317 11.6075 8.2895 11.4298C8.31567 11.2523 8.36017 11.0706 8.423 10.8846L4.75 8.82708V15.9693L11.25 19.5731ZM12 14.2501C12.627 14.2501 13.1588 14.0318 13.5953 13.5953C14.0317 13.1588 14.25 12.6271 14.25 12.0001C14.25 11.3731 14.0317 10.8413 13.5953 10.4048C13.1588 9.96833 12.627 9.75008 12 9.75008C11.373 9.75008 10.8413 9.96833 10.4048 10.4048C9.96825 10.8413 9.75 11.3731 9.75 12.0001C9.75 12.6271 9.96825 13.1588 10.4048 13.5953C10.8413 14.0318 11.373 14.2501 12 14.2501ZM12.75 19.5731L19.25 15.9693V8.82708L15.577 10.8846C15.6398 11.0706 15.6843 11.2523 15.7105 11.4298C15.7368 11.6075 15.75 11.7976 15.75 12.0001C15.75 12.8911 15.4702 13.6789 14.9105 14.3636C14.351 15.0481 13.6308 15.4878 12.75 15.6828V19.5731Z"
+                                                    fill="currentColor" />
+                                            </g>
+                                        </svg>
+                                        <div className="font-bold text-base flex p-2">{credit} Credits</div>
+                                    </div>
+                                )}
+
+
+                            <div
+                                className={`w-[80px] h-[44px] rounded-[36px] border-2 ${borderColor} flex justify-center items-center gap-[4px] cursor-pointer`}
+                                onClick={() => setShowDropdown(!showDropdown)}
+                            >
+                                <div className="trainer-profile w-[36px] h-[36px] rounded-full bg-gray-200 flex items-center justify-center">
+                                    <img
+                                        src="assets/prof-1.jpeg"
+                                        alt="img"
+                                        className="w-full h-full object-cover rounded-full"
+                                    />
                                 </div>
-                                <div className="w-[24px] h-[24px]">
-                                    <img src="assets/keyboard_arrow_down.png" alt="" />
-                                </div>
+                                <svg
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className={`fill-current ${textColor} transition-transform ${showDropdown ? 'rotate-180' : ''}`}
+                                >
+                                    <mask
+                                        id="mask0_171_5481"
+                                        style={{ maskType: "alpha" }}
+                                        maskUnits="userSpaceOnUse"
+                                        x="0"
+                                        y="0"
+                                        width="24"
+                                        height="24"
+                                    >
+                                        <rect width="24" height="24" fill="#D9D9D9" />
+                                    </mask>
+                                    <g mask="url(#mask0_171_5481)">
+                                        <path
+                                            d="M12.0092 15.0527L6.35547 9.39897L7.40922 8.34521L12.0092 12.9452L16.6092 8.34521L17.663 9.39897L12.0092 15.0527Z"
+                                            fill="currentColor"
+                                        />
+                                    </g>
+                                </svg>
                             </div>
+
+                            {/* Dropdown Menu */}
+                            {showDropdown && (
+                                <div className="absolute top-15 right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                                    <button
+                                        onClick={handleProfile}
+                                        className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                    >
+                                        <UserIcon className="w-4 h-4" />
+                                        Profile
+                                    </button>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                    >
+                                        <LogOutIcon className="w-4 h-4" />
+                                        Logout
+                                    </button>
+                                </div>
+                            )}
                         </div>
-                    )} */}
+                    ) : (
+                        <div className="flex items-center gap-4">
+                            <button
+                                className={`font-medium text-base cursor-pointer ${textColor}`}
+                                onClick={handleLogin}
+                            >
+                                Login
+                            </button>
+                            <button
+                                className={`${bgColor === "bg-white"
+                                    ? "bg-primary text-white"
+                                    : "bg-white text-primary"
+                                    } px-5 py-1.5 rounded-full font-semibold text-base shadow-sm hover:bg-primary-light transition cursor-pointer`}
+                                onClick={handleSignup}
+                            >
+                                Sign Up
+                            </button>
+                        </div>
+                    )}
                 </nav>
             </header>
         </>
     );
-} 
+}
