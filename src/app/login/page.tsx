@@ -5,6 +5,13 @@ import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { LoginModel, LoginFormData } from '@/models/auth.models';
 import { motion } from 'framer-motion';
+import { useTheme } from '@/styles/ThemeProvider';
+import { authApis } from '@/lib/apis/auth.apis';
+import { trainerApis } from '@/lib/apis/trainer.apis';
+import { getCurrentUserRole, setUserDetailsToLocalStore } from '@/lib/utils/auth.utils';
+import Loader from '@/components/Loader';
+import { useLoading } from '@/context/LoadingContext';
+
 
 export default function LoginPage() {
     const [formData, setFormData] = useState<LoginFormData>({
@@ -13,75 +20,55 @@ export default function LoginPage() {
     });
     const [show, setShow] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isRouting, setIsRouting] = useState(false);
+    const { showLoader, hideLoader } = useLoading();
+
     const router = useRouter();
+    const { theme } = useTheme();
 
     const handleLogin = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError(null);
+        showLoader()
 
         const loginModel = new LoginModel(formData);
         const validationError = loginModel.validate();
 
         if (validationError) {
             setError(validationError);
+            hideLoader()
             return;
         }
 
         try {
-
-            const response = await fetch('/api/method/trainer.api.customLogin', {
-                method: "POST",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ "usr": formData.email, "pwd": formData.password }),
-                credentials: 'include'
-            });// use global axios setup
-
-            const data = await response.json();
+            const data = await authApis.login(formData.email, formData.password);
 
             if (data.user_details && data.key_details) {
+                const success: boolean = setUserDetailsToLocalStore(data);
+                console.log("data set to local store successfully");
 
-                localStorage.setItem("user_details", JSON.stringify(data.user_details));
-                localStorage.setItem("auth", JSON.stringify(data.key_details));
             }
 
-            if (data.user_details.role_user == "Trainer") {
+            if (data.user_details.role_user === "Trainer") {
+                console.log("here is the current user", getCurrentUserRole());
 
+                setIsRouting(true);
 
-
-                const response1 = await fetch(
-                    `/api/resource/Trainer?filters=${JSON.stringify({ trainer: data.user_details.email })}`,
-                    {
-                        method: "GET",
-                        headers: {
-                            'Authorization': `token ${data.key_details.api_key}:${data.key_details.api_secret}`,
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
-
-
-                // Convert response to JSON
-                const responseData = await response1.json();
-                const trainerName = responseData.data[0].name;
-                console.log("dfadf", responseData.data[0].name);
-
-                router.push(`/trainer-details?${trainerName}`);
-
-                //  1 need to add and check first time login to route 
-            }
-            else {
-
-                // same 1 here
+                if (data) {
+                    router.push(`/trainer-details?trainer=${data.user_details.name}`);
+                } else {
+                    setError('Trainer profile not found');
+                    setIsRouting(false);
+                }
+            } else {
+                setIsRouting(true);
                 router.push("/");
             }
-
-
         } catch (err) {
             setError('Login failed. Please try again.');
+        } finally {
+            hideLoader()
         }
     }, [formData]);
 
@@ -94,31 +81,38 @@ export default function LoginPage() {
     };
 
     return (
-
-        <div className="flex justify-center items-center h-screen bg-gradient-to-r bg-blue-100 translate-transform">
+        <div className="flexCenter h-screen  transition-colors duration-300"
+            style={{ background: theme.gradients.primary }}
+        >
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
-                className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-2xl max-w-md w-full"
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg p-8 rounded-2xl shadow-2xl max-w-md w-full transition-colors duration-300"
             >
-                <h2 className="text-3xl font-bold text-center text-gray-900 mb-6">Welcome Back</h2>
+                <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-6 transition-colors duration-300">Welcome Back</h2>
+
+                {error && (
+                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                        {error}
+                    </div>
+                )}
 
                 {/* Form */}
                 <form className="space-y-5" onSubmit={handleLogin}>
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-1">Email</label>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1 transition-colors duration-300">Email</label>
                         <input
                             type="text"
                             name="email"
                             value={formData.email}
                             onChange={handleInputChange}
                             placeholder="Enter your email"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         />
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-1">Password</label>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1 transition-colors duration-300">Password</label>
                         <div className="flex relative">
                             <input
                                 type={show ? "text" : "password"}
@@ -126,21 +120,21 @@ export default function LoginPage() {
                                 value={formData.password}
                                 onChange={handleInputChange}
                                 placeholder="Enter your password"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                             />
                             {
                                 show ?
                                     <div className="absolute right-4 top-6">
                                         <EyeOff
                                             size={24}
-                                            className="transform -translate-y-1/2 cursor-pointer text-gray"
+                                            className="transform -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-400 transition-colors duration-300"
                                             onClick={() => setShow(!show)}
                                         />
                                     </div> :
                                     <div className="absolute right-4 top-6">
                                         <Eye
                                             size={24}
-                                            className="transform -translate-y-1/2 cursor-pointer text-gray"
+                                            className="transform -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-400 transition-colors duration-300"
                                             onClick={() => setShow(!show)}
                                         />
                                     </div>
@@ -151,15 +145,16 @@ export default function LoginPage() {
                         type="submit"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="w-full bg-blue-500 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                        className="w-full bg-primary hover:bg-primary-hover text-white px-4 py-3 rounded-lg font-semibold transition-colors duration-300 relative"
+                    // disabled={isLoading || isRouting}
                     >
-                        Login
+                        login
                     </motion.button>
                 </form>
 
-                <p className="text-center text-gray-600 mt-4">
+                <p className="text-center text-gray-600 dark:text-gray-400 mt-4 transition-colors duration-300">
                     Don't have an account?
-                    <a href="/signup" className="text-blue-600 font-semibold hover:underline ml-1">Sign up</a>
+                    <a href="/signup" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline ml-1 transition-colors duration-300">Sign up</a>
                 </p>
             </motion.div>
         </div>

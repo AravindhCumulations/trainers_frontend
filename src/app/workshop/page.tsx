@@ -7,6 +7,8 @@ import Image from 'next/image';
 import NavBar from '../../components/Navbar';
 import { Workshop, WorkshopFormData, WorkshopModel } from '@/models/workshop.models';
 import Footer from '@/components/Footer';
+import EditWorkshop from '@/components/EditWorkshop';
+import WorkshopDetails from '@/components/WorkshopDetails';
 
 // Dummy workshops data with images
 const initialWorkshops: Workshop[] = [
@@ -48,6 +50,89 @@ const initialWorkshops: Workshop[] = [
     }
 ];
 
+interface OverlayProps {
+    isOpen: boolean;
+    type: 'details' | 'edit' | 'create' | null;
+    setOverlayState: (state: { isOpen: boolean; type: 'details' | 'edit' | 'create' | null }) => void;
+}
+// Workshop Details Component
+const WorkshopDetailsOverlay = ({ setOverlayState }: { setOverlayState: (state: { isOpen: boolean; type: 'details' | 'edit' | 'create' | null }) => void }) => {
+    const handleClose = () => {
+        setOverlayState({ isOpen: false, type: null });
+    };
+
+    const handleEdit = () => {
+        setOverlayState({ isOpen: true, type: 'edit' });
+    };
+
+    const workshopData = {
+        id: '1',
+        title: 'Soft Skills Enhancement Workshop',
+        description: 'Enhance communication, build team rapport, and develop key interpersonal skills via interactive sessions.',
+        price: 99.99,
+        targetAudience: 'Corporate teams, managers, team leaders, and HR professionals looking to enhance collaboration.',
+        format: 'In Person',
+        image: '/assets/edit_model.jpg',
+        objectives: 'Enhance communication, build team rapport, and develop key interpersonal skills via interactive sessions.',
+        outcomes: 'Stronger communication, better emotional intelligence, and practical tools for collaboration success.',
+        handouts: 'Participants receive handouts with exercises, session notes, and reflection prompts for continued learning.',
+        programFlow: 'Welcome & Icebreaker, Interactive activities, Scenario roleplays, Group discussions',
+        evaluation: 'Workshop impact is assessed using post-session surveys, self-reflection, and peer feedback methods.'
+    };
+
+    return <WorkshopDetails workshop={workshopData} onClose={handleClose} onEdit={handleEdit} />;
+};
+// Dynamic Overlay Component
+const Overlay = ({ isOpen, type, setOverlayState }: OverlayProps) => {
+    if (!isOpen) return null;
+
+    const handleClose = () => {
+        setOverlayState({ isOpen: false, type: null });
+    };
+    // Sample workshop data for editing
+    const sampleWorkshopData = {
+        id: '1',
+        title: 'Soft Skills Enhancement Workshop',
+        description: 'Enhance communication, build team rapport, and develop key interpersonal skills via interactive sessions.',
+        price: 99.99,
+        targetAudience: 'Corporate teams, managers, team leaders, and HR professionals looking to enhance collaboration.',
+        format: 'In Person',
+        image: '/assets/edit_model.jpg',
+        objectives: '<ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Enhance communication</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span> build team rapport</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>develop key interpersonal skills via interactive sessions.</li></ol>',
+        outcomes: '<ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Stronger communicatio</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>better emotional intelligence</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>practical tools for collaboration success.</li></ol>',
+        handouts: 'Participants receive handouts with exercises, session notes, and reflection prompts for continued learning.',
+        programFlow: '<ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Welcome &amp; Ice-breaker</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Interactive activities</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span> Scenario roleplays, Group discussions</li></ol>',
+        evaluation: 'Workshop impact is assessed using post-session surveys, self-reflection, and peer feedback methods.'
+    };
+
+    return (
+        <div className="absolute edit-overlay top-0 left-0 w-full h-full bg-black/40 z-30 flex justify-center items-start">
+            <div className="w-full max-w-5xl flex justify-around items-center">
+                {type === 'details' && <WorkshopDetailsOverlay setOverlayState={setOverlayState} />}
+                {type === 'edit' && (
+                    <div className="bg-white w-full rounded-2xl mt-4">
+                        <EditWorkshop
+                            onClose={handleClose}
+                            initialData={sampleWorkshopData}
+                            mode="edit"
+                        />
+                    </div>
+                )}
+                {type === 'create' && (
+                    <div className="bg-white w-full rounded-2xl mt-4">
+                        <EditWorkshop
+                            onClose={handleClose}
+                            mode="create"
+                        />
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+
+
 export default function WorkshopsPage() {
     const [workshops, setWorkshops] = useState<Workshop[]>(initialWorkshops);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -61,9 +146,23 @@ export default function WorkshopsPage() {
         image: '',
         format: ''
     });
+    const [overlayState, setOverlayState] = useState<{
+        isOpen: boolean;
+        type: 'details' | 'edit' | 'create' | null;
+    }>({
+        isOpen: false,
+        type: null
+    });
+
+    const handleWorkshopClick = (type: 'details' | 'edit' | 'create') => {
+        setOverlayState({ isOpen: true, type });
+    };
+
 
     const handleAddWorkshop = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+
 
         const workshopModel = new WorkshopModel(currentWorkshop);
         const validationError = workshopModel.validate();
@@ -326,6 +425,14 @@ export default function WorkshopsPage() {
         <div className="min-h-screen bg-blue-100">
             <NavBar />
             <div className="container mx-auto my-4 w-full">
+
+                <Overlay
+                    isOpen={overlayState.isOpen}
+                    type={overlayState.type}
+                    setOverlayState={setOverlayState}
+                />
+
+
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-4xl font-bold text-gray-800">My Workshops</h1>
                     <button
@@ -354,6 +461,7 @@ export default function WorkshopsPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             className="bg-white rounded-lg shadow-lg overflow-hidden"
+                            onClick={() => handleWorkshopClick('details')}
                         >
                             <div className="relative h-48">
                                 <Image

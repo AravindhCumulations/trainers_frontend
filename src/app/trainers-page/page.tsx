@@ -1,7 +1,13 @@
-import React from 'react';
+"use client";
+
+import React, { useEffect, useState } from 'react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import TrainerGrid from '../../components/TrainerGrid';
+import { useSearchParams } from 'next/navigation';
+import { trainerApis } from '../../lib/apis/trainer.apis';
+import { categories } from '@/app/content/categories'
+import { getCurrentUserName } from '@/lib/utils/auth.utils'
 
 const dummyTrainers = [
     {
@@ -18,7 +24,7 @@ const dummyTrainers = [
         expertise_in: [{ expetrise: "Conflict Resolution" }, { expetrise: "Team Building" }],
     },
     {
-        name: "rahul_verma",
+        name: "rahul_vedfrma",
         full_name: "Rahul Verma",
         first_name: "Rahul",
         last_name: "Verma",
@@ -31,7 +37,7 @@ const dummyTrainers = [
         expertise_in: [{ expetrise: "Public Speaking" }, { expetrise: "Leadership" }],
     },
     {
-        name: "anjali_mehta",
+        name: "anjalisd_mehta",
         full_name: "Anjali Mehta",
         first_name: "Anjali",
         last_name: "Mehta",
@@ -44,8 +50,164 @@ const dummyTrainers = [
         expertise_in: [{ expetrise: "Emotional Intelligence" }, { expetrise: "Life Coaching" }],
     },
     {
-        name: "kiran_rao",
+        name: "sddfkiran_rao",
         full_name: "Kiran Rao",
+        first_name: "Kiran",
+        last_name: "Rao",
+        image: "/kiran.jpg", // Replace with actual image path or URL
+        avg_rating: 4.0,
+        location: "Bengaluru",
+        charge: 1800,
+        is_wishlisted: 1,
+        is_unlocked: 1,
+        expertise_in: [{ expetrise: "Time Management" }, { expetrise: "Career Growth" }],
+    },
+    {
+        name: "sanyfdsa_gupta",
+        full_name: "Sanya Gupta",
+        first_name: "Sanya",
+        last_name: "Gupta",
+        image: "/sanya.jpg", // Replace with actual image path or URL
+        avg_rating: 4.5,
+        location: "Pune",
+        charge: 1800,
+        is_wishlisted: 0,
+        is_unlocked: 1,
+        expertise_in: [{ expetrise: "Conflict Resolution" }, { expetrise: "Team Building" }],
+    },
+    {
+        name: "rasahul_verma",
+        full_name: "Rahul Verma",
+        first_name: "Rahul",
+        last_name: "Verma",
+        image: "/rahul.jpg", // Replace with actual image path or URL
+        avg_rating: 4.0,
+        location: "Delhi",
+        charge: 2500,
+        is_wishlisted: 1,
+        is_unlocked: 1,
+        expertise_in: [{ expetrise: "Public Speaking" }, { expetrise: "Leadership" }],
+    },
+    {
+        name: "agffnjali_mehta",
+        full_name: "Anjali Mehta",
+        first_name: "Anjali",
+        last_name: "Mehta",
+        image: "/anjali.jpg", // Replace with actual image path or URL
+        avg_rating: 5.0,
+        location: "Mumbai",
+        charge: 2200,
+        is_wishlisted: 0,
+        is_unlocked: 1,
+        expertise_in: [{ expetrise: "Emotional Intelligence" }, { expetrise: "Life Coaching" }],
+    },
+    {
+        name: "kiran_asdrao",
+        full_name: "Kiran Rao",
+        first_name: "Kiran",
+        last_name: "Rao",
+        image: "/kiran.jpg", // Replace with actual image path or URL
+        avg_rating: 4.0,
+        location: "Bengaluru",
+        charge: 1800,
+        is_wishlisted: 1,
+        is_unlocked: 1,
+        expertise_in: [{ expetrise: "Time Management" }, { expetrise: "Career Growth" }],
+    },
+    {
+        name: "sanya_sagupta 2",
+        full_name: "Sanya Gupta",
+        first_name: "Sanya",
+        last_name: "Gupta",
+        image: "/sanya.jpg", // Replace with actual image path or URL
+        avg_rating: 4.5,
+        location: "Pune",
+        charge: 1800,
+        is_wishlisted: 0,
+        is_unlocked: 1,
+        expertise_in: [{ expetrise: "Conflict Resolution" }, { expetrise: "Team Building" }],
+    },
+    {
+        name: "rahul_gfverma",
+        full_name: "Rahul Verma",
+        first_name: "Rahul",
+        last_name: "Verma",
+        image: "/rahul.jpg", // Replace with actual image path or URL
+        avg_rating: 4.0,
+        location: "Delhi",
+        charge: 2500,
+        is_wishlisted: 1,
+        is_unlocked: 1,
+        expertise_in: [{ expetrise: "Public Speaking" }, { expetrise: "Leadership" }],
+    },
+    {
+        name: "anjali_measahta",
+        full_name: "Anjali Mehta",
+        first_name: "Anjali",
+        last_name: "Mehta",
+        image: "/anjali.jpg", // Replace with actual image path or URL
+        avg_rating: 5.0,
+        location: "Mumbai",
+        charge: 2200,
+        is_wishlisted: 0,
+        is_unlocked: 1,
+        expertise_in: [{ expetrise: "Emotional Intelligence" }, { expetrise: "Life Coaching" }],
+    },
+    {
+        name: "kiran_rssao",
+        full_name: "Kiran Rao",
+        first_name: "Kiran",
+        last_name: "Rao",
+        image: "/kiran.jpg", // Replace with actual image path or URL
+        avg_rating: 4.0,
+        location: "Bengaluru",
+        charge: 1800,
+        is_wishlisted: 1,
+        is_unlocked: 1,
+        expertise_in: [{ expetrise: "Time Management" }, { expetrise: "Career Growth" }],
+    },
+    {
+        name: "sanya_gupffta",
+        full_name: "Sanya Gupta",
+        first_name: "Sanya",
+        last_name: "Gupta",
+        image: "/sanya.jpg", // Replace with actual image path or URL
+        avg_rating: 4.5,
+        location: "Pune",
+        charge: 1800,
+        is_wishlisted: 0,
+        is_unlocked: 1,
+        expertise_in: [{ expetrise: "Conflict Resolution" }, { expetrise: "Team Building" }],
+    },
+    {
+        name: "rahul_vasaerma",
+        full_name: "Rahul Verma",
+        first_name: "Rahul",
+        last_name: "Verma",
+        image: "/rahul.jpg", // Replace with actual image path or URL
+        avg_rating: 4.0,
+        location: "Delhi",
+        charge: 2500,
+        is_wishlisted: 1,
+        is_unlocked: 1,
+        expertise_in: [{ expetrise: "Public Speaking" }, { expetrise: "Leadership" }],
+    },
+    {
+        name: "anjafdfli_mehta",
+        full_name: "Anjali Mehta",
+        first_name: "Anjali",
+        last_name: "Mehta",
+        image: "/anjali.jpg", // Replace with actual image path or URL
+        avg_rating: 5.0,
+        location: "Mumbai",
+        charge: 2200,
+        is_wishlisted: 0,
+        is_unlocked: 1,
+        expertise_in: [{ expetrise: "Emotional Intelligence" }, { expetrise: "Life Coaching" }],
+    },
+    {
+        name: "kiran_aarao",
+        full_name: "Kiran Rao oho",
         first_name: "Kiran",
         last_name: "Rao",
         image: "/kiran.jpg", // Replace with actual image path or URL
@@ -58,14 +220,108 @@ const dummyTrainers = [
     },
 ];
 
-
 export default function TrainersPage() {
+
+    const searchParams = useSearchParams();
+    const [citySearch, setCitySearch] = useState('');
+    const [searchText, setSearchText] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [searchTitle, setSearchTitle] = useState('All Trainers');
     const allExpertise = dummyTrainers.flatMap(trainer => trainer.expertise_in.map(e => e.expetrise));
-    const uniqueExpertise = Array.from(new Set(allExpertise));
+
+    const handleSearch = (searchValue = searchText, cityValue = citySearch) => {
+        console.log('Search params:', { searchValue, cityValue });
+
+        trainerApis.searchTrainers(getCurrentUserName(), searchValue, cityValue)
+            .then(response => {
+                console.log('Full API response:', response);
+                console.log('Response data:', response.data);
+                console.log('Trainers array (attempting data.trainers):', response.data?.trainers);
+                console.log('Response message:', response.message);
+                console.log('Response message[0]:', response.message?.[0]);
+
+                // Assuming trainers are in response.message or response.message[0]
+                const trainers = Array.isArray(response.message) ? response.message : (Array.isArray(response.message?.[0]?.trainers) ? response.message[0].trainers : []);
+
+                console.log('Setting search results with:', trainers);
+                setSearchResults(trainers);
+
+                // Update search title after successful API call
+                if (searchValue || cityValue) {
+                    setSearchTitle(`Search Results for${searchValue ? ` "${searchValue}"` : ''}${cityValue ? ` in "${cityValue}"` : ''}`);
+                } else {
+                    setSearchTitle('All Trainers');
+                }
+            })
+            .catch(error => {
+                console.error('Error searching trainers:', error);
+                setSearchResults([]);
+                setSearchTitle('All Trainers');
+            });
+    };
+
+    const handleSearchClick = () => {
+        handleSearch();
+    };
+
+    const handleClearSearch = () => {
+        setSearchText('');
+        handleSearch('', citySearch);
+    };
+
+    const handleClearCity = () => {
+        setCitySearch('');
+        handleSearch(searchText, '');
+    };
+
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
+    useEffect(() => {
+        const city = searchParams.get('city') || undefined;
+        const searchText = searchParams.get('search_text') || undefined;
+
+        console.log('URL params:', { city, searchText });
+
+        if (city || searchText) {
+            if (city) setCitySearch(city);
+            if (searchText) setSearchText(searchText);
+            if (searchText || city) {
+                setSearchTitle(`Search Results for${searchText ? ` "${searchText}"` : ''}${city ? ` in "${city}"` : ''}`);
+            }
+        }
+        trainerApis.searchTrainers(getCurrentUserName(), searchText, city)
+            .then(response => {
+                console.log('Initial search - Full API response:', response);
+                console.log('Initial search - Response data:', response.data);
+                console.log('Initial search - Trainers array (attempting data.trainers):', response.data?.trainers);
+                console.log('Initial search - Response message:', response.message);
+                console.log('Initial search - Response message[0]:', response.message?.[0]);
+
+                // Assuming trainers are in response.message or response.message[0]
+                const trainers = Array.isArray(response.message) ? response.message : (Array.isArray(response.message?.[0]?.trainers) ? response.message[0].trainers : []);
+
+                console.log('Initial search - Setting search results with:', trainers);
+                setSearchResults(trainers);
+            })
+            .catch(error => {
+                console.error('Error in initial search:', error);
+                setSearchResults([]);
+            });
+
+    }, [searchParams]);
+
+    // Add a debug effect to monitor searchResults
+    useEffect(() => {
+        console.log('Current searchResults state:', searchResults);
+    }, [searchResults]);
 
     return (
-        <>
-            <section className="relative w-full mx-auto flex flex-col items-center header-hero-section">
+        <div className="bg-white min-h-screen flex flex-col">
+            <section className="relative w-full mx-auto flex flex-col items-center header-hero-section bg-white">
                 <div className="w-full bg-gradient-to-b  from-blue-400 to-blue-600 text-white pb-10 px-0 flex flex-col items-center rounded-b-[40px] relative z-10 header-hero-bg">
                     <Navbar bgColor='transparent' />
                     <div className="flex w-full items-center py-6 px-[80px]">
@@ -74,9 +330,19 @@ export default function TrainersPage() {
                                 <input
                                     type="text"
                                     placeholder="Motivational Speaker"
+                                    value={searchText}
+                                    onChange={(e) => setSearchText(e.target.value)}
+                                    onKeyPress={handleKeyPress}
                                     className="flex-1 px-5 py-2 rounded-full outline-none text-white bg-transparent placeholder-white/80 text-[16px] font-normal hero-search-input"
                                 />
-                                <div className="pr-2">
+                                {searchText && (
+                                    <div className="pr-2 cursor-pointer" onClick={handleClearSearch}>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="white" />
+                                        </svg>
+                                    </div>
+                                )}
+                                <div className="pr-2 cursor-pointer" onClick={handleSearchClick}>
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <mask id="mask0_201_1588" style={{ maskType: "alpha" }} maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
                                             <rect width="24" height="24" fill="#D9D9D9" />
@@ -86,16 +352,24 @@ export default function TrainersPage() {
                                         </g>
                                     </svg>
                                 </div>
-
                             </div>
-                            {/* Search and Filter Section */}
                             <div className=" w-[40%]   flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md mb-5 hero-search-city-bar">
                                 <input
                                     type="text"
-                                    placeholder="Choose city"
+                                    placeholder="Choose City"
+                                    value={citySearch}
+                                    onChange={(e) => setCitySearch(e.target.value)}
+                                    onKeyPress={handleKeyPress}
                                     className="flex-1 px-5 py-2 rounded-full outline-none text-white bg-transparent placeholder-white/80 text-[16px] font-normal hero-search-input"
                                 />
-                                <div className="pr-2">
+                                {citySearch && (
+                                    <div className="pr-2 cursor-pointer" onClick={handleClearCity}>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="white" />
+                                        </svg>
+                                    </div>
+                                )}
+                                <div className="pr-2 cursor-pointer" onClick={handleSearchClick}>
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <mask id="mask0_201_1588" style={{ maskType: "alpha" }} maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
                                             <rect width="24" height="24" fill="#D9D9D9" />
@@ -105,42 +379,48 @@ export default function TrainersPage() {
                                         </g>
                                     </svg>
                                 </div>
-
                             </div>
                         </div>
                     </div>
-
                 </div>
             </section>
 
+            <main className="flex-grow">
+                {/* Search Results Heading */}
+                <div className="w-full max-w-[1352px] mx-auto px-4 py-4">
+                    <h2 className="text-2xl font-bold text-gray-900">
+                        {searchTitle}
+                    </h2>
+                </div>
 
-
-            {/* Search Results Heading */}
-            <div className="w-full max-w-[1352px] mx-auto px-4 py-4">
-                <h2 className="text-2xl font-bold text-gray-900">Search Results for Motivational Speakers</h2>
-            </div>
-
-            <TrainerGrid trainers={dummyTrainers} />
-            <TrainerGrid trainers={dummyTrainers} />
-            <TrainerGrid trainers={dummyTrainers} />
-            <TrainerGrid trainers={dummyTrainers} />
-
-
+                <TrainerGrid
+                    trainers={searchResults}
+                    paginationMode="client"
+                    paginationConfig={{ page: 1, pageSize: 8 }}
+                />
+            </main>
 
             {/* Similar Categories */}
             <div className="w-full max-w-[1352px] mx-auto px-4 py-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Similar Categories</h2>
                 <div className="flex flex-wrap gap-3">
-                    <button className="py-1 px-3 bg-blue-100 text-blue-800 text-sm font-medium rounded-md items-center flex flex-col">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#3B82F6"><path d="M746.15-612.31q-50.47 0-87.65-32.46-37.19-32.46-44.27-81.38H344.77q-6.39 43.53-36.89 74.42-30.5 30.88-74.03 37.27v268.69q48.92 7.08 81.38 44.27 32.46 37.18 32.46 87.65 0 56-38.92 94.93Q269.85-80 213.85-80t-94.93-38.92Q80-157.85 80-213.85q0-50.47 32.46-87.65 32.46-37.19 81.39-44.27v-268.69q-48.93-7.08-81.39-44.08T80-746.15q0-56 39.09-94.93Q158.18-880 213.08-880q50.61 0 87.61 32.46t44.08 81.39h269.46q7.08-48.93 44.27-81.39Q695.68-880 746.15-880q55.22 0 94.53 39.32Q880-801.37 880-746.15q0 56-39.32 94.92-39.31 38.92-94.53 38.92ZM213.36-119.23q39.64 0 66.99-27.85 27.34-27.84 27.34-66.28 0-39.64-27.34-66.99-27.35-27.34-66.99-27.34-38.44 0-66.28 27.34-27.85 27.35-27.85 66.99 0 38.44 27.85 66.28 27.84 27.85 66.28 27.85Zm0-532.31q39.64 0 66.99-27.82 27.34-27.82 27.34-66.88 0-39.07-27.34-66.41Q253-840 213.36-840q-38.44 0-66.28 27.35-27.85 27.34-27.85 66.41 0 39.06 27.85 66.88 27.84 27.82 66.28 27.82ZM746.15-80q-56 0-94.92-38.92-38.92-38.93-38.92-94.37 0-55.44 38.92-94.92 38.92-39.48 94.92-39.48t94.93 39.48Q880-268.73 880-213.29q0 55.44-38.92 94.37Q802.15-80 746.15-80Zm.09-39.23q39.07 0 66.41-27.85Q840-174.92 840-213.36q0-39.64-27.35-66.99-27.34-27.34-66.41-27.34-39.06 0-66.88 27.34-27.82 27.35-27.82 66.99 0 38.44 27.82 66.28 27.82 27.85 66.88 27.85Zm0-532.31q39.07 0 66.41-27.82Q840-707.18 840-746.24q0-39.07-27.35-66.41Q785.31-840 746.24-840q-39.06 0-66.88 27.35-27.82 27.34-27.82 66.41 0 39.06 27.82 66.88 27.82 27.82 66.88 27.82ZM213.85-213.85Zm0-532.3Zm532.3 532.3Zm0-532.3Z" /></svg>
-                        marketing
-                    </button>
+                    {categories.map((category, index) => (
+                        <button
+                            onClick={() => {
+                                setSearchText(category.name);
+                                handleSearch(category.name, '');
+                            }}
+                            key={index}
+                            className="py-1.5 px-4 text-[#3B82F6] bg-blue-100 text-sm font-medium rounded-md items-center flex flex-col"
+                        >
+                            {category.icon}
+                            {category.name}
+                        </button>
+                    ))}
                 </div>
             </div>
 
-
-
             <Footer />
-        </>
+        </div>
     );
 } 

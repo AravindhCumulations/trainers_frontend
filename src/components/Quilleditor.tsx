@@ -20,9 +20,25 @@ export default function QuillEditor({ value, onChange }: { value: string, onChan
                 quillInstance.current = new Quill(quillRef.current, {
                     theme: 'snow',
                     modules: {
-                        toolbar: [[{ list: 'bullet' }]] // Only bullet list
+                        toolbar: [
+                            ['bold', 'italic', 'underline'],
+                            [{ 'list': 'bullet' }],
+                            ['clean']
+                        ]
                     }
                 });
+
+                // Set initial value
+                if (value) {
+                    // If the value is a string of bullet points, convert it to proper HTML
+                    if (value.includes('•')) {
+                        const bulletPoints = value.split(/[•]/).filter(point => point.trim());
+                        const htmlContent = `<ul>${bulletPoints.map(point => `<li>${point.trim()}</li>`).join('')}</ul>`;
+                        quillInstance.current.root.innerHTML = htmlContent;
+                    } else {
+                        quillInstance.current.root.innerHTML = value;
+                    }
+                }
 
                 // Listen for changes
                 quillInstance.current.on('text-change', () => {

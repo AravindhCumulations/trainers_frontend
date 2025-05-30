@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { useState, useEffect } from "react";
+import { log } from 'console';
 
 
 interface WorkshopDetailsProps {
@@ -25,6 +26,11 @@ interface WorkshopDetailsProps {
 const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose, onEdit }) => {
     const [userRole, setUserRole] = useState(null);
     const [isTrainer, setIsTrainer] = useState(false);
+
+    console.log("the data from details comp");
+    console.log(workshop);
+
+
 
     useEffect(() => {
         const role = localStorage.getItem("user_details");
@@ -98,28 +104,18 @@ const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose, on
             <div className="flex gap-6 justify-between mt-6 w-full ">
                 <div className='w-[50%]'>
                     <p className="font-semibold">🌟 Outcomes</p>
-                    <p className="text-gray-600 py-2">{workshop.outcomes || 'Participants will gain practical skills and knowledge in the subject matter.'}</p>
+                    <p className="text-gray-600 py-2">{workshop.outcomes || 'outcomes here'}</p>
                 </div>
                 <div className='w-[50%] '>
                     <p className="font-semibold">📄 Handouts</p>
-                    <p className="text-gray-600 py-2">{workshop.handouts || 'Participants receive comprehensive handouts with exercises, session notes, and reflection prompts.'}</p>
+                    <p className="text-gray-600 py-2">{workshop.handouts || 'handouts here'}</p>
                 </div>
             </div>
             <div className="flex gap-6 justify-between mt-6">
                 <div className='w-[50%]'>
                     <p className="font-semibold">🧠 Program Flow</p>
-                    <ul className="list-disc list-inside text-gray-600 py-2">
-                        {workshop.programFlow ? (
-                            <li>{workshop.programFlow}</li>
-                        ) : (
-                            <>
-                                <li>Welcome & Ice-breaker</li>
-                                <li>Interactive activities</li>
-                                <li>Scenario roleplays</li>
-                                <li>Group discussions</li>
-                            </>
-                        )}
-                    </ul>
+                    <p className="text-gray-600 py-2">{workshop.programFlow || 'programFlow here'}</p>
+
                 </div>
                 <div className="w-[50%]">
                     <p className="font-semibold">📊 Evaluation</p>

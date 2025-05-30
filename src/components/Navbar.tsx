@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from 'next/link';
+import { useLoading } from '@/context/LoadingContext';
+import { getUserDetails, getCurrentUserRole } from "@/lib/utils/auth.utils";
+import { useNavigation } from "@/lib/hooks/useNavigation";
 
 import { ChevronDownIcon, LogOutIcon, UserIcon, WalletIcon } from "lucide-react";
 
@@ -14,27 +17,35 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
     const [credit, setCredit] = useState(0);
     const [logged_in, setLogged_in] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
-    const [userRole, setUserRole] = useState(null);
     const [isTrainer, setIsTrainer] = useState(false);
+    const [isCompany, setIsCompany] = useState(false);
+    const { showLoader, hideLoader } = useLoading();
+    const { handleNavigation } = useNavigation();
 
     useEffect(() => {
-        const role = localStorage.getItem("user_details");
         try {
-            const userDetails = role ? JSON.parse(role) : null;
 
-            if (userDetails && userDetails.role_user) {
-                const Role = userDetails.role_user;
-                setUserRole(Role);
-                setIsTrainer(Role === "Trainer");
-            } else {
+            const role = getCurrentUserRole();
+
+            if (role) {
+                if (role === 'Trainer') {
+                    setIsTrainer(true);
+                } else {
+                    setIsCompany(true);
+                    credits();
+                }
+                setLogged_in(true);
+            }
+            else {
                 console.warn("No user role found.");
-                setUserRole(null);
                 setIsTrainer(false);
+                setIsCompany(false)
             }
         } catch (error) {
             console.error("Failed to parse user_details from localStorage", error);
-            setUserRole(null);
             setIsTrainer(false);
+            setIsCompany(false)
+
         }
     }, []);
 
@@ -45,46 +56,35 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
     const borderColor = bgColor === "bg-white" ? "border-blue-600" : "border-white";
     const hoverColor = bgColor === "bg-white" ? "bg-blue-100" : "bg-white/20";
 
-    useEffect(() => {
-        // Check if user is logged in on component mount
-        const userDetails = localStorage.getItem("user_details");
-        const isUserLoggedIn = !!userDetails;
-        setLogged_in(isUserLoggedIn);
-
-        // Only fetch credits if user is logged in
-        if (isUserLoggedIn) {
-            credits();
-        }
-    }, []);
-
-    const handleSubscription = () => {
-        window.location.href = "/subscription";
-    };
 
     const handleLogin = () => {
-        window.location.href = "/login";
+        handleNavigation("/login");
     };
 
     const handleSignup = () => {
-        window.location.href = "/signup";
+        handleNavigation("/signup");
     };
 
     const handleLogout = () => {
         localStorage.removeItem("user_details");
         localStorage.removeItem("auth");
         setLogged_in(false);
-        window.location.href = "/";
+        handleNavigation("/");
+
+
     };
 
     const handleCredits = () => {
-        window.location.href = "/manage-credits";
+        handleNavigation("/manage-credits");
     }
 
     const handleProfile = () => {
-        window.location.href = "/profile";
+        handleNavigation("/profile");
     };
 
     const credits = () => {
+        console.log("i dont know why am getting called");
+
         try {
             const user = JSON.parse(localStorage.getItem("user_details") || "{}");
             if (!user || !user.email) return;
@@ -115,7 +115,6 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
         }
     };
 
-
     return (
         <>
             {/* Navbar */}
@@ -128,9 +127,7 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                     </Link>
 
                     {logged_in ? (
-
                         <div className="relative flex justify-center items-center gap-[20px]">
-
                             {!isTrainer &&
                                 (
                                     <div onClick={handleCredits} className={` h-[44px] p-1 px-2 flex  justify-around items-center hover:cursor-pointer hover:${hoverColor} rounded-[36px]`}>
@@ -142,7 +139,6 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                                             xmlns="http://www.w3.org/2000/svg"
                                             className={`fill-current ${textColor} transition-transform ${showDropdown ? 'rotate-180' : ''}`}
                                         >
-
                                             <mask id="mask0_171_5475" style={{ maskType: 'alpha' }} maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
                                                 <rect width="24" height="24" fill="#D9D9D9" />
                                             </mask>
@@ -154,7 +150,6 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                                         <div className="font-bold text-base flex p-2">{credit} Credits</div>
                                     </div>
                                 )}
-
 
                             <div
                                 className={`w-[80px] h-[44px] rounded-[36px] border-2 ${borderColor} flex justify-center items-center gap-[4px] cursor-pointer`}
@@ -227,7 +222,7 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                                 className={`${bgColor === "bg-white"
                                     ? "bg-primary text-white"
                                     : "bg-white text-primary"
-                                    } px-5 py-1.5 rounded-full font-semibold text-base shadow-sm hover:bg-primary-light transition cursor-pointer`}
+                                    } px-5 py-1.5 rounded-full font-semibold text-base shadow-sm hover:bg-primary-light transition cursor-pointer hover:scale-105`}
                                 onClick={handleSignup}
                             >
                                 Sign Up

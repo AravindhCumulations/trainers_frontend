@@ -4,6 +4,7 @@ import Footer from '@/components/Footer';
 import NavBar from '@/components/Navbar';
 import React, { useState } from 'react';
 import { FaWallet, FaPlus, FaMinus } from 'react-icons/fa';
+import { useTheme } from '@/styles/ThemeProvider';
 
 interface Transaction {
     id: string;
@@ -14,6 +15,7 @@ interface Transaction {
 }
 
 const ManageCredits = () => {
+    const { theme } = useTheme();
     const [credits, setCredits] = useState(300);
     const [buyAmount, setBuyAmount] = useState(0);
     const [transactions] = useState<Transaction[]>([
@@ -48,12 +50,13 @@ const ManageCredits = () => {
             <div className="bg-blue-100 py-4">
                 <div className="w-[1024px] mx-auto bg-white my-4 rounded-2xl overflow-hidden " >
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-[#4F80FF] to-[#6F49EE] text-white py-4 px-6 text-center">
+                    <div className="bg-gradient-to-r text-white py-4 px-6 text-center"
+                        style={{ background: theme.gradients.header }}>
                         <h1 className="text-[32px] font-bold mb-2">Manage Your Credits</h1>
                         <p className="text-[16px] text-white/90">Purchase credits to book sessions with trainers and unlock premium features</p>
                     </div>
 
-                    <div className="max-w-[900px] mx-auto  relative px-4 sm:px-0">
+                    <div className="max-w-[900px] mx-auto  relative p-8">
                         {/* Current Balance Card */}
                         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                             <div className="flex justify-between items-center">
@@ -86,7 +89,7 @@ const ManageCredits = () => {
                                             <div className="h-1 bg-[#4F80FF] rounded-full w-1/3"></div> {/* Example fill */}
                                         </div>
                                         <span className="absolute -top-20 right-0 text-[12px] font-medium text-[#4F80FF] bg-[#E0E7FF] px-2 py-0.5 rounded-full">Best Value</span>
-                                        <span className="absolute -top-8 right-0 text-[14px] text-[#1F2937]">50 credits = $10</span>
+                                        <span className="absolute -top-8 right-0 text-[14px] text-[#1F2937]">50 credits = ₹10</span>
                                     </div>
                                 </div>
 
@@ -141,20 +144,20 @@ const ManageCredits = () => {
                                     <div className="w-[224px] border border-[#E5E7EB] rounded-lg p-6 text-center">
                                         <p className="text-[16px] font-medium text-[#1F2937] mb-2">Basic</p>
                                         <p className="text-[24px] font-semibold text-[#1F2937] mb-1">50 credits</p>
-                                        <p className="text-[14px] text-[#6B7280]">$10</p>
+                                        <p className="text-[14px] text-[#6B7280]">₹10</p>
                                     </div>
                                     {/* Popular */}
                                     <div className="w-[224px] border border-[#4F80FF] rounded-lg p-6 text-center relative bg-white shadow-md">
                                         <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-[#4F80FF] text-white text-[11px] font-medium px-2 py-1 rounded-full">Most Popular</span>
                                         <p className="text-[16px] font-medium text-[#1F2937] mb-2 mt-2">Popular</p>
                                         <p className="text-[24px] font-semibold text-[#4F80FF] mb-1">150 credits</p>
-                                        <p className="text-[14px] text-[#6B7280]">$30</p>
+                                        <p className="text-[14px] text-[#6B7280]">₹30</p>
                                     </div>
                                     {/* Power User */}
                                     <div className=" w-[224px] border border-[#E5E7EB] rounded-lg p-6 text-center">
                                         <p className="text-[16px] font-medium text-[#1F2937] mb-2">Power User</p>
                                         <p className="text-[24px] font-semibold text-[#1F2937] mb-1">500 credits</p>
-                                        <p className="text-[14px] text-[#6B7280]">$100</p>
+                                        <p className="text-[14px] text-[#6B7280]">₹100</p>
                                     </div>
                                 </div>
 

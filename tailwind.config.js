@@ -7,7 +7,12 @@ module.exports = {
     ],
     theme: {
         extend: {
+            colors: {
+                'primary': '#3B82F6',
+                'primary-hover': '#2563eb'
+            },
             fontFamily: {
+                sans: ['var(--font-inter)'],
                 arial: ['Arial', 'sans-serif'],
                 segoe: ['"Segoe UI"', 'sans-serif'],
             },

@@ -4,18 +4,24 @@ export interface LoginFormData {
 }
 
 export interface SignupFormData {
-    role: 'trainer' | 'company';
-    companyName: string;
+    name: string;
     email: string;
+    first_name: string;
+    last_name: string;
     password: string;
-    rePassword: string;
+    roles: string[];
 }
 
 export interface User {
-    role: 'trainer' | 'company';
-    companyName: string;
-    email: string;
-    isFirstLogin: boolean;
+    email: string,
+    first_name: string,
+    last_name: string,
+    password: string,
+    roles: string[];
+    // rePassword: string;
+    // name: string,
+
+
 }
 
 export class LoginModel {
@@ -49,22 +55,22 @@ export class LoginModel {
 }
 
 export class SignupModel {
-    private role: 'trainer' | 'company';
-    private companyName: string;
+    private roles: string[];
+    private first_name: string;
+    private last_name: string;
     private email: string;
     private password: string;
-    private rePassword: string;
 
-    constructor(data: SignupFormData) {
-        this.role = data.role;
-        this.companyName = data.companyName;
+    constructor(data: User) {
+        this.roles = data.roles;
+        this.first_name = data.first_name;
+        this.last_name = data.last_name;
         this.email = data.email;
         this.password = data.password;
-        this.rePassword = data.rePassword;
     }
 
     validate(): string | null {
-        if (!this.companyName) {
+        if (!this.first_name) {
             return 'Name is required';
         }
         if (!this.email) {
@@ -79,27 +85,27 @@ export class SignupModel {
         if (this.password.length < 6) {
             return 'Password must be at least 6 characters';
         }
-        if (this.password !== this.rePassword) {
-            return 'Passwords do not match';
-        }
+
         return null;
     }
 
-    toJSON(): Omit<SignupFormData, 'rePassword'> {
-        return {
-            role: this.role,
-            companyName: this.companyName,
-            email: this.email,
-            password: this.password
-        };
-    }
+    // toJSON(): Omit<SignupFormData,''> {
+    //     return {
+    //         roles: this.roles,
+    //         name: this.name,
+    //         email: this.email,
+    //         password: this.password
+    //     };
+    // }
 
-    static createUser(data: SignupFormData): User {
+    static createUser(data: User): User {
         return {
-            role: data.role,
-            companyName: data.companyName,
+            first_name: data.first_name,
             email: data.email,
-            isFirstLogin: true
+            last_name: data.last_name,
+            password: data.password,
+            roles: data.roles
+
         };
     }
 } 

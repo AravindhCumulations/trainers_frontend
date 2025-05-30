@@ -21,6 +21,11 @@ interface EditWorkshopProps {
 }
 
 const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData }) => {
+
+    console.log("here is the id data for population");
+    console.log(initialData);
+
+
     const [formData, setFormData] = useState({
         title: initialData?.title || '',
         objectives: initialData?.objectives || '',
@@ -40,8 +45,8 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData }) => 
     };
 
     return (
-        <div className="bg-white w-full h-full py-8 rounded-2xl overflow-hidden">
-            <div className="form max-w-7xl mx-auto">
+        <div className="bg-white max-w-full h-full py-8 rounded-2xl overflow-hidden">
+            <div className="form max-w-4xl mx-auto">
                 <div className="bg-white rounded-2xl p-12 flex flex-col gap-[24px] text-blue-700 font-semibold">
                     <div className="flex justify-between items-center">
                         <p className="text-3xl font-bold text-black">🎓 Create / Edit Workshop</p>

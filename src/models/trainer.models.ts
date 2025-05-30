@@ -13,9 +13,15 @@ export interface Certification {
 export interface PersonalInfo {
     bio: string;
     experience: number;
-    location: string;
-    charge: number;
+    city: string;
+    dob: string;
+}
+export interface ProfessionalInfo {
+    expertise: string[];
+    languages_known: string;
+    hourly_rate: string;
     phone: string;
+    email: string;
 }
 
 export interface SocialMedia {
@@ -26,11 +32,20 @@ export interface SocialMedia {
     website: string;
 }
 
+export interface Testimonial {
+    reviewer_name: string;
+    reviewer_org: string
+    content: string;
+}
+
 export interface TrainerFormData {
     personalInfo: PersonalInfo;
+    professionalInfo: ProfessionalInfo;
     education: Education[];
     certifications: Certification[];
     socialMedia: SocialMedia;
+    testimonials: Testimonial[]; // ← added
+
 }
 
 export class TrainerFormValidator {
@@ -45,18 +60,11 @@ export class TrainerFormValidator {
             errors.push('Experience must be greater than 0');
         }
 
-        if (!data.location.trim()) {
+        if (!data.city.trim()) {
             errors.push('Location is required');
         }
-
-        if (!data.charge || data.charge <= 0) {
-            errors.push('Hourly rate must be greater than 0');
-        }
-
-        if (!data.phone.trim()) {
-            errors.push('Phone number is required');
-        } else if (!/^\+?[\d\s-]{10,}$/.test(data.phone)) {
-            errors.push('Invalid phone number format');
+        if (!data.dob.trim()) {
+            errors.push('Date of birth is required');
         }
 
         return errors;
@@ -97,12 +105,12 @@ export class TrainerFormValidator {
             if (!cert.name.trim()) {
                 errors.push(`Certification name is required for entry ${index + 1}`);
             }
-            if (!cert.issuer.trim()) {
-                errors.push(`Issuing organization is required for certification ${index + 1}`);
-            }
-            if (!cert.year.trim()) {
-                errors.push(`Year is required for certification ${index + 1}`);
-            }
+            // if (!cert.issuer.trim()) {
+            //     errors.push(`Issuing organization is required for certification ${index + 1}`);
+            // }
+            // if (!cert.year.trim()) {
+            //     errors.push(`Year is required for certification ${index + 1}`);
+            // }
         });
 
         return errors;
@@ -137,50 +145,11 @@ export class TrainerFormValidator {
             ...this.validateEducation(data.education),
             ...this.validateCertifications(data.certifications),
             ...this.validateSocialMedia(data.socialMedia)
+
         ];
 
         return errors;
     }
 }
 
-export class TrainerModel {
-    private data: TrainerFormData;
 
-    constructor(data: TrainerFormData) {
-        this.data = data;
-    }
-
-    validate(): string | null {
-        if (!this.data.bio) {
-            return 'Bio is required';
-        }
-        if (!this.data.experience) {
-            return 'Experience is required';
-        }
-        if (!this.data.location) {
-            return 'Location is required';
-        }
-        if (!this.data.phone) {
-            return 'Phone number is required';
-        }
-        if (!this.data.charge) {
-            return 'Hourly rate is required';
-        }
-        if (this.data.education.length === 0) {
-            return 'At least one education entry is required';
-        }
-        if (this.data.certificates.length === 0) {
-            return 'At least one certificate is required';
-        }
-        return null;
-    }
-
-    toJSON(): TrainerFormData {
-        return {
-            ...this.data,
-            experience: Number(this.data.experience),
-            age: Number(this.data.age),
-            charge: Number(this.data.charge)
-        };
-    }
-} 
