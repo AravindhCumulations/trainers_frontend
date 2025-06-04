@@ -167,7 +167,7 @@ export class TrainerFormValidator {
         return errors;
     }
 
-    static validateSocialMedia(data: any): string[] {
+    static validateSocialMedia(data: SocialMedia): string[] {
         const errors: string[] = [];
         const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
 
@@ -195,7 +195,7 @@ export class TrainerFormValidator {
             ...this.validatePersonalInfo(data.personalInfo),
             ...this.validateEducation(data.education),
             ...this.validateCertifications(data.certifications),
-            ...this.validateSocialMedia(data)
+            ...this.validateSocialMedia(data.socialMedia)
 
         ];
 

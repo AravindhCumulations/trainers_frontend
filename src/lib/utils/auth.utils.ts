@@ -1,5 +1,3 @@
-import { details } from "framer-motion/client";
-
 // Auth Utilities
 
 export const getAuthHeaders = (contentType: string = 'application/json') => {
@@ -116,7 +114,20 @@ export const setCurrentUserName = (name: string): string => {
 
 // local storage utilities
 
-export const setUserDetailsToLocalStore = (data: any): boolean => {
+export const setUserDetailsToLocalStore = (data: {
+    user_details: {
+        name?: string;
+        first_name?: string;
+        last_name?: string;
+        email?: string;
+        role_user?: string;
+        last_login?: string | null;
+    };
+    key_details: {
+        api_key?: string;
+        api_secret?: string;
+    };
+}): boolean => {
     try {
         if (data.user_details && data.key_details) {
             const userDetails = data.user_details;
@@ -131,20 +142,10 @@ export const setUserDetailsToLocalStore = (data: any): boolean => {
                 last_login: userDetails.last_login ?? null,
             };
 
-
-
-
-
-
             const keys = {
-
                 api_key: keyDetails.api_key ?? "",
                 api_secret: keyDetails.api_secret ?? "",
-            }
-
-
-
-
+            };
 
             localStorage.setItem("user_details", JSON.stringify(details));
             localStorage.setItem("auth", JSON.stringify(keys));
@@ -157,11 +158,23 @@ export const setUserDetailsToLocalStore = (data: any): boolean => {
     return false;
 };
 
-export const setKeyDetailsToLocalStore = (data: any): boolean => {
+export const setKeyDetailsToLocalStore = (data: {
+    user_details: {
+        name?: string;
+        first_name?: string;
+        last_name?: string;
+        email?: string;
+        role_user?: string;
+        last_login?: string | null;
+    };
+    key_details: {
+        api_key?: string;
+        api_secret?: string;
+    };
+}): boolean => {
     try {
         if (data.user_details && data.key_details) {
             const userDetails = data.user_details;
-            const keyDetails = data.key_details;
 
             const details = {
                 name: userDetails.name ?? "",
@@ -171,7 +184,6 @@ export const setKeyDetailsToLocalStore = (data: any): boolean => {
                 role_user: userDetails.role_user ?? "",
                 last_login: userDetails.last_login ?? null,
             };
-
 
             localStorage.setItem("user_details", JSON.stringify(details));
             return true;

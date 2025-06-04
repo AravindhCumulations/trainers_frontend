@@ -45,7 +45,7 @@ export interface TrainerDetailsModel {
     name: string;
     owner: string;
     profile_views: number;
-    table_ftex: any[];
+    table_ftex: { [key: string]: string | number | boolean }[];
     trainer: string;
     total_reviews: number;
     reviews: string[];

@@ -8,7 +8,7 @@ export interface TrainerCardModel {
     language: String;
     charge: number;
     profile_views: number;
-    status: any;
+    status: 'active' | 'inactive' | 'pending';
     image: string;
     is_wishlisted: number;
 }
