@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { useState, useEffect } from "react";
 import { log } from 'console';
+import parse from 'html-react-parser';
 
 
 interface WorkshopDetailsProps {
@@ -20,15 +21,14 @@ interface WorkshopDetailsProps {
         evaluation?: string;
     };
     onClose: () => void;
-    onEdit: () => void;
 }
 
-const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose, onEdit }) => {
+const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose }) => {
     const [userRole, setUserRole] = useState(null);
     const [isTrainer, setIsTrainer] = useState(false);
 
-    console.log("the data from details comp");
-    console.log(workshop);
+
+
 
 
 
@@ -58,12 +58,6 @@ const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose, on
             <div className="flex justify-between items-center w-full">
                 <p className="text-[36px] font-bold">{workshop.title}</p>
                 <div className="flex items-center gap-4">
-                    {isTrainer && (<button
-                        onClick={onEdit}
-                        className="text-blue-600 hover:text-blue-800 font-semibold"
-                    >
-                        Edit
-                    </button>)}
                     <button
                         className="text-gray-500 hover:text-gray-800 text-xl font-bold"
                         onClick={onClose}
@@ -104,22 +98,39 @@ const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose, on
             <div className="flex gap-6 justify-between mt-6 w-full ">
                 <div className='w-[50%]'>
                     <p className="font-semibold">🌟 Outcomes</p>
-                    <p className="text-gray-600 py-2">{workshop.outcomes || 'outcomes here'}</p>
+                    <div
+                        className="text-gray-600 py-2 template-container"
+
+                    >
+                        {parse(workshop.outcomes || 'outcomes here')}
+                    </div>
                 </div>
                 <div className='w-[50%] '>
                     <p className="font-semibold">📄 Handouts</p>
-                    <p className="text-gray-600 py-2">{workshop.handouts || 'handouts here'}</p>
+                    <div
+                        className="text-gray-600 py-2 template-container"
+                    >
+                        {parse(workshop.handouts || 'handouts here')}
+                    </div>
                 </div>
             </div>
             <div className="flex gap-6 justify-between mt-6">
                 <div className='w-[50%]'>
                     <p className="font-semibold">🧠 Program Flow</p>
-                    <p className="text-gray-600 py-2">{workshop.programFlow || 'programFlow here'}</p>
+                    <div
+                        className="text-gray-600 py-2 template-container"
+                    >
+                        {parse(workshop.programFlow || 'programFlow here')}
+                    </div>
 
                 </div>
                 <div className="w-[50%]">
                     <p className="font-semibold">📊 Evaluation</p>
-                    <p className="text-gray-600 py-2">{workshop.evaluation || 'Workshop impact is assessed using post-session surveys, self-reflection, and peer feedback methods.'}</p>
+                    <div
+                        className="text-gray-600 py-2 template-container"
+                    >
+                        {parse(workshop.evaluation || 'eval here')}
+                    </div>
                 </div>
             </div>
         </div>

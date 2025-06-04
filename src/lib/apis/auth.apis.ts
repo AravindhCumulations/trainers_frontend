@@ -20,7 +20,7 @@ export const authApis = {
     // Logout
     logout: async () => {
         try {
-            const response = await axios.post('/api/method/trainer.api.signup_user', {}, {
+            const response = await axios.post('/api/method/logout', {}, {
                 headers: getAuthHeaders()
             });
             return response.data;

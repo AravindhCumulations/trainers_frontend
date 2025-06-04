@@ -1,6 +1,7 @@
 import { memo, useState } from 'react';
 import { TrainerCardProps } from '../models/trainerCard.model';
 import { trainerApis } from '../lib/apis/trainer.apis';
+import Image from 'next/image';
 
 const TrainerCard = memo(({ trainer, onClick, viewMode }: TrainerCardProps) => {
     const [isWishlisted, setIsWishlisted] = useState(trainer.is_wishlisted === 1 || viewMode === "wishlisted");
@@ -31,11 +32,15 @@ const TrainerCard = memo(({ trainer, onClick, viewMode }: TrainerCardProps) => {
         >
             {/* Trainer image */}
             <div className="rounded-2xl overflow-hidden mb-3 flex items-center justify-center bg-gray-100 relative h-[192px] w-[260px] trainer-card-avatar">
-                <div className="w-full h-full overflow-hidden">
-                    <img
+                <div className="w-full h-full overflow-hidden relative">
+                    <Image
                         src={trainer.image || '/default_trainer.png'}
                         alt={`${trainer.full_name}'s profile picture`}
-                        className="object-cover w-full h-full min-w-[230px] hover:scale-110 transition-all duration-300 ease-in-out"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover hover:scale-110 transition-all duration-300 ease-in-out"
+                        placeholder="blur"
+                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                     />
                 </div>
                 <button
@@ -90,7 +95,7 @@ const TrainerCard = memo(({ trainer, onClick, viewMode }: TrainerCardProps) => {
 
                     <span className="block text-xs mb-1 trainer-card-exp">
                         {/* {trainer.experience} */}
-                        12 years   • {trainer.location ? trainer.location : 'bengaluru'}
+                        12 years   • {trainer.city}
                     </span>
 
                     <span className="block text-xs mb-1 trainer-card-lang">

@@ -42,7 +42,7 @@ export default function TrainerDetails() {
   }, []);
 
   const handleSubmitReview = () => {
-    console.log("Review submitted:", { rating, review });
+
     // Implementation for submitting review
     // Reset the form
     setRating(0);
@@ -55,29 +55,29 @@ export default function TrainerDetails() {
   };
 
   const handleSaveEdit = (field) => {
-    console.log(`Saving ${field} with value:`, editValues[field]);
+
     // Implementation for saving edited field
     // For now, let's just update the local state
     if (field === 'bio') {
       setTrainer({ ...trainer, bio_line: editValues[field] });
     } else if (field === 'subjects') {
       // In a real implementation, you'd update the appropriate field
-      console.log("Updated subjects");
+
     } else if (field === 'achievements') {
       // In a real implementation, you'd update the appropriate field
-      console.log("Updated achievements");
+
     } else if (field === 'approach') {
       // In a real implementation, you'd update the appropriate field
-      console.log("Updated teaching approach");
+
     } else if (field === 'education') {
       // In a real implementation, you'd update the appropriate field
-      console.log("Updated education details");
+
     } else if (field === 'certificates') {
       // In a real implementation, you'd update the appropriate field
-      console.log("Updated certificates");
+
     } else if (field === 'clients') {
       // In a real implementation, you'd update the appropriate field
-      console.log("Updated clients");
+
     }
 
     setEditingField(null);

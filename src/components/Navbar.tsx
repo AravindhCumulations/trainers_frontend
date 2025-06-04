@@ -5,8 +5,13 @@ import Link from 'next/link';
 import { useLoading } from '@/context/LoadingContext';
 import { getUserDetails, getCurrentUserRole } from "@/lib/utils/auth.utils";
 import { useNavigation } from "@/lib/hooks/useNavigation";
+import Image from 'next/image';
+import { creditsApis } from "@/lib/apis/credits.apis";
 
 import { ChevronDownIcon, LogOutIcon, UserIcon, WalletIcon } from "lucide-react";
+import { authApis } from "@/lib/apis/auth.apis";
+import { useUser } from '@/context/UserContext';
+
 
 interface NavBarProps {
     bgColor?: string;
@@ -21,14 +26,20 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
     const [isCompany, setIsCompany] = useState(false);
     const { showLoader, hideLoader } = useLoading();
     const { handleNavigation } = useNavigation();
+    const { resetUser, user } = useUser();
+
 
     useEffect(() => {
         try {
 
             const role = getCurrentUserRole();
 
+
+
+
             if (role) {
                 if (role === 'Trainer') {
+
                     setIsTrainer(true);
                 } else {
                     setIsCompany(true);
@@ -47,7 +58,7 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
             setIsCompany(false)
 
         }
-    }, []);
+    }, [credit]);
 
     const url = "http://3.94.205.118:8000";
 
@@ -66,12 +77,12 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
     };
 
     const handleLogout = () => {
+        authApis.logout();
         localStorage.removeItem("user_details");
         localStorage.removeItem("auth");
         setLogged_in(false);
+        resetUser()
         handleNavigation("/");
-
-
     };
 
     const handleCredits = () => {
@@ -82,36 +93,15 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
         handleNavigation("/profile");
     };
 
-    const credits = () => {
-        console.log("i dont know why am getting called");
+    const credits = async () => {
 
         try {
-            const user = JSON.parse(localStorage.getItem("user_details") || "{}");
-            if (!user || !user.email) return;
-
-            fetch(
-                `/api/resource/Credits?fields=["credits"]&filters=${encodeURIComponent(
-                    JSON.stringify({ user: user.email })
-                )}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `token a6d10becfd9dfd8:e0881f66419822c`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            )
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data && data.data && data.data.length > 0) {
-                        setCredit(data.data[0].credits);
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error fetching credits:", error);
-                });
+            const response = await creditsApis.getUserCredits();
+            if (response && response.data && response.data.length > 0) {
+                setCredit(response.data[0].credits);
+            }
         } catch (error) {
-            console.error("Error parsing user details:", error);
+            console.error("Error fetching credits:", error);
         }
     };
 
@@ -155,11 +145,14 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                                 className={`w-[80px] h-[44px] rounded-[36px] border-2 ${borderColor} flex justify-center items-center gap-[4px] cursor-pointer`}
                                 onClick={() => setShowDropdown(!showDropdown)}
                             >
-                                <div className="trainer-profile w-[36px] h-[36px] rounded-full bg-gray-200 flex items-center justify-center">
-                                    <img
-                                        src="assets/prof-1.jpeg"
-                                        alt="img"
-                                        className="w-full h-full object-cover rounded-full"
+                                <div className="trainer-profile w-[36px] h-[36px] rounded-full bg-gray-200 flex items-center justify-center relative">
+                                    <Image
+                                        src={(user.profilePic ? user.profilePic : '/assets/prof-1.jpeg')}
+                                        alt="Profile"
+                                        fill
+                                        className="object-cover rounded-full"
+                                        placeholder="blur"
+                                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                                     />
                                 </div>
                                 <svg
@@ -192,7 +185,7 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
 
                             {/* Dropdown Menu */}
                             {showDropdown && (
-                                <div className="absolute top-15 right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                                <div className="absolute top-11 right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
                                     <button
                                         onClick={handleProfile}
                                         className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"

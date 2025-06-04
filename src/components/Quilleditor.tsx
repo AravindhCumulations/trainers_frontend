@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
-export default function QuillEditor({ value, onChange }: { value: string, onChange: (val: string) => void }) {
+export default function QuillEditor({
+    value,
+    onChange
+}: {
+    value: string;
+    onChange: (val: string) => void;
+}) {
     const quillRef = useRef<HTMLDivElement>(null);
     const quillInstance = useRef<any>(null);
     const [isMounted, setIsMounted] = useState(false);
@@ -22,25 +28,18 @@ export default function QuillEditor({ value, onChange }: { value: string, onChan
                     modules: {
                         toolbar: [
                             ['bold', 'italic', 'underline'],
-                            [{ 'list': 'bullet' }],
+                            [{ list: 'bullet' }],
                             ['clean']
                         ]
                     }
                 });
 
-                // Set initial value
+                // Set initial content safely
                 if (value) {
-                    // If the value is a string of bullet points, convert it to proper HTML
-                    if (value.includes('•')) {
-                        const bulletPoints = value.split(/[•]/).filter(point => point.trim());
-                        const htmlContent = `<ul>${bulletPoints.map(point => `<li>${point.trim()}</li>`).join('')}</ul>`;
-                        quillInstance.current.root.innerHTML = htmlContent;
-                    } else {
-                        quillInstance.current.root.innerHTML = value;
-                    }
+                    quillInstance.current.clipboard.dangerouslyPasteHTML(value);
                 }
 
-                // Listen for changes
+                // On content change, pass HTML to parent
                 quillInstance.current.on('text-change', () => {
                     const html = quillInstance.current.root.innerHTML;
                     if (html !== value) {
@@ -53,15 +52,23 @@ export default function QuillEditor({ value, onChange }: { value: string, onChan
         initQuill();
     }, [isMounted, onChange, value]);
 
-    // Update content when value prop changes
+    // Sync external value changes into editor
     useEffect(() => {
-        if (quillInstance.current && quillInstance.current.root.innerHTML !== value) {
-            quillInstance.current.root.innerHTML = value;
+        if (
+            quillInstance.current &&
+            quillInstance.current.root.innerHTML !== value
+        ) {
+            quillInstance.current.clipboard.dangerouslyPasteHTML(value);
         }
     }, [value]);
 
     if (!isMounted) {
-        return <div className="border border-blue-100 rounded-lg border-2xl overflow-hidden" style={{ minHeight: '120px' }} />;
+        return (
+            <div
+                className="border border-blue-100 rounded-lg border-2xl overflow-hidden"
+                style={{ minHeight: '120px' }}
+            />
+        );
     }
 
     return (

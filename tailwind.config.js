@@ -16,26 +16,36 @@ module.exports = {
                 arial: ['Arial', 'sans-serif'],
                 segoe: ['"Segoe UI"', 'sans-serif'],
             },
-            fontSize: {
-                '18': ['18px', { lineHeight: '28px' }],
-                '16': ['16px', { lineHeight: '24px' }],
-                '14': ['14px', { lineHeight: '20px' }],
-                '12': ['12px', { lineHeight: '18px' }],
-            },
             maxWidth: {
                 '8xl': '64rem', // 1408px
                 '9xl': '96rem', // 1536px
             },
             fontSize: {
                 'text-xxl': ['148px', { lineHeight: '56px', fontWeight: '700' }],
+
                 'text-xl': ['36px', { lineHeight: '44px', fontWeight: '700' }],
+
                 'text-lg': ['32px', { lineHeight: '40px', fontWeight: '400' }],
-                'text-md': ['30px', { lineHeight: '38px', fontWeight: '700' }],
+
+                'text-md': ['30px', { lineHeight: '36px', fontWeight: '700' }],
+
                 'text-sm': ['28px', { lineHeight: '36px', fontWeight: '700' }],
+
                 'text-xs': ['24px', { lineHeight: '32px', fontWeight: '400' }],
+                // Subheadings or strong labels (e.g., "Popular trainers")
+                'text-subheading-bold': ['18px', { lineHeight: '28px', fontWeight: '700' }],
+                'text-button': ['18px', { lineHeight: '28px', fontWeight: '600' }],
                 'text-body': ['18px', { lineHeight: '28px', fontWeight: '400' }],
+
+                'text-body-base-semibold': ['16px', { lineHeight: '24px', fontWeight: '600' }],
+                'text-body-base': ['16px', { lineHeight: '24px', fontWeight: '400' }],
+
                 'text-caption-semibold': ['14px', { lineHeight: '20px', fontWeight: '600' }],
                 'text-caption': ['14px', { lineHeight: '20px', fontWeight: '400' }],
+
+                // Small helper text or secondary links (e.g., "Back to Login")
+                'text-helper-sm': ['12px', { lineHeight: '18px', fontWeight: '400' }], // New for 12px regular
+
             }
         },
     },

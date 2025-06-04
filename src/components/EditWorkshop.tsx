@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import QuillEditor from '@/components/Quilleditor';
+import { isEqual } from 'lodash';
+import { useLoading } from '@/context/LoadingContext';
+import { useErrorPopup } from '@/lib/hooks/useErrorPopup';
 
 interface EditWorkshopProps {
     onClose: () => void;
@@ -18,15 +21,14 @@ interface EditWorkshopProps {
         evaluation?: string;
     };
     mode: 'create' | 'edit';
+    onUpdate?: (updatedWorkshop: any) => void;
 }
 
-const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData }) => {
+const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpdate }) => {
+    const { showLoader, hideLoader } = useLoading();
+    const { showError } = useErrorPopup();
 
-    console.log("here is the id data for population");
-    console.log(initialData);
-
-
-    const [formData, setFormData] = useState({
+    const initialFormData = {
         title: initialData?.title || '',
         objectives: initialData?.objectives || '',
         targetAudience: initialData?.targetAudience || '',
@@ -35,13 +37,100 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData }) => 
         handouts: initialData?.handouts || '',
         programFlow: initialData?.programFlow || '',
         evaluation: initialData?.evaluation || ''
-    });
+    };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const [formData, setFormData] = useState(initialFormData);
+    const [modifiedFields, setModifiedFields] = useState<Partial<typeof formData>>({});
+    const initialFormState = useRef(initialFormData);
+
+    // Function to handle changes with deep comparison
+    const handleChange = (field: keyof typeof formData, value: string) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+
+        // Only track modification if value is different from initial state using deep comparison
+        const initialValue = initialFormState.current[field];
+        if (!isEqual(value, initialValue)) {
+            setModifiedFields(prev => ({
+                ...prev,
+                [field]: value
+            }));
+        } else {
+            // If value is same as initial state, remove it from modifiedFields
+            setModifiedFields(prev => {
+                const newModifiedFields = { ...prev };
+                delete newModifiedFields[field];
+                return newModifiedFields;
+            });
+        }
+    };
+
+    // Check if form has changes using useMemo
+    const hasFormChanges = useMemo(() => {
+        return Object.keys(modifiedFields).length > 0;
+    }, [modifiedFields]);
+
+    // Update form data when initialData changes
+    useEffect(() => {
+        if (initialData) {
+            const newInitialData = {
+                title: initialData.title || '',
+                objectives: initialData.objectives || '',
+                targetAudience: initialData.targetAudience || '',
+                format: initialData.format || 'In Person',
+                outcomes: initialData.outcomes || '',
+                handouts: initialData.handouts || '',
+                programFlow: initialData.programFlow || '',
+                evaluation: initialData.evaluation || ''
+            };
+            setFormData(newInitialData);
+            initialFormState.current = newInitialData;
+            setModifiedFields({});
+        }
+    }, [initialData]);
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // Handle form submission
-        console.log(formData);
-        onClose();
+        if (!hasFormChanges || !initialData?.id) return;
+
+        try {
+            showLoader();
+
+            // Prepare the update data
+            const updateData = {
+                ...initialData,
+                ...modifiedFields
+            };
+
+            // Make API call to update workshop
+            const response = await fetch(`http://3.94.205.118:8000/api/resource/Workshop/${initialData.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token a6d10becfd9dfd8:e0881f66419822c`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            const data = await response.json();
+
+            if (data.data) {
+                // Call the onUpdate callback with the updated workshop data
+                if (onUpdate) {
+                    onUpdate(data.data);
+                }
+                onClose();
+            } else {
+                showError('Failed to update workshop');
+            }
+        } catch (error) {
+            console.error('Error updating workshop:', error);
+            showError('Failed to update workshop');
+        } finally {
+            hideLoader();
+        }
     };
 
     return (
@@ -69,7 +158,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData }) => 
                             <input
                                 type="text"
                                 value={formData.title}
-                                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                                onChange={(e) => handleChange('title', e.target.value)}
                                 className="h-[40px] rounded-lg w-full p-2 border border-blue-100 text-gray-700 font-normal placeholder:text-gray-400 placeholder:text-xs placeholder:font-thin"
                                 placeholder="Enter workshop title"
                             />
@@ -80,7 +169,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData }) => 
                             <p>Objectives</p>
                             <QuillEditor
                                 value={formData.objectives}
-                                onChange={(val) => setFormData(prev => ({ ...prev, objectives: val }))}
+                                onChange={(val) => handleChange('objectives', val)}
                             />
                         </div>
 
@@ -89,7 +178,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData }) => 
                             <p>Target Audience</p>
                             <textarea
                                 value={formData.targetAudience}
-                                onChange={(e) => setFormData(prev => ({ ...prev, targetAudience: e.target.value }))}
+                                onChange={(e) => handleChange('targetAudience', e.target.value)}
                                 className="h-[50px] rounded-lg w-full p-2 border border-blue-100 text-gray-700 font-normal placeholder:text-gray-400 placeholder:text-xs placeholder:font-thin resize-none"
                                 placeholder="Who is this for?"
                             ></textarea>
@@ -100,7 +189,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData }) => 
                             <p>Program Flow</p>
                             <QuillEditor
                                 value={formData.programFlow}
-                                onChange={(val) => setFormData(prev => ({ ...prev, programFlow: val }))}
+                                onChange={(val) => handleChange('programFlow', val)}
                             />
                         </div>
 
@@ -109,30 +198,26 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData }) => 
                             <p>Outcomes</p>
                             <QuillEditor
                                 value={formData.outcomes}
-                                onChange={(val) => setFormData(prev => ({ ...prev, outcomes: val }))}
+                                onChange={(val) => handleChange('outcomes', val)}
                             />
                         </div>
 
                         {/* Handouts */}
                         <div className="flex flex-col gap-2">
                             <p>Handouts</p>
-                            <textarea
+                            <QuillEditor
                                 value={formData.handouts}
-                                onChange={(e) => setFormData(prev => ({ ...prev, handouts: e.target.value }))}
-                                className="h-[50px] rounded-lg w-full p-2 border border-blue-100 text-gray-700 font-normal placeholder:text-gray-400 placeholder:text-xs placeholder:font-thin resize-none"
-                                placeholder="What materials are provided?"
-                            ></textarea>
+                                onChange={(val) => handleChange('handouts', val)}
+                            />
                         </div>
 
                         {/* Evaluations */}
                         <div className="flex flex-col gap-2">
                             <p>Evaluations</p>
-                            <textarea
+                            <QuillEditor
                                 value={formData.evaluation}
-                                onChange={(e) => setFormData(prev => ({ ...prev, evaluation: e.target.value }))}
-                                className="h-[50px] rounded-lg w-full p-2 border border-blue-100 text-gray-700 font-normal placeholder:text-gray-400 placeholder:text-xs placeholder:font-thin resize-none"
-                                placeholder="How is success measured?"
-                            ></textarea>
+                                onChange={(val) => handleChange('evaluation', val)}
+                            />
                         </div>
 
                         {/* Format Selection */}
@@ -145,7 +230,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData }) => 
                                         name="format"
                                         id="in-person"
                                         checked={formData.format === 'In Person'}
-                                        onChange={() => setFormData(prev => ({ ...prev, format: 'In Person' }))}
+                                        onChange={() => handleChange('format', 'In Person')}
                                     />
                                     <label htmlFor="in-person">In-person</label>
                                 </div>
@@ -155,7 +240,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData }) => 
                                         name="format"
                                         id="virtual"
                                         checked={formData.format === 'Virtual'}
-                                        onChange={() => setFormData(prev => ({ ...prev, format: 'Virtual' }))}
+                                        onChange={() => handleChange('format', 'Virtual')}
                                     />
                                     <label htmlFor="virtual">Virtual</label>
                                 </div>
@@ -190,9 +275,13 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData }) => 
                             </button>
                             <button
                                 type="submit"
-                                className="rounded-lg bg-blue-700 text-white font-normal px-6 py-2 hover:bg-blue-800"
+                                disabled={!hasFormChanges}
+                                className={`rounded-lg px-6 py-2 font-normal transition-colors duration-200 ${hasFormChanges
+                                    ? 'bg-blue-700 text-white hover:bg-blue-800'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
                             >
-                                Save Workshop
+                                {hasFormChanges ? 'Save Workshop' : 'No Changes'}
                             </button>
                         </div>
                     </form>

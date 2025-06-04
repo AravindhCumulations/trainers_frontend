@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, use } from 'react';
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { LoginModel, LoginFormData } from '@/models/auth.models';
@@ -11,22 +11,27 @@ import { trainerApis } from '@/lib/apis/trainer.apis';
 import { getCurrentUserRole, setUserDetailsToLocalStore } from '@/lib/utils/auth.utils';
 import Loader from '@/components/Loader';
 import { useLoading } from '@/context/LoadingContext';
+import { useNavigation } from "@/lib/hooks/useNavigation";
+import { useUser } from '@/context/UserContext';
 
 
 export default function LoginPage() {
+
+    const router = useRouter();
+    const { theme } = useTheme();
+    const { setUser, user, } = useUser();
+    // form
     const [formData, setFormData] = useState<LoginFormData>({
         email: '',
         password: ''
     });
+
     const [show, setShow] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isRouting, setIsRouting] = useState(false);
     const { showLoader, hideLoader } = useLoading();
+    const { handleNavigation } = useNavigation();
 
-    const router = useRouter();
-    const { theme } = useTheme();
-
+    // handles
     const handleLogin = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError(null);
@@ -46,24 +51,29 @@ export default function LoginPage() {
 
             if (data.user_details && data.key_details) {
                 const success: boolean = setUserDetailsToLocalStore(data);
-                console.log("data set to local store successfully");
 
-            }
+                // Set user context
+                setUser({
+                    name: data.user_details.name,
+                    email: data.user_details.email,
+                    role: data.user_details.role_user === "Trainer" ? "Trainer" : "user_role",
+                    profilePic: '',
+                    isLoggedIn: true
+                });
+                // console.log('User from context');
 
-            if (data.user_details.role_user === "Trainer") {
-                console.log("here is the current user", getCurrentUserRole());
+                // console.log(user);
 
-                setIsRouting(true);
 
-                if (data) {
-                    router.push(`/trainer-details?trainer=${data.user_details.name}`);
+                if (data.user_details.role_user === "Trainer") {
+                    if (data) {
+                        handleNavigation('/trainer-details', { 'trainer': data.user_details.name })
+                    } else {
+                        setError('Trainer profile not found');
+                    }
                 } else {
-                    setError('Trainer profile not found');
-                    setIsRouting(false);
+                    router.push("/");
                 }
-            } else {
-                setIsRouting(true);
-                router.push("/");
             }
         } catch (err) {
             setError('Login failed. Please try again.');
@@ -154,7 +164,9 @@ export default function LoginPage() {
 
                 <p className="text-center text-gray-600 dark:text-gray-400 mt-4 transition-colors duration-300">
                     Don't have an account?
-                    <a href="/signup" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline ml-1 transition-colors duration-300">Sign up</a>
+                    <a className="text-blue-600 dark:text-blue-400 font-semibold hover:underline ml-1 transition-colors duration-300 cursor-pointer"
+                        onClick={() => handleNavigation('/signup')}
+                    >Sign up</a>
                 </p>
             </motion.div>
         </div>

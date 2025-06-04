@@ -464,6 +464,12 @@ body {
   background: var(--color-accent-dark);
 }
 
+.template-container ul {
+  list-style-type: disc !important;
+  /* Use !important temporarily for testing */
+  margin-left: 1.5em !important;
+}
+
 .card {
   background: var(--color-card);
   border-radius: var(--radius-xl);

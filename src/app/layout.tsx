@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { UserProvider } from '@/context/UserContext';
 import { ThemeProvider } from "@/styles/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LoadingProvider } from '@/context/LoadingContext';
@@ -23,12 +24,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} antialiased`}>
-        <ThemeProvider>
-          <ThemeToggle />
-          <LoadingProvider>
-            {children}
-          </LoadingProvider>
-        </ThemeProvider>
+        <UserProvider>
+          <ThemeProvider>
+            <ThemeToggle />
+            <LoadingProvider>
+              {children}
+            </LoadingProvider>
+          </ThemeProvider>
+        </UserProvider>
+
       </body>
     </html>
   );

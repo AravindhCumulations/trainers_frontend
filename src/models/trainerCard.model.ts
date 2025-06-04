@@ -4,7 +4,7 @@ export interface TrainerCardModel {
     full_name: string;
     avg_rating: number;
     expertise_in: string;
-    location: string;
+    city: string;
     language: String;
     charge: number;
     profile_views: number;

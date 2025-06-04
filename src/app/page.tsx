@@ -8,127 +8,119 @@ import { useEffect, useState } from 'react';
 import Loader from '@/components/Loader';
 import SearchCategoriesRow from '@/components/SearchCategoriesRow';
 import { trainerApis } from '@/lib/apis/trainer.apis';
-import { getCurrentUserRole } from "@/lib/utils/auth.utils";
+import { getCurrentUserMail, getCurrentUserRole } from "@/lib/utils/auth.utils";
 import { useLoading } from '@/context/LoadingContext';
 import { getCurrentUserName } from "@/lib/utils//auth.utils";
 import { dummyTrainers } from "@/app/content/DummyTrainers";
 import { useNavigation } from "@/lib/hooks/useNavigation";
+import Image from 'next/image';
+import { useUser } from '@/context/UserContext';
+
 
 
 
 
 export default function Home() {
 
+  const { user } = useUser();
 
-  const router = useRouter();
+  // trainers list
   const [trainers, setTrainers] = useState([]);
+  const [totalTrainers, setTotalTrainers] = useState(0);
   const [unlockedTrainers, setUnlockedTrainers] = useState([]);
   const [wishlistedTrainers, setWishlistedTrainers] = useState([]);
+
+
+  // helper variables
+  const [isCompany, setIsCompany] = useState(user.role === 'user_role');
+  const [isLoggedIn, setIsLoggedIn] = useState(user.isLoggedIn);
+
+  const [searchText, setSearchText] = useState(''); // global search
+
+  // loaders and Navigations
   const { showLoader, hideLoader } = useLoading();
-  const [userRole, setUserRole] = useState(null);
-  const [isTrainer, setIsTrainer] = useState(false);
-  const [isCompany, setIsCompany] = useState(false);
-  const [isLoggedIn, setIsloggedIn] = useState(false);
-  const [isRouting, setIsRouting] = useState(false);
-  const [searchText, setSearchText] = useState('');
   const { handleNavigation } = useNavigation();
 
-
-  const locations = [
-    { name: 'Hyderabad', image: 'assets/hydrabad.jpg' },
-    { name: 'Bengaluru', image: 'assets/Bangalore.jpg' },
-    { name: 'Delhi', image: 'assets/delhi.jpg' },
-    { name: 'Chennai', image: 'assets/chennai.jpg' },
-    { name: 'Kochi', image: 'assets/kochi.jpg' },
-    { name: 'Mumbai', image: 'assets/mumbai.jpg' },
-  ];
-
-
-
-  useEffect(() => {
-    const role = localStorage.getItem("user_details");
-    try {
-      const userDetails = role ? JSON.parse(role) : null;
-
-      if (userDetails && userDetails.role_user) {
-        const Role = userDetails.role_user;
-        setUserRole(Role);
-        setIsTrainer(Role === "Trainer");
-        setIsCompany(Role === "user_role")
-        setIsloggedIn(true)
-        // setIsCompany(Role === "Company");
-      } else {
-        console.warn("No user role found.");
-        setUserRole(null);
-        setIsTrainer(false);
-      }
-      const userEmail = userDetails?.email;
-
-      if (!userEmail) {
-        console.warn("User email not found.");
-        hideLoader();
-        return;
-      }
-      showLoader();
-      fetch(`/api/method/trainer.api.get_all_trainers?user=${userEmail}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `token a6d10becfd9dfd8:e0881f66419822c`,
-          'Content-Type': 'application/json'
-        }
-      })
-        .then(response => response.json())
-        .then(data => {
-          setTrainers(data.message.All_trainers || []);
-          // setUnlockedTrainers(data.message.unlocked_trainers || []);
-          // setWishlistedTrainers(data.message.wishlist_trainers || []);
-        })
-        .catch(error => {
-          console.error('Error fetching trainers:', error);
-        })
-        .finally(() => {
-          hideLoader();
-        });
-
-      fetch(`/api/method/trainer.api.company_trainers?user=${userEmail}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `token a6d10becfd9dfd8:e0881f66419822c`,
-          'Content-Type': 'application/json'
-        }
-      })
-        .then(response => response.json())
-        .then(data => {
-          setUnlockedTrainers(data.message.unlocked_trainers || []);
-          setWishlistedTrainers(data.message.wishlist_trainers || []);
-        })
-        .catch(error => {
-          console.error('Error fetching trainers:', error);
-        })
-        .finally(() => {
-          hideLoader();
-        });
-
-
-
-    } catch (error) {
-      console.error("Failed to parse user_details from localStorage", error);
-      setUserRole(null);
-      setIsTrainer(false);
-      hideLoader();
-    }
-  }, []);
-
+  // tabs
   const [activeTab, setActiveTab] = useState('Featured');
   const tabs = ['Featured', 'Unlocked', 'Wish listed'];
 
 
+  const locations = [
+    { name: 'Hyderabad', image: '/assets/hydrabad.jpg' },
+    { name: 'Bengaluru', image: '/assets/Bangalore.jpg' },
+    { name: 'Delhi', image: '/assets/delhi.jpg' },
+    { name: 'Chennai', image: '/assets/chennai.jpg' },
+    { name: 'Kochi', image: '/assets/kochi.jpg' },
+    { name: 'Mumbai', image: '/assets/mumbai.jpg' },
+  ];
+
+  // custom methods 
+
+  const fetchAllTrainers = async (userName: string) => {
+
+    try {
+      const allTrainersData = await trainerApis.getAllTrainers(userName, 1, 8);
+      setTrainers(allTrainersData.All_trainers);
+      setTotalTrainers(allTrainersData.total);
+    }
+    catch (error) {
+      console.error('Error fetching trainers:', error);
+
+    }
+
+  };
+
+  const fetchCompanyTrainers = async (userName: string) => {
+    if (!userName) {
+      return;
+    }
+    showLoader();
+
+    try {
+      const companyTrainersData = await trainerApis.getComapanyTrainers(userName);
+
+      setUnlockedTrainers(companyTrainersData.unlocked_trainers || []);
+      setWishlistedTrainers(companyTrainersData.wishlist_trainers || []);
+
+    }
+    catch (error) {
+      console.error('Error fetching trainers:', error);
+    }
+  };
+
+
+  // effects
+  useEffect(() => {
+    console.log(" use effect triggered");
+
+    const initializeData = async () => {
+      try {
+        const userName = user.name;
+        showLoader();
+        await fetchAllTrainers(userName);
+        if (isCompany) {
+          await fetchCompanyTrainers(userName);
+        }
+      } catch (error) {
+        console.error("Failed to initialize data:", error);
+      } finally {
+        hideLoader();
+      }
+    };
+
+    initializeData();
+  }, [user.name]);
+
+
+
+  // handles
 
   const handleSearch = async () => {
     if (!searchText.trim()) return;
 
     showLoader();
-    console.log("trying to search");
+
 
     try {
       await handleNavigation('/trainers-page', { 'search_text': searchText });
@@ -225,10 +217,14 @@ export default function Home() {
           !isLoggedIn && (
             <section className="relative -top-[50px] w-[100%]  z-1 are-you-a-trainer-section">
               <div className="relative w-full h-[390px] flex items-center justify-start overflow-hidden are-you-a-trainer-bg shadow-lg">
-                <img
+                <Image
                   src="/assets/hero.jpg"
                   alt="Trainer background"
+                  fill
+                  priority
                   className="absolute inset-0 w-full h-full object-cover object-top z-0 are-you-a-trainer-img"
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                 />
 
                 <div className="absolute inset-0 bg-black/40 h-[220px] z-10 are-you-a-trainer-overlay flex flex-row justify-around px-[100px] items-center  self-end">
@@ -301,7 +297,7 @@ export default function Home() {
           <h2 className="text-[30px] font-bold mb-6 text-gray-800 trainer-list-title">Discover Our Popular Trainers</h2>
           {/* <TrainerGrid trainers={dummyTrainers} limit={8} /> */}
           <TrainerGrid
-            trainers={dummyTrainers}
+            trainers={trainers}
             paginationMode="client"
             paginationConfig={{ page: 1, pageSize: 12 }}
             pageLocked={true}
@@ -323,16 +319,43 @@ export default function Home() {
               </div>
               <div className="flex flex-col justify-center items-center bg-blue-50 rounded-2xl text-center gap-2 py-6">
 
-                <div className="w-[200px] h-[200px]"><img src="assets/Profiling-pana 1.png" alt="" /></div>
+                <div className="w-[200px] h-[200px] relative">
+                  <Image
+                    src="/assets/Profiling-pana 1.png"
+                    alt="Browse trainers"
+                    fill
+                    className="object-contain"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                  />
+                </div>
                 <p className="text-[24px] font-normal"><span className="font-semibold">Browse</span> trainers profiles from across India</p>
               </div>
               <div className="flex flex-col justify-center items-center  bg-blue-50 rounded-2xl text-center gap-2 py-6">
-                <div className="w-[200px] h-[200px]"><img src="assets/Key-pana 1.png" alt="" /></div>
+                <div className="w-[200px] h-[200px] relative">
+                  <Image
+                    src="/assets/Key-pana 1.png"
+                    alt="Unlock contact details"
+                    fill
+                    className="object-contain"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                  />
+                </div>
 
                 <p className="text-[24px] font-normal"><span className="font-semibold">Unlock</span> contact details using credits. </p>
               </div>
               <div className="flex flex-col justify-center items-center bg-blue-50 rounded-2xl text-center gap-2 py-6">
-                <div className="w-[200px] h-[200px]"><img src="assets/Calling-pana 1.png" alt="" /></div>
+                <div className="w-[200px] h-[200px] relative">
+                  <Image
+                    src="/assets/Calling-pana 1.png"
+                    alt="Connect directly"
+                    fill
+                    className="object-contain"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                  />
+                </div>
                 <p className="text-[24px] font-normal"><span className="font-semibold">Connect directly--</span>no commisions, no hassle!</p>
               </div>
 
@@ -349,14 +372,19 @@ export default function Home() {
           {locations.map((city, index) => (
             <div
               key={index}
-              className="flex flex-col relative max-w-[424px] h-[300px] px-1 hover:px-0 cursor-pointer"
+              className="flex flex-col justify-center items-center relative max-w-[424px] h-[300px]  hover:px-0 cursor-pointer"
               onClick={() => handleNavigation('/trainers-page', { 'city': city.name })}
             >
-              <img
-                src={city.image}
-                alt={city.name}
-                className="rounded-2xl w-full h-full object-cover object-top"
-              />
+              <div className="w-[calc(100%-10px)] hover:w-[100%] h-full relative">
+                <Image
+                  src={city.image}
+                  alt={city.name}
+                  fill
+                  className="rounded-2xl w-full h-full object-cover  "
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                />
+              </div>
               <div className="text-2xl font-light absolute bottom-0 left-0 text-white bg-black/50 px-6 py-4 w-full rounded-t-lg flex items-center justify-between">
                 <div className="flex flex-col">
                   <p className="text-[24px] font-semibold">{city.name}</p>
@@ -395,16 +423,43 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col justify-center items-center bg-blue-50 rounded-2xl text-center gap-2 py-6">
 
-                  <div className="w-[200px] h-[200px]"><img src="assets/Checklist-pana 1.png" alt="" /></div>
+                  <div className="w-[200px] h-[200px] relative">
+                    <Image
+                      src="/assets/Checklist-pana 1.png"
+                      alt="List your profile"
+                      fill
+                      className="object-contain"
+                      placeholder="blur"
+                      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                    />
+                  </div>
                   <p className="text-[24px] font-normal"><span className="font-semibold">List your profile</span> with expertise and experience</p>
                 </div>
                 <div className="flex flex-col justify-center items-center  bg-blue-50 rounded-2xl text-center gap-2 py-6">
-                  <div className="w-[200px] h-[200px]"><img src="assets/Calling-pana 1.png" alt="" /></div>
+                  <div className="w-[200px] h-[200px] relative">
+                    <Image
+                      src="/assets/Calling-pana 1.png"
+                      alt="Get contacted"
+                      fill
+                      className="object-contain"
+                      placeholder="blur"
+                      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                    />
+                  </div>
 
                   <p className="text-[24px] font-normal"><span className="font-semibold">Get contacted</span>directly by potential clients</p>
                 </div>
                 <div className="flex flex-col justify-center items-center bg-blue-50 rounded-2xl text-center gap-2 py-6">
-                  <div className="w-[200px] h-[200px]"><img src="assets/Mobile Marketing-pana 1.png" alt="" /></div>
+                  <div className="w-[200px] h-[200px] relative">
+                    <Image
+                      src="/assets/Mobile Marketing-pana 1.png"
+                      alt="Gain visibility"
+                      fill
+                      className="object-contain"
+                      placeholder="blur"
+                      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                    />
+                  </div>
                   <p className="text-[24px] font-normal"><span className="font-semibold">Gain visibility </span>among people looking for trainers.</p>
                 </div>
 
@@ -482,8 +537,15 @@ export default function Home() {
               </div>
               {/* Right Column: Placeholder Image */}
               <div className="flex-1 flex justify-center items-start w-[40%] image-container">
-                <div className="rounded-2xl overflow-hidden w-[80%] aspect-[4/3]">
-                  <img src="assets/howitwork.jpg" alt="" className="object-cover w-full h-full" />
+                <div className="rounded-2xl overflow-hidden w-[80%] aspect-[4/3] relative">
+                  <Image
+                    src="/assets/howitwork.jpg"
+                    alt="How it works"
+                    fill
+                    className="object-cover w-full h-full"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                  />
                 </div>
               </div>
 

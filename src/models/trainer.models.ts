@@ -5,13 +5,16 @@ export interface Education {
 }
 
 export interface Certification {
-    name: string;
-    issuer: string;
-    year: string;
+    certificate_name: string;
+    issued_by: string;
+    issued_date: string;
+    certificate_url: string;
+
 }
 
 export interface PersonalInfo {
     bio: string;
+    trainerApproch: string;
     experience: number;
     city: string;
     dob: string;
@@ -33,9 +36,47 @@ export interface SocialMedia {
 }
 
 export interface Testimonial {
-    reviewer_name: string;
-    reviewer_org: string
-    content: string;
+    client_name: string;
+    company: string;
+    testimonials: string;
+}
+
+export interface Workshop {
+
+    idx: number,
+    title: string,
+    description: string,
+    price: number,
+    target_audience: "marketing, sales",
+    format: string,
+    workshop_image: string,
+    outcomes: string;
+    handouts: string;
+    program_flow: string;
+    evaluation: string;
+
+}
+export interface CaseStudy {
+
+    idx: number,
+    title: string,
+    description: string,
+    price: number,
+    target_audience: "marketing, sales",
+    format: string,
+    workshop_image: string,
+    outcomes: string;
+    handouts: string;
+    program_flow: string;
+    evaluation: string;
+
+}
+
+
+export interface Client {
+    idx: number,
+    company: string,
+
 }
 
 export interface TrainerFormData {
@@ -46,6 +87,12 @@ export interface TrainerFormData {
     socialMedia: SocialMedia;
     testimonials: Testimonial[]; // ← added
 
+}
+
+export interface FileUploadResponse {
+    message: {
+        file_url: string;
+    }
 }
 
 export class TrainerFormValidator {
@@ -100,23 +147,27 @@ export class TrainerFormValidator {
             errors.push('At least one certification is required');
             return errors;
         }
+        if (!data || data.length > 2) {
+            errors.push('Only 3 certificates can be Added');
+            return errors;
+        }
 
         data.forEach((cert, index) => {
-            if (!cert.name.trim()) {
+            if (!cert.certificate_name.trim()) {
                 errors.push(`Certification name is required for entry ${index + 1}`);
             }
-            // if (!cert.issuer.trim()) {
-            //     errors.push(`Issuing organization is required for certification ${index + 1}`);
-            // }
-            // if (!cert.year.trim()) {
-            //     errors.push(`Year is required for certification ${index + 1}`);
-            // }
+            if (!cert.issued_by.trim()) {
+                errors.push(`Issuing organization is required for certification ${index + 1}`);
+            }
+            if (!cert.issued_date.trim()) {
+                errors.push(`Year is required for certification ${index + 1}`);
+            }
         });
 
         return errors;
     }
 
-    static validateSocialMedia(data: SocialMedia): string[] {
+    static validateSocialMedia(data: any): string[] {
         const errors: string[] = [];
         const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
 
@@ -144,7 +195,7 @@ export class TrainerFormValidator {
             ...this.validatePersonalInfo(data.personalInfo),
             ...this.validateEducation(data.education),
             ...this.validateCertifications(data.certifications),
-            ...this.validateSocialMedia(data.socialMedia)
+            ...this.validateSocialMedia(data)
 
         ];
 

@@ -9,127 +9,11 @@ import { Workshop, WorkshopFormData, WorkshopModel } from '@/models/workshop.mod
 import Footer from '@/components/Footer';
 import EditWorkshop from '@/components/EditWorkshop';
 import WorkshopDetails from '@/components/WorkshopDetails';
+import { initialWorkshops } from '../content/InitialWorkshops';
 
 // Dummy workshops data with images
-const initialWorkshops: Workshop[] = [
-    {
-        id: '1',
-        title: 'Fitness Fundamentals',
-        description: 'Learn the basics of physical fitness and create a strong foundation for your health journey.',
-        price: 99.99,
-        targetAudience: 'Beginners',
-        format: 'virtual',
-        image: '/assets/w1.jpg'
-    },
-    {
-        id: '2',
-        title: 'Advanced Nutrition Masterclass',
-        description: 'Deep dive into nutrition science, meal planning, and optimal dietary strategies.',
-        price: 149.99,
-        targetAudience: 'Intermediate',
-        format: 'In-Person',
-        image: '/assets/w2.jpg'
-    },
-    {
-        id: '3',
-        title: 'Mental Wellness Workshop',
-        description: 'Techniques for stress management, mindfulness, and improving mental health.',
-        price: 129.99,
-        targetAudience: 'All Levels',
-        format: 'virtual',
-        image: '/assets/w3.jpg'
-    },
-    {
-        id: '4',
-        title: 'High-Intensity Training Program',
-        description: 'Intensive workout strategies for maximum fitness results and performance.',
-        price: 199.99,
-        targetAudience: 'Advanced',
-        format: 'In-Person',
-        image: '/assets/w2.jpg'
-    }
-];
 
-interface OverlayProps {
-    isOpen: boolean;
-    type: 'details' | 'edit' | 'create' | null;
-    setOverlayState: (state: { isOpen: boolean; type: 'details' | 'edit' | 'create' | null }) => void;
-}
-// Workshop Details Component
-const WorkshopDetailsOverlay = ({ setOverlayState }: { setOverlayState: (state: { isOpen: boolean; type: 'details' | 'edit' | 'create' | null }) => void }) => {
-    const handleClose = () => {
-        setOverlayState({ isOpen: false, type: null });
-    };
 
-    const handleEdit = () => {
-        setOverlayState({ isOpen: true, type: 'edit' });
-    };
-
-    const workshopData = {
-        id: '1',
-        title: 'Soft Skills Enhancement Workshop',
-        description: 'Enhance communication, build team rapport, and develop key interpersonal skills via interactive sessions.',
-        price: 99.99,
-        targetAudience: 'Corporate teams, managers, team leaders, and HR professionals looking to enhance collaboration.',
-        format: 'In Person',
-        image: '/assets/edit_model.jpg',
-        objectives: 'Enhance communication, build team rapport, and develop key interpersonal skills via interactive sessions.',
-        outcomes: 'Stronger communication, better emotional intelligence, and practical tools for collaboration success.',
-        handouts: 'Participants receive handouts with exercises, session notes, and reflection prompts for continued learning.',
-        programFlow: 'Welcome & Icebreaker, Interactive activities, Scenario roleplays, Group discussions',
-        evaluation: 'Workshop impact is assessed using post-session surveys, self-reflection, and peer feedback methods.'
-    };
-
-    return <WorkshopDetails workshop={workshopData} onClose={handleClose} onEdit={handleEdit} />;
-};
-// Dynamic Overlay Component
-const Overlay = ({ isOpen, type, setOverlayState }: OverlayProps) => {
-    if (!isOpen) return null;
-
-    const handleClose = () => {
-        setOverlayState({ isOpen: false, type: null });
-    };
-    // Sample workshop data for editing
-    const sampleWorkshopData = {
-        id: '1',
-        title: 'Soft Skills Enhancement Workshop',
-        description: 'Enhance communication, build team rapport, and develop key interpersonal skills via interactive sessions.',
-        price: 99.99,
-        targetAudience: 'Corporate teams, managers, team leaders, and HR professionals looking to enhance collaboration.',
-        format: 'In Person',
-        image: '/assets/edit_model.jpg',
-        objectives: '<ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Enhance communication</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span> build team rapport</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>develop key interpersonal skills via interactive sessions.</li></ol>',
-        outcomes: '<ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Stronger communicatio</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>better emotional intelligence</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>practical tools for collaboration success.</li></ol>',
-        handouts: 'Participants receive handouts with exercises, session notes, and reflection prompts for continued learning.',
-        programFlow: '<ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Welcome &amp; Ice-breaker</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Interactive activities</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span> Scenario roleplays, Group discussions</li></ol>',
-        evaluation: 'Workshop impact is assessed using post-session surveys, self-reflection, and peer feedback methods.'
-    };
-
-    return (
-        <div className="absolute edit-overlay top-0 left-0 w-full h-full bg-black/40 z-30 flex justify-center items-start">
-            <div className="w-full max-w-5xl flex justify-around items-center">
-                {type === 'details' && <WorkshopDetailsOverlay setOverlayState={setOverlayState} />}
-                {type === 'edit' && (
-                    <div className="bg-white w-full rounded-2xl mt-4">
-                        <EditWorkshop
-                            onClose={handleClose}
-                            initialData={sampleWorkshopData}
-                            mode="edit"
-                        />
-                    </div>
-                )}
-                {type === 'create' && (
-                    <div className="bg-white w-full rounded-2xl mt-4">
-                        <EditWorkshop
-                            onClose={handleClose}
-                            mode="create"
-                        />
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-};
 
 
 
@@ -288,18 +172,18 @@ export default function WorkshopsPage() {
         //     });
     };
 
-    const openEditModal = (workshop: Workshop) => {
-        setCurrentWorkshop({
-            id: workshop.id,
-            title: workshop.title,
-            description: workshop.description,
-            price: workshop.price.toString(),
-            targetAudience: workshop.targetAudience,
-            image: workshop.image,
-            format: workshop.format
-        });
-        setIsEditModalOpen(true);
-    };
+    // const openEditModal = (workshop: Workshop) => {
+    //     setCurrentWorkshop({
+    //         id: workshop.id,
+    //         title: workshop.title,
+    //         description: workshop.description,
+    //         price: workshop.price.toString(),
+    //         targetAudience: workshop.targetAudience,
+    //         image: workshop.image,
+    //         format: workshop.format
+    //     });
+    //     setIsEditModalOpen(true);
+    // };
 
     const renderWorkshopModal = (isEdit: boolean) => (
         <AnimatePresence>
@@ -426,15 +310,15 @@ export default function WorkshopsPage() {
             <NavBar />
             <div className="container mx-auto my-4 w-full">
 
-                <Overlay
+                {/* <Overlay
                     isOpen={overlayState.isOpen}
                     type={overlayState.type}
                     setOverlayState={setOverlayState}
-                />
+                /> */}
 
 
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-4xl font-bold text-gray-800">My Workshops</h1>
+                    <h1 className="text-4xl font-bold text-gray-800">Workshops</h1>
                     <button
                         onClick={() => {
                             setCurrentWorkshop({

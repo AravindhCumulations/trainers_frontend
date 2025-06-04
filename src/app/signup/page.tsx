@@ -6,14 +6,18 @@ import { motion } from 'framer-motion';
 import { SignupModel, SignupFormData, User } from '@/models/auth.models';
 import { authApis } from "@/lib/apis/auth.apis"
 import { getCurrentUserRole, setUserDetailsToLocalStore } from '@/lib/utils/auth.utils';
+import { useNavigation } from "@/lib/hooks/useNavigation";
+
 
 export default function SignupPage() {
+
     const router = useRouter();
     const [formData, setFormData] = useState<User>();
     const [rePassword, setRePassword] = useState<string>('');
     const [fullName, setFullName] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
-    const [isRouting, setIsRouting] = useState(false);
+    const { handleNavigation } = useNavigation();
+
 
 
     const handleFullNameChange = (value: string) => {
@@ -35,12 +39,11 @@ export default function SignupPage() {
     const handleSignup = async () => {
         setError(null);
 
-        console.log("am clicked");
+
 
 
         try {
             if (formData) {
-                console.log("am in");
 
                 // Ensure the data is properly formatted
                 const signupData: User = {
@@ -52,15 +55,15 @@ export default function SignupPage() {
                     roles: formData.roles
                 };
 
-                console.log(signupData);
+
 
 
                 const signupModel = new SignupModel(signupData);
                 const validationError = signupModel.validate();
 
                 if (validationError) {
-                    console.log('error occured');
-                    console.log(error);
+
+
 
 
                     setError(validationError);
@@ -68,7 +71,7 @@ export default function SignupPage() {
                 }
 
                 const newUser = SignupModel.createUser(signupData);
-                console.log(newUser);
+
 
                 const data = await authApis.singUp(newUser);
 
@@ -77,19 +80,15 @@ export default function SignupPage() {
                         const success: boolean = setUserDetailsToLocalStore(data);
                         if (success) {
                             if (data.user_details.role_user === "Trainer") {
-                                console.log("here is the current user", getCurrentUserRole());
-
-                                setIsRouting(true);
 
                                 if (data) {
-                                    router.push(`/trainer-form`);
+                                    // router.push(`/trainer-form`);
+                                    await handleNavigation('/trainer-form')
                                 } else {
                                     setError('Trainer profile not found');
-                                    setIsRouting(false);
                                 }
                             } else {
-                                setIsRouting(true);
-                                router.push("/");
+                                await handleNavigation('/')
                             }
                         }
 
@@ -154,8 +153,8 @@ export default function SignupPage() {
                             <input
                                 type="radio"
                                 name="role"
-                                value="company"
-                                checked={formData?.roles[0] === "company"}
+                                value="user_role"
+                                checked={formData?.roles[0] === "user_role"}
                                 onChange={(e) => setFormData(prev => ({
                                     ...prev,
                                     roles: [e.target.value],
@@ -243,9 +242,11 @@ export default function SignupPage() {
                         />
                     </div>
 
-                    {
-                        formData?.password !== rePassword ? (<p className='text-red-600'>password doesnt match</p>) : (<p></p>)
-                    }
+                    {formData?.password && rePassword && formData.password !== rePassword ? (
+                        <p className="text-red-600">Password doesn't match</p>
+                    ) : (
+                        <p></p>
+                    )}
 
                     <button
                         type="button"
@@ -259,7 +260,11 @@ export default function SignupPage() {
                     </button>
                 </form>
 
-                <p className="text-center text-gray-600 mt-4">Already have an account? <a href="/login" className="text-blue-600 font-semibold">Login</a></p>
+                <p className="text-center text-gray-600 mt-4">Already have an account?
+                    <a className="text-blue-600 font-semibold cursor-pointer"
+                        onClick={() => handleNavigation('/login')}
+                    >Login</a>
+                </p>
             </motion.div>
         </div>
     );

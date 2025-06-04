@@ -15,6 +15,7 @@ interface Transaction {
 }
 
 const ManageCredits = () => {
+
     const { theme } = useTheme();
     const [credits, setCredits] = useState(300);
     const [buyAmount, setBuyAmount] = useState(0);

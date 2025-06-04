@@ -1,11 +1,10 @@
 'use client'
 
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import axios from 'axios';
+import isEqual from 'lodash/isEqual';
+
 import NavBar from '../../components/Navbar';
-import { TrainerFormData, TrainerFormValidator, PersonalInfo, SocialMedia, Education, Certification, ProfessionalInfo, Testimonial } from '@/models/trainer.models';
+import { Education, Certification, Testimonial } from '@/models/trainer.models';
 import { useTheme } from '@/styles/ThemeProvider';
 import Footer from '@/components/Footer';
 import FacebookIcon from '@mui/icons-material/Facebook';
@@ -15,189 +14,483 @@ import LanguageIcon from '@mui/icons-material/Language';
 import XIcon from '@mui/icons-material/X';
 import {
     TextField,
-    Grid,
-    Box,
-    Typography,
     InputAdornment,
-    MenuItem,
-    Select,
-    FormControl,
-    InputLabel,
     IconButton,
-    Button
 } from '@mui/material';
 import { Add, Delete, CalendarToday } from "@mui/icons-material";
 import { indianCities } from "@/app/content/IndianCities";
 import { languages } from "@/app/content/Languages";
+import { trainerApis } from "@/lib/apis/trainer.apis";
+import { useLoading } from '@/context/LoadingContext';
+import { useNavigation } from "@/lib/hooks/useNavigation";
+import { getCurrentUserFullName, getCurrentUserMail, getCurrentUserName, setCurrentUserName } from '@/lib/utils/auth.utils';
+import { TrainerFormDto } from '@/models/trainerDetails.model';
+import { image } from 'framer-motion/client';
+import { expertise_in } from '@/app/content/ExpertiseIN';
 
-
-
-
-
-
+// Add type for tracking modified fields
+type ModifiedTrainerFields = Partial<TrainerFormDto>;
 
 export default function TrainerDetailsPage() {
+
+
     const { theme } = useTheme();
-    const router = useRouter();
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    // edit mode
+    const [isEdit, setIsEdit] = useState(false);
+    const [modifiedFields, setModifiedFields] = useState<ModifiedTrainerFields>({});
+
+
+    // dropDowns
     const [searchTerm, setSearchTerm] = useState('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
+
+    // loaders and Navigations
+    const { showLoader, hideLoader } = useLoading();
+    const { handleNavigation } = useNavigation();
+
+    // content
     const [filteredLanguages, setFilteredLanguages] = useState(languages);
+    const [filteredCities, setFilteredCities] = useState(indianCities);
+
+    // elemRefs
+
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const cityDropdownRef = useRef<HTMLDivElement>(null);
 
-    const [form, setForm] = useState<TrainerFormData>({
-        personalInfo: {
-            bio: '',
-            experience: 1,
-            city: '',
-            dob: ''
-        },
-        professionalInfo: {
-            expertise: [],
-            languages_known: "",
-            hourly_rate: '',
-            phone: '',
-            email: ''
+    //form
+    const [form, setForm] = useState<TrainerFormDto>({
+        // personalInfo
+        bio_line: '',
+        trainers_approach: '',
+        experience: 1,
+        city: '',
+        dob: '',
 
-        },
+
+        // professionalInfo
+        expertise_in: '',
+        language: '',
+        charge: 0,
+        phone: '',
+        email: '',
+        trainer: '',
+        image: '',
+
+        // education
         education: [{ course: '', institution: '', year: '' }],
-        certifications: [{ name: '', issuer: '', year: '' }],
-        socialMedia: {
-            facebook: '',
-            instagram: '',
-            linkedin: '',
-            twitter: '',
-            website: ''
-        },
-        testimonials: [{ reviewer_name: '', reviewer_org: '', content: '' }]
+        // certifications
+        certificates: [{ certificate_name: '', issued_by: '', issued_date: '', certificate_url: '' }],
+
+        // social media links
+        facebook: '',
+        instagram: '',
+        linkedin: '',
+        twitter: '',
+        website: '',
+
+        // testimonials
+        testimonilas: [{ client_name: '', company: '', testimonials: '' }],
+
     });
 
+    // Add initial state reference
+    const initialFormState = useRef<TrainerFormDto>({ ...form });
+
+    // Add initializeFormData method
+    const initializeFormData = (trainerData: any) => {
+        const formData = {
+            bio_line: trainerData.bio_line || '',
+            trainers_approach: trainerData.trainers_approach || '',
+            experience: trainerData.experience || 1,
+            city: trainerData.city || '',
+            dob: trainerData.dob || '',
+            expertise_in: trainerData.expertise_in || '',
+            language: trainerData.language || '',
+            charge: trainerData.charge || 0,
+            phone: trainerData.phone?.trim() || '',
+            email: trainerData.email || '',
+            trainer: trainerData.email || '',
+            image: trainerData.image || '', // Keep the existing image URL
+            education: trainerData.education || [{ course: '', institution: '', year: '' }],
+            certificates: trainerData.certificates || [{ certificate_name: '', issued_by: '', issued_date: '', certificate_url: '' }],
+            testimonilas: trainerData.testimonilas || [{ client_name: '', company: '', testimonials: '' }],
+            facebook: trainerData.facebook || '',
+            instagram: trainerData.instagram || '',
+            linkedin: trainerData.linkedin || '',
+            twitter: trainerData.twitter || '',
+            website: trainerData.personal_website || '',
+        };
+
+        // Set both form and initial form state
+        setForm(formData);
+        initialFormState.current = { ...formData };
+    };
+
+    // console.log(initialFormState);
+
+
+
+
+    // Function to check if form has changes
+
+    // erros
     const [errors, setErrors] = useState<string[]>([]);
 
-    const handlePersonalInfoChange = (field: keyof PersonalInfo, value: string | number) => {
-        setForm({
-            ...form,
-            personalInfo: {
-                ...form.personalInfo,
-                [field]: value
-            }
+    const [profileImage, setProfileImage] = useState<File | null>(null);
+    const [profileImagePreview, setProfileImagePreview] = useState<string>('');
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [hasImageChanged, setHasImageChanged] = useState(false);
+
+    // Function to check if form has changes
+    const hasFormChanges = useMemo(() => {
+        if (!isEdit) return true; // Always enable submit for new forms
+
+        // For edit mode, check if any field is different from initial state using deep comparison
+        const hasFormDataChanges = Object.keys(modifiedFields).some(key => {
+            const currentValue = form[key as keyof TrainerFormDto];
+            const initialValue = initialFormState.current[key as keyof TrainerFormDto];
+            return !isEqual(currentValue, initialValue);
         });
+
+        // In edit mode, we need either form changes OR image changes
+        return hasFormDataChanges || hasImageChanged;
+    }, [modifiedFields, isEdit, form, hasImageChanged]);
+
+
+
+    // Add new state for expertise dropdown
+    const [isExpertiseDropdownOpen, setIsExpertiseDropdownOpen] = useState(false);
+    const expertiseDropdownRef = useRef<HTMLDivElement>(null);
+
+    // Add expertise search handler
+    const handleExpertiseSearch = (searchValue: string) => {
+        setSearchTerm(searchValue);
+        const filtered = expertise_in.filter(exp =>
+            exp.toLowerCase().includes(searchValue.toLowerCase())
+        );
+        setFilteredExpertise(filtered);
     };
 
-    const handleProfessionalInfoChange = (
-        field: keyof ProfessionalInfo,
-        value: string | number | string[] | number[]
-    ) => {
-        setForm((prevForm) => ({
-            ...prevForm,
-            professionalInfo: {
-                ...prevForm.professionalInfo,
-                [field]: value,
-            },
+    // Add expertise selection handler
+    const isExpertiseSelected = (exp: string) => {
+        const selectedExpertise = form.expertise_in.split(',').map(e => e.trim());
+        return selectedExpertise.includes(exp);
+    };
+
+    const handleExpertiseClick = (exp: string) => {
+        const selectedExpertise = form.expertise_in.split(',').map(e => e.trim()).filter(e => e !== '');
+
+        if (isExpertiseSelected(exp)) {
+            // Remove expertise if already selected
+            const newExpertise = selectedExpertise.filter(e => e !== exp);
+            handleChanges('expertise_in', newExpertise.join(', '));
+        } else {
+            // Check if we've reached the limit of 3
+            if (selectedExpertise.length >= 3) {
+                return; // Don't add more if we've reached the limit
+            }
+            // Add new expertise
+            const newValue = form.expertise_in
+                ? `${form.expertise_in}, ${exp}`
+                : exp;
+            handleChanges('expertise_in', newValue);
+        }
+    };
+
+    // Add filtered expertise state
+    const [filteredExpertise, setFilteredExpertise] = useState(expertise_in);
+
+    // Add useEffect to fetch trainer data
+    useEffect(() => {
+        const fetchTrainerData = async () => {
+            try {
+                showLoader();
+                const searchParams = new URLSearchParams(window.location.search);
+                const trainerParam = searchParams.get('trainer');
+
+                if (trainerParam) {
+                    setIsEdit(true);
+                    const trainerData = JSON.parse(decodeURIComponent(trainerParam));
+
+                    // Set the existing image URL as preview if available
+                    if (trainerData.image) {
+                        setProfileImagePreview(trainerData.image);
+                    }
+
+                    // Initialize form data using the new method
+                    initializeFormData(trainerData);
+                }
+
+            } catch (error) {
+                console.error('Error fetching trainer data:', error);
+            } finally {
+                hideLoader();
+            }
+        };
+
+        fetchTrainerData();
+    }, []);
+
+
+
+    // Function to handle changes with deep comparison
+    const handleChanges = (field: keyof TrainerFormDto, value: string | number) => {
+        setForm(prev => ({
+            ...prev,
+            [field]: value
         }));
-    };
 
+        // Only track modification if value is different from initial state using deep comparison
+        const initialValue = initialFormState.current[field];
+        if (!isEqual(value, initialValue)) {
+            setModifiedFields(prev => ({
+                ...prev,
+                [field]: value
+            }));
+        } else {
+            // If value is same as initial state, remove it from modifiedFields
+            setModifiedFields(prev => {
+                const newModifiedFields = { ...prev };
+                delete newModifiedFields[field];
+                return newModifiedFields;
+            });
+        }
+    };
 
     const handleEducationChange = (index: number, field: keyof Education, value: string) => {
-        const newEducation = [...form.education];
-        newEducation[index] = {
-            ...newEducation[index],
+        const updatedEducation = [...form.education];
+        updatedEducation[index] = {
+            ...updatedEducation[index],
             [field]: value
         };
-        setForm({
-            ...form,
-            education: newEducation
-        });
+        setForm(prev => ({
+            ...prev,
+            education: updatedEducation
+        }));
+
+        // Track modified education using deep comparison
+        if (!isEqual(updatedEducation, initialFormState.current.education)) {
+            setModifiedFields(prev => ({
+                ...prev,
+                education: updatedEducation
+            }));
+        } else {
+            setModifiedFields(prev => {
+                const newModifiedFields = { ...prev };
+                delete newModifiedFields.education;
+                return newModifiedFields;
+            });
+        }
     };
 
     const handleCertificationChange = (index: number, field: keyof Certification, value: string) => {
-        const newCertifications = [...form.certifications];
-        newCertifications[index] = {
-            ...newCertifications[index],
+        const updatedCertificates = [...form.certificates];
+        updatedCertificates[index] = {
+            ...updatedCertificates[index],
             [field]: value
         };
-        setForm({
-            ...form,
-            certifications: newCertifications
-        });
+        setForm(prev => ({
+            ...prev,
+            certificates: updatedCertificates
+        }));
+
+        // Track modified certificates using deep comparison
+        if (!isEqual(updatedCertificates, initialFormState.current.certificates)) {
+            setModifiedFields(prev => ({
+                ...prev,
+                certificates: updatedCertificates
+            }));
+        } else {
+            setModifiedFields(prev => {
+                const newModifiedFields = { ...prev };
+                delete newModifiedFields.certificates;
+                return newModifiedFields;
+            });
+        }
     };
 
-    const handleSocialMediaChange = (field: keyof SocialMedia, value: string) => {
-        setForm({
-            ...form,
-            socialMedia: {
-                ...form.socialMedia,
-                [field]: value
-            }
-        });
-    };
-    // Testimonial handlers
     const handleTestimonialChange = (index: number, field: keyof Testimonial, value: string) => {
-        const updated = [...form.testimonials];
-        updated[index] = {
-            ...updated[index],
+        const updatedTestimonials = [...form.testimonilas];
+        updatedTestimonials[index] = {
+            ...updatedTestimonials[index],
             [field]: value
         };
-        setForm({ ...form, testimonials: updated });
+        setForm(prev => ({
+            ...prev,
+            testimonilas: updatedTestimonials
+        }));
+
+        // Track modified testimonials using deep comparison
+        if (!isEqual(updatedTestimonials, initialFormState.current.testimonilas)) {
+            setModifiedFields(prev => ({
+                ...prev,
+                testimonilas: updatedTestimonials
+            }));
+        } else {
+            setModifiedFields(prev => {
+                const newModifiedFields = { ...prev };
+                delete newModifiedFields.testimonilas;
+                return newModifiedFields;
+            });
+        }
     };
 
-    const addTestimonial = () => {
-        setForm({
-            ...form,
-            testimonials: [...form.testimonials, { reviewer_name: '', reviewer_org: '', content: '' }]
-        });
-    };
-
-    const removeTestimonial = (index: number) => {
-        const updated = [...form.testimonials];
-        updated.splice(index, 1);
-        setForm({ ...form, testimonials: updated });
-    };
     const addEducation = () => {
-        setForm({
-            ...form,
-            education: [...form.education, { course: '', institution: '', year: '' }]
-        });
+        const newEducation = [...form.education, { course: '', institution: '', year: '' }];
+        setForm(prev => ({
+            ...prev,
+            education: newEducation
+        }));
+        // Track modified education using deep comparison
+        if (!isEqual(newEducation, initialFormState.current.education)) {
+            setModifiedFields(prev => ({
+                ...prev,
+                education: newEducation
+            }));
+        }
     };
 
     const removeEducation = (index: number) => {
         const newEducation = form.education.filter((_, i) => i !== index);
-        setForm({
-            ...form,
+        setForm(prev => ({
+            ...prev,
             education: newEducation
-        });
+        }));
+        // Track modified education using deep comparison
+        if (!isEqual(newEducation, initialFormState.current.education)) {
+            setModifiedFields(prev => ({
+                ...prev,
+                education: newEducation
+            }));
+        }
     };
 
     const addCertification = () => {
-        setForm({
-            ...form,
-            certifications: [...form.certifications, { name: '', issuer: '', year: '' }]
-        });
+        const newCertificates = [...form.certificates, { certificate_name: '', issued_by: '', issued_date: '', certificate_url: '' }];
+        setForm(prev => ({
+            ...prev,
+            certificates: newCertificates
+        }));
+        // Track modified certificates using deep comparison
+        if (!isEqual(newCertificates, initialFormState.current.certificates)) {
+            setModifiedFields(prev => ({
+                ...prev,
+                certificates: newCertificates
+            }));
+        }
     };
 
     const removeCertification = (index: number) => {
-        const newCertifications = form.certifications.filter((_, i) => i !== index);
-        setForm({
-            ...form,
-            certifications: newCertifications
-        });
+        const newCertifications = form.certificates.filter((_, i) => i !== index);
+        setForm(prev => ({
+            ...prev,
+            certificates: newCertifications
+        }));
+        // Track modified certificates using deep comparison
+        if (!isEqual(newCertifications, initialFormState.current.certificates)) {
+            setModifiedFields(prev => ({
+                ...prev,
+                certificates: newCertifications
+            }));
+        }
+    };
+
+    const addTestimonial = () => {
+        const newTestimonials = [...form.testimonilas, { client_name: '', company: '', testimonials: '' }];
+        setForm(prev => ({
+            ...prev,
+            testimonilas: newTestimonials
+        }));
+        // Track modified testimonials using deep comparison
+        if (!isEqual(newTestimonials, initialFormState.current.testimonilas)) {
+            setModifiedFields(prev => ({
+                ...prev,
+                testimonilas: newTestimonials
+            }));
+        }
+    };
+
+    const removeTestimonial = (index: number) => {
+        const updated = form.testimonilas.filter((_, i) => i !== index);
+        setForm(prev => ({
+            ...prev,
+            testimonilas: updated
+        }));
+        // Track modified testimonials using deep comparison
+        if (!isEqual(updated, initialFormState.current.testimonilas)) {
+            setModifiedFields(prev => ({
+                ...prev,
+                testimonilas: updated
+            }));
+        }
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setHasImageChanged(true);
+            setProfileImage(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProfileImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        setErrors([])
-        // Validate form
-        const validationErrors = TrainerFormValidator.validateForm(form);
+        setErrors([]);
+
+        try {
+            showLoader();
+
+            // if (validationErrors.length > 0) {
+            //     setErrors(validationErrors);
+            //     hideLoader()
+            //     return;
+            // }
 
 
-        if (validationErrors.length > 0) {
-            setErrors(validationErrors);
-            return;
+            console.log(modifiedFields);
+            console.log(form);
+
+            let imageUrl = form.image; // Keep existing image URL by default
+
+            // Only upload new image if a new file was selected
+            if (profileImage) {
+                const uploadResponse = await trainerApis.fileUpload.uploadProfilePicture(profileImage);
+                imageUrl = uploadResponse.message.file_url;
+            }
+
+            if (isEdit) {
+                const submitData = {
+                    ...modifiedFields,
+                    ...(hasImageChanged && { image: imageUrl }) // Only include image if it was changed
+                };
+
+                const data = await trainerApis.trainerForm.editFormData(submitData);
+            } else {
+                const submitData = {
+                    ...form,
+                    ...(hasImageChanged && { image: imageUrl }) // Only include image if it was changed
+                };
+
+                const data = await trainerApis.trainerForm.createFormData(submitData);
+                setCurrentUserName(data.data.name);
+            }
+
+            // Reset image change state after successful submission
+            setHasImageChanged(false);
+            await handleNavigation('/trainer-details', { 'trainer': getCurrentUserName() });
+        } catch (error) {
+            setErrors(["submission failed check errors"]);
+        } finally {
+            hideLoader();
         }
-
-        console.log(form);
-
-        // window.location.href = "/trainer-details";
     };
 
     const handleLanguageSearch = (searchValue: string) => {
@@ -208,11 +501,30 @@ export default function TrainerDetailsPage() {
         setFilteredLanguages(filtered);
     };
 
+    const handleCitySearch = (searchValue: string) => {
+        setSearchTerm(searchValue);
+        const filtered = indianCities.filter(city =>
+            city.toLowerCase().includes(searchValue.toLowerCase())
+        );
+        setFilteredCities(filtered);
+    };
+
+    // Update handleClickOutside to include expertise dropdown
     const handleClickOutside = (event: MouseEvent) => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
             setIsDropdownOpen(false);
             setSearchTerm('');
             setFilteredLanguages(languages);
+        }
+        if (cityDropdownRef.current && !cityDropdownRef.current.contains(event.target as Node)) {
+            setIsCityDropdownOpen(false);
+            setSearchTerm('');
+            setFilteredCities(indianCities);
+        }
+        if (expertiseDropdownRef.current && !expertiseDropdownRef.current.contains(event.target as Node)) {
+            setIsExpertiseDropdownOpen(false);
+            setSearchTerm('');
+            setFilteredExpertise(expertise_in);
         }
     };
 
@@ -224,23 +536,23 @@ export default function TrainerDetailsPage() {
     }, []);
 
     const isLanguageSelected = (lang: string) => {
-        const selectedLanguages = form.professionalInfo.languages_known.split(',').map(l => l.trim());
+        const selectedLanguages = form.language.split(',').map(l => l.trim());
         return selectedLanguages.includes(lang);
     };
 
     const handleLanguageClick = (lang: string) => {
-        const selectedLanguages = form.professionalInfo.languages_known.split(',').map(l => l.trim());
+        const selectedLanguages = form.language.split(',').map(l => l.trim());
 
         if (isLanguageSelected(lang)) {
             // Remove language if already selected
             const newLanguages = selectedLanguages.filter(l => l !== lang);
-            handleProfessionalInfoChange('languages_known', newLanguages.join(', '));
+            handleChanges('language', newLanguages.join(', '));
         } else {
             // Add new language
-            const newValue = form.professionalInfo.languages_known
-                ? `${form.professionalInfo.languages_known}, ${lang}`
+            const newValue = form.language
+                ? `${form.language}, ${lang}`
                 : lang;
-            handleProfessionalInfoChange('languages_known', newValue);
+            handleChanges('language', newValue);
         }
     };
 
@@ -269,6 +581,39 @@ export default function TrainerDetailsPage() {
 
                     <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-8">
 
+                        {/* Profile Picture Upload */}
+                        <div className="rounded-xl p-6 shadow-sm bg-white">
+                            <h3 className="text-xl font-semibold text-gray-800 mb-6">Profile Picture</h3>
+                            <div className="flex flex-col items-center space-y-4">
+                                <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-gray-200">
+                                    {profileImagePreview ? (
+                                        <img
+                                            src={profileImagePreview}
+                                            alt="Profile preview"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                                            <span className="text-gray-400">No image</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleImageChange}
+                                    accept="image/*"
+                                    className="hidden"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    {profileImage ? 'Change Picture' : 'Upload Picture'}
+                                </button>
+                            </div>
+                        </div>
 
                         <div className="rounded-xl p-6 shadow-sm bg-white">
                             {/* Section Title */}
@@ -282,14 +627,49 @@ export default function TrainerDetailsPage() {
                                 >
                                     Your Bio
                                 </label>
-                                <textarea
-                                    id="bio"
-                                    value={form.personalInfo.bio}
-                                    onChange={(e) => handlePersonalInfoChange('bio', e.target.value)}
-                                    placeholder="Share your training philosophy and what makes you unique..."
-                                    rows={6}
-                                    className="w-full px-4 py-2.5 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                                />
+                                <div className="relative">
+                                    <textarea
+                                        id="bio"
+                                        value={form.bio_line}
+                                        onChange={(e) => {
+                                            if (e.target.value.length <= 500) {
+                                                handleChanges('bio_line', e.target.value);
+                                            }
+                                        }}
+                                        placeholder="Share your training philosophy and what makes you unique..."
+                                        rows={6}
+                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                    />
+                                    <div className="absolute bottom-2 right-2 text-sm text-gray-500">
+                                        {form.bio_line.length}/500
+                                    </div>
+                                </div>
+                            </div>
+                            {/* TrainerApproch */}
+                            <div className="mb-6">
+                                <label
+                                    htmlFor="trainerApproch"
+                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                >
+                                    Trainer Approch
+                                </label>
+                                <div className="relative">
+                                    <textarea
+                                        id="trainerApproch"
+                                        value={form.trainers_approach}
+                                        onChange={(e) => {
+                                            if (e.target.value.length <= 500) {
+                                                handleChanges('trainers_approach', e.target.value);
+                                            }
+                                        }}
+                                        placeholder="Share your approch strategy"
+                                        rows={4}
+                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                    />
+                                    <div className="absolute bottom-2 right-2 text-sm text-gray-500">
+                                        {form.trainers_approach.length}/500
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Grid Row for Experience, City, DOB */}
@@ -305,9 +685,9 @@ export default function TrainerDetailsPage() {
                                     <input
                                         id="experience"
                                         type="number"
-                                        value={form.personalInfo.experience}
+                                        value={form.experience}
                                         onChange={(e) =>
-                                            handlePersonalInfoChange('experience', Number(e.target.value))
+                                            handleChanges('experience', Number(e.target.value))
                                         }
                                         placeholder="Your years of experience"
                                         className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
@@ -315,26 +695,52 @@ export default function TrainerDetailsPage() {
                                 </div>
 
                                 {/* City Dropdown */}
-                                <div>
+                                <div className="relative" ref={cityDropdownRef}>
                                     <label
                                         htmlFor="city"
                                         className="block text-sm font-medium text-gray-700 mb-1"
                                     >
                                         City
                                     </label>
-                                    <select
-                                        id="city"
-                                        value={form.personalInfo.city}
-                                        onChange={(e) => handlePersonalInfoChange('city', e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition "
-                                    >
-                                        <option value="">Select your city</option>
-                                        {indianCities.map((city) => (
-                                            <option key={city} value={city}>
-                                                {city}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            value={form.city}
+                                            readOnly
+                                            placeholder="Select your city"
+                                            className="w-full px-4 py-2.5 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            onClick={() => setIsCityDropdownOpen(true)}
+                                        />
+                                        {isCityDropdownOpen && (
+                                            <div className="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Search cities..."
+                                                    className="w-full px-4 py-2 border-b border-gray-300 focus:outline-none"
+                                                    value={searchTerm}
+                                                    onChange={(e) => handleCitySearch(e.target.value)}
+                                                    autoFocus
+                                                />
+                                                <div className="max-h-48 overflow-y-auto">
+                                                    {filteredCities.map(city => (
+                                                        <div
+                                                            key={city}
+                                                            className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${form.city === city ? 'bg-blue-50' : ''
+                                                                }`}
+                                                            onClick={() => {
+                                                                handleChanges('city', city);
+                                                                setIsCityDropdownOpen(false);
+                                                                setSearchTerm('');
+                                                                setFilteredCities(indianCities);
+                                                            }}
+                                                        >
+                                                            {city}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Year of Birth */}
@@ -349,14 +755,13 @@ export default function TrainerDetailsPage() {
                                         id="dob"
                                         type="date"
                                         max={new Date().toISOString().split('T')[0]}
-                                        value={form.personalInfo.dob}
-                                        onChange={(e) => handlePersonalInfoChange('dob', e.target.value)}
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        value={form.dob}
+                                        onChange={(e) => handleChanges('dob', e.target.value)}
+                                        className="w-full px-4 py-2.5 h-[46px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                                     />
                                 </div>
                             </div>
                         </div>
-
 
                         {/* Professrional Information */}
                         <div className="rounded-xl p-6 shadow-sm bg-white">
@@ -364,15 +769,63 @@ export default function TrainerDetailsPage() {
 
                             <div className="space-y-5">
                                 {/* Expertise */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Expertise</label>
+                                <div className="relative" ref={expertiseDropdownRef}>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Expertise / tags
+                                        <span className="text-sm text-gray-500 ml-2">
+                                            (Select up to 3)
+                                        </span>
+                                    </label>
                                     <input
                                         type="text"
-                                        value={form.professionalInfo.expertise.join(', ')}
-                                        onChange={(e) => handleProfessionalInfoChange('expertise', e.target.value.split(',').map(item => item.trim()))}
-                                        placeholder="Enter expertise comma seperated - ex. Management, Development.."
+                                        value={form.expertise_in}
+                                        readOnly
+                                        placeholder="Select expertise from dropdown"
                                         className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        onFocus={() => setIsExpertiseDropdownOpen(true)}
                                     />
+                                    {isExpertiseDropdownOpen && (
+                                        <div className="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+                                            <input
+                                                type="text"
+                                                placeholder="Search expertise..."
+                                                className="w-full px-4 py-2 border-b border-gray-300 focus:outline-none"
+                                                value={searchTerm}
+                                                onChange={(e) => handleExpertiseSearch(e.target.value)}
+                                                autoFocus
+                                            />
+                                            <div className="max-h-48 overflow-y-auto">
+                                                {filteredExpertise.map(exp => {
+                                                    const selectedExpertise = form.expertise_in.split(',').map(e => e.trim()).filter(e => e !== '');
+                                                    const isDisabled = !isExpertiseSelected(exp) && selectedExpertise.length >= 3;
+
+                                                    return (
+                                                        <div
+                                                            key={exp}
+                                                            className={`px-4 py-2 cursor-pointer flex items-center justify-between 
+                                                                ${isExpertiseSelected(exp)
+                                                                    ? 'bg-blue-50 hover:bg-blue-100'
+                                                                    : isDisabled
+                                                                        ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                                                                        : 'hover:bg-gray-100'
+                                                                }`}
+                                                            onClick={() => !isDisabled && handleExpertiseClick(exp)}
+                                                        >
+                                                            <span>{exp}</span>
+                                                            {isExpertiseSelected(exp) && (
+                                                                <span className="text-xs text-blue-600">
+                                                                    <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none">
+                                                                        <circle cx="8" cy="8" r="8" fill="currentColor" />
+                                                                        <path d="M5.5 5.5L10.5 10.5M10.5 5.5L5.5 10.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                                                                    </svg>
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Languages Known */}
@@ -380,7 +833,7 @@ export default function TrainerDetailsPage() {
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Languages Known</label>
                                     <input
                                         type="text"
-                                        value={form.professionalInfo.languages_known}
+                                        value={form.language}
                                         readOnly
                                         placeholder="Select languages from dropdown"
                                         className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
@@ -431,8 +884,8 @@ export default function TrainerDetailsPage() {
                                             <span className="text-gray-500">₹</span>
                                             <input
                                                 type="number"
-                                                value={form.professionalInfo.hourly_rate}
-                                                onChange={(e) => handleProfessionalInfoChange('hourly_rate', e.target.value)}
+                                                value={form.charge}
+                                                onChange={(e) => handleChanges('charge', e.target.value)}
                                                 placeholder="Enter hourly rate"
                                                 className="w-full ml-2 outline-none"
                                             />
@@ -446,8 +899,8 @@ export default function TrainerDetailsPage() {
                                             <span className="text-gray-500">+91</span>
                                             <input
                                                 type="tel"
-                                                value={form.professionalInfo.phone}
-                                                onChange={(e) => handleProfessionalInfoChange('phone', e.target.value)}
+                                                value={form.phone}
+                                                onChange={(e) => handleChanges('phone', e.target.value)}
                                                 placeholder="Enter phone number"
                                                 className="w-full ml-2 outline-none"
                                             />
@@ -462,8 +915,8 @@ export default function TrainerDetailsPage() {
                                             <span className="text-transparent select-none">--</span>
                                             <input
                                                 type="email"
-                                                value={form.professionalInfo.email}
-                                                onChange={(e) => handleProfessionalInfoChange('email', e.target.value)}
+                                                value={form.email}
+                                                onChange={(e) => handleChanges('email', e.target.value)}
                                                 placeholder="Enter Mail ID"
                                                 className="w-full ml-2 outline-none"
                                             />
@@ -473,10 +926,6 @@ export default function TrainerDetailsPage() {
                                 </div>
                             </div>
                         </div>
-
-
-
-
 
                         {/* Education & Certifications  */}
                         <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -496,7 +945,6 @@ export default function TrainerDetailsPage() {
                                                 value={edu.course}
                                                 onChange={(e) => handleEducationChange(index, "course", e.target.value)}
                                                 size="small"
-
                                             />
                                             {form.education.length > 1 && (
                                                 <IconButton
@@ -507,9 +955,6 @@ export default function TrainerDetailsPage() {
                                                     <Delete fontSize="small" />
                                                 </IconButton>
                                             )}
-
-
-
                                         </div>
 
                                         <div className="flex gap-4 mt-3">
@@ -552,18 +997,18 @@ export default function TrainerDetailsPage() {
                             <div>
                                 <label className="block font-medium text-gray-700 mb-2">Certificates</label>
 
-                                {form.certifications.map((cert, index) => (
+                                {form.certificates.map((cert, index) => (
                                     <div key={index} className="mb-6">
                                         <div className="relative flex gap-2">
                                             <TextField
                                                 variant="outlined"
                                                 fullWidth
                                                 placeholder="Certificate Name"
-                                                value={cert.name}
-                                                onChange={(e) => handleCertificationChange(index, "name", e.target.value)}
+                                                value={cert.certificate_name}
+                                                onChange={(e) => handleCertificationChange(index, "certificate_name", e.target.value)}
                                                 size="small"
                                             />
-                                            {form.certifications.length > 1 && (
+                                            {form.certificates.length > 1 && (
                                                 <IconButton
                                                     onClick={() => removeCertification(index)}
                                                     className="absolute top-0 right-0 text-red-600"
@@ -579,15 +1024,15 @@ export default function TrainerDetailsPage() {
                                                 variant="outlined"
                                                 fullWidth
                                                 placeholder="Issuing Organization"
-                                                value={cert.issuer}
-                                                onChange={(e) => handleCertificationChange(index, "issuer", e.target.value)}
+                                                value={cert.issued_by}
+                                                onChange={(e) => handleCertificationChange(index, "issued_by", e.target.value)}
                                                 size="small"
                                             />
                                             <TextField
                                                 variant="outlined"
                                                 placeholder="Year"
-                                                value={cert.year}
-                                                onChange={(e) => handleCertificationChange(index, "year", e.target.value)}
+                                                value={cert.issued_date}
+                                                onChange={(e) => handleCertificationChange(index, "issued_date", e.target.value)}
                                                 size="small"
                                                 InputProps={{
                                                     endAdornment: (
@@ -622,7 +1067,7 @@ export default function TrainerDetailsPage() {
                                     Share testimonials from your clients to build trust with potential new clients.
                                 </p>
 
-                                {form.testimonials.map((testimonial, index) => (
+                                {form.testimonilas.map((testimonial, index) => (
                                     <div key={index} className="mb-6">
                                         <div className="flex gap-4 mb-3">
                                             <TextField
@@ -630,16 +1075,16 @@ export default function TrainerDetailsPage() {
                                                 size="small"
                                                 variant="outlined"
                                                 placeholder="Reviewer Name"
-                                                value={testimonial.reviewer_name}
-                                                onChange={(e) => handleTestimonialChange(index, "reviewer_name", e.target.value)}
+                                                value={testimonial.client_name}
+                                                onChange={(e) => handleTestimonialChange(index, "client_name", e.target.value)}
                                             />
                                             <TextField
                                                 fullWidth
                                                 size="small"
                                                 variant="outlined"
                                                 placeholder="Organization/Company"
-                                                value={testimonial.reviewer_org}
-                                                onChange={(e) => handleTestimonialChange(index, "reviewer_org", e.target.value)}
+                                                value={testimonial.company}
+                                                onChange={(e) => handleTestimonialChange(index, "company", e.target.value)}
                                             />
                                         </div>
                                         <div className="relative">
@@ -650,10 +1095,10 @@ export default function TrainerDetailsPage() {
                                                 size="small"
                                                 variant="outlined"
                                                 placeholder="Client testimonial (e.g., 'Working with this trainer has transformed my fitness journey. I've lost 20 pounds and gained confidence.')"
-                                                value={testimonial.content}
-                                                onChange={(e) => handleTestimonialChange(index, "content", e.target.value)}
+                                                value={testimonial.testimonials}
+                                                onChange={(e) => handleTestimonialChange(index, "testimonials", e.target.value)}
                                             />
-                                            {form.testimonials.length > 1 && (
+                                            {form.testimonilas.length > 1 && (
                                                 <IconButton
                                                     className="absolute top-0 right-0 text-red-500"
                                                     onClick={() => removeTestimonial(index)}
@@ -692,8 +1137,8 @@ export default function TrainerDetailsPage() {
                                         size="small"
                                         placeholder="Your Facebook profile URL"
                                         variant="outlined"
-                                        value={form.socialMedia.facebook}
-                                        onChange={(e) => handleSocialMediaChange('facebook', e.target.value)}
+                                        value={form.facebook}
+                                        onChange={(e) => handleChanges('facebook', e.target.value)}
                                     />
                                 </div>
 
@@ -708,8 +1153,8 @@ export default function TrainerDetailsPage() {
                                         size="small"
                                         placeholder="Your Instagram profile URL"
                                         variant="outlined"
-                                        value={form.socialMedia.instagram}
-                                        onChange={(e) => handleSocialMediaChange('instagram', e.target.value)}
+                                        value={form.instagram}
+                                        onChange={(e) => handleChanges('instagram', e.target.value)}
                                     />
                                 </div>
 
@@ -724,8 +1169,8 @@ export default function TrainerDetailsPage() {
                                         size="small"
                                         placeholder="Your LinkedIn profile URL"
                                         variant="outlined"
-                                        value={form.socialMedia.linkedin}
-                                        onChange={(e) => handleSocialMediaChange('linkedin', e.target.value)}
+                                        value={form.linkedin}
+                                        onChange={(e) => handleChanges('linkedin', e.target.value)}
                                     />
                                 </div>
 
@@ -740,8 +1185,8 @@ export default function TrainerDetailsPage() {
                                         size="small"
                                         placeholder="Your Twitter/X profile URL"
                                         variant="outlined"
-                                        value={form.socialMedia.twitter}
-                                        onChange={(e) => handleSocialMediaChange('twitter', e.target.value)}
+                                        value={form.twitter}
+                                        onChange={(e) => handleChanges('twitter', e.target.value)}
                                     />
                                 </div>
 
@@ -756,23 +1201,23 @@ export default function TrainerDetailsPage() {
                                         size="small"
                                         placeholder="Your website URL (if available)"
                                         variant="outlined"
-                                        value={form.socialMedia.website}
-                                        onChange={(e) => handleSocialMediaChange('website', e.target.value)}
+                                        value={form.website}
+                                        onChange={(e) => handleChanges('website', e.target.value)}
                                     />
                                 </div>
                             </div>
                         </div>
 
-
-
-
                         <div className="flex justify-end">
                             <button
                                 type="submit"
-                                className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg bg-primary hover:bg-primary-hover transition-colors"
-                            // style={{ background: theme.button.primary }}
+                                disabled={!hasFormChanges}
+                                className={`w-full px-6 py-3 text-white rounded-lg ${hasFormChanges
+                                    ? 'bg-blue-600 hover:bg-blue-700'
+                                    : 'bg-gray-400 cursor-not-allowed'
+                                    } transition-colors`}
                             >
-                                Complete Your Profile
+                                {isEdit ? 'Update Profile' : 'Create Profile'}
                             </button>
                         </div>
                     </form>

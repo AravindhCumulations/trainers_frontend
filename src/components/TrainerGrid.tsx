@@ -45,9 +45,9 @@ export default function TrainerGrid({
     }, []);
 
     // Add debug logging
-    console.log('TrainerGrid received trainers:', trainers);
-    console.log('TrainerGrid trainers type:', typeof trainers);
-    console.log('TrainerGrid trainers length:', Array.isArray(trainers) ? trainers.length : 'not an array');
+
+
+
 
     const totalPages = useMemo(() =>
         Math.ceil((paginationConfig.totalItems || trainers.length) / pageSize),
@@ -76,18 +76,6 @@ export default function TrainerGrid({
     }, [trainers, paginationMode, localPage, pageSize, pageLocked]);
 
     const handleTrainerClick = useCallback((trainer: TrainerCardModel) => {
-        // const sanitizedTrainer = {
-        //     name: trainer.name,
-        //     full_name: trainer.full_name,
-        //     avg_rating: trainer.avg_rating,
-        //     image: trainer.image,
-        //     charge: trainer.charge,
-        //     city: trainer.location,
-        //     expertise_in: trainer.expertise_in,
-        // };
-        const urlEncodedName = encodeURIComponent(trainer.name);
-        console.log("check the name here ");
-
 
         handleNavigation('/trainer-details', { 'trainer': trainer.name })
 
