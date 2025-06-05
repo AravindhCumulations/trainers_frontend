@@ -35,12 +35,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
     // Initialize user state from localStorage on mount
     useEffect(() => {
         const initializeUser = () => {
-            console.log('Initializing user from localStorage...');
+
             const name = getCurrentUserName();
             const email = getCurrentUserMail();
             const role = getCurrentUserRole();
 
-            console.log('User data from localStorage:', { name, email, role });
+
 
             if (name && email && role) {
                 const userData = {
@@ -50,10 +50,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
                     profilePic: '',
                     isLoggedIn: true
                 };
-                console.log('Setting user context with:', userData);
+
                 setUser(userData);
             } else {
-                console.log('No user data found in localStorage');
+
                 setUser(defaultUser);
             }
             setIsInitialized(true);
@@ -66,7 +66,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const resetUser = () => {
-        console.log('Resetting user to default state');
+
         setUser(defaultUser);
     };
 
@@ -80,7 +80,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     // Log whenever user state changes
     useEffect(() => {
         if (isInitialized) {
-            console.log('User context updated:', user);
+
         }
     }, [user, isInitialized]);
 

@@ -8,7 +8,13 @@ export const initialWorkshops: Workshop[] = [
         price: 99.99,
         targetAudience: 'Beginners',
         format: 'virtual',
-        image: '/assets/w1.jpg'
+        image: '/assets/w1.jpg',
+        objectives: 'dsometing ',
+        outcomes: 'dsometing ',
+        handouts: 'dsometing ',
+        evaluation: 'dsometing ',
+        programFlow: 'dsomething',
+
     },
     {
         id: '2',
@@ -17,7 +23,14 @@ export const initialWorkshops: Workshop[] = [
         price: 149.99,
         targetAudience: 'Intermediate',
         format: 'In-Person',
-        image: '/assets/w2.jpg'
+        image: '/assets/w2.jpg',
+        objectives: 'dsometing ',
+        outcomes: 'dsometing ',
+        handouts: 'dsometing ',
+        evaluation: 'dsometing ',
+        programFlow: 'dsomething',
+
+
     },
     {
         id: '3',
@@ -26,7 +39,12 @@ export const initialWorkshops: Workshop[] = [
         price: 129.99,
         targetAudience: 'All Levels',
         format: 'virtual',
-        image: '/assets/w3.jpg'
+        image: '/assets/w3.jpg',
+        objectives: 'dsometing ',
+        outcomes: 'dsometing ',
+        handouts: 'dsometing ',
+        evaluation: 'dsometing ',
+        programFlow: 'dsomething',
     },
     {
         id: '4',
@@ -35,6 +53,13 @@ export const initialWorkshops: Workshop[] = [
         price: 199.99,
         targetAudience: 'Advanced',
         format: 'In-Person',
-        image: '/assets/w2.jpg'
+        image: '/assets/w2.jpg',
+        objectives: 'dsometing ',
+        outcomes: 'dsometing ',
+        handouts: 'dsometing ',
+        evaluation: 'dsometing ',
+        programFlow: 'dsomething',
+
+
     }
 ];

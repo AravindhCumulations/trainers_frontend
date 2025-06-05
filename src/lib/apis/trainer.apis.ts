@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { getAuthHeaders, getCurrentUserName, getUserDetails } from '../utils/auth.utils';
-import { TrainerFormData, FileUploadResponse } from '@/models/trainer.models';
+import { FileUploadResponse } from '@/models/trainer.models';
 import { TrainerFormDto } from '@/models/trainerDetails.model';
-import { headers } from 'next/headers';
-import { use } from 'react';
+// import { headers } from 'next/headers';
+// import { use } from 'react';
 
 export const trainerApis = {
     // Get all trainers
@@ -91,9 +91,9 @@ export const trainerApis = {
                 withCredentials: true,
             });
             return response.data;
-        } catch (error: any) {
-            if (error.response?.data?.exc_type === "DoesNotExistError") {
-
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.data?.exc_type === "DoesNotExistError") {
+                // Handle DoesNotExistError case
             }
             console.error('Error fetching trainer:', error);
             throw error;
@@ -111,9 +111,9 @@ export const trainerApis = {
                 headers,
             });
             return response.data;
-        } catch (error: any) {
-            if (error.response?.data?.exc_type === "DoesNotExistError") {
-
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.data?.exc_type === "DoesNotExistError") {
+                // Handle DoesNotExistError case
             }
             console.error('Error fetching trainer:', error);
             throw error;
@@ -135,9 +135,9 @@ export const trainerApis = {
                 });
 
                 return response.data;
-            } catch (error: any) {
-                if (error.response?.data?.exc_type === "DoesNotExistError") {
-
+            } catch (error: unknown) {
+                if (axios.isAxiosError(error) && error.response?.data?.exc_type === "DoesNotExistError") {
+                    // Handle DoesNotExistError case
                 }
                 console.error('Error fetching trainer:', error);
                 throw error;

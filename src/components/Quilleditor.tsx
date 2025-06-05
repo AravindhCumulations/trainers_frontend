@@ -36,7 +36,14 @@ export default function QuillEditor({
 
                 // Set initial content safely
                 if (value) {
-                    quillInstance.current.clipboard.dangerouslyPasteHTML(value);
+                    try {
+                        // Ensure the value is treated as HTML content
+                        const htmlContent = value.startsWith('<') ? value : `<p>${value}</p>`;
+                        quillInstance.current.clipboard.dangerouslyPasteHTML(htmlContent);
+                    } catch (error) {
+                        console.error('Error setting initial content:', error);
+                        quillInstance.current.clipboard.dangerouslyPasteHTML('<p></p>');
+                    }
                 }
 
                 // On content change, pass HTML to parent
@@ -58,7 +65,13 @@ export default function QuillEditor({
             quillInstance.current &&
             quillInstance.current.root.innerHTML !== value
         ) {
-            quillInstance.current.clipboard.dangerouslyPasteHTML(value);
+            try {
+                // Ensure the value is treated as HTML content
+                const htmlContent = value.startsWith('<') ? value : `<p>${value}</p>`;
+                quillInstance.current.clipboard.dangerouslyPasteHTML(htmlContent);
+            } catch (error) {
+                console.error('Error syncing content:', error);
+            }
         }
     }, [value]);
 

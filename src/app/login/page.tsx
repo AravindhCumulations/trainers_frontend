@@ -1,15 +1,13 @@
 "use client";
 
-import { useState, useCallback, use } from 'react';
+import { useState, useCallback } from 'react';
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { LoginModel, LoginFormData } from '@/models/auth.models';
 import { motion } from 'framer-motion';
 import { useTheme } from '@/styles/ThemeProvider';
 import { authApis } from '@/lib/apis/auth.apis';
-import { trainerApis } from '@/lib/apis/trainer.apis';
-import { getCurrentUserRole, setUserDetailsToLocalStore } from '@/lib/utils/auth.utils';
-import Loader from '@/components/Loader';
+import { setUserDetailsToLocalStore } from '@/lib/utils/auth.utils';
 import { useLoading } from '@/context/LoadingContext';
 import { useNavigation } from "@/lib/hooks/useNavigation";
 import { useUser } from '@/context/UserContext';
@@ -19,7 +17,7 @@ export default function LoginPage() {
 
     const router = useRouter();
     const { theme } = useTheme();
-    const { setUser, user, } = useUser();
+    const { setUser } = useUser();
     // form
     const [formData, setFormData] = useState<LoginFormData>({
         email: '',
@@ -50,7 +48,7 @@ export default function LoginPage() {
             const data = await authApis.login(formData.email, formData.password);
 
             if (data.user_details && data.key_details) {
-                const success: boolean = setUserDetailsToLocalStore(data);
+                setUserDetailsToLocalStore(data);
 
                 // Set user context
                 setUser({
@@ -60,10 +58,6 @@ export default function LoginPage() {
                     profilePic: '',
                     isLoggedIn: true
                 });
-                // console.log('User from context');
-
-                // console.log(user);
-
 
                 if (data.user_details.role_user === "Trainer") {
                     if (data) {
@@ -80,11 +74,11 @@ export default function LoginPage() {
         } finally {
             hideLoader()
         }
-    }, [formData]);
+    }, [formData, handleNavigation, hideLoader, router, setUser, showLoader]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
+        setFormData((prev: LoginFormData) => ({
             ...prev,
             [name]: value
         }));
@@ -163,7 +157,7 @@ export default function LoginPage() {
                 </form>
 
                 <p className="text-center text-gray-600 dark:text-gray-400 mt-4 transition-colors duration-300">
-                    Don't have an account?
+                    Don&apos;t have an account?
                     <a className="text-blue-600 dark:text-blue-400 font-semibold hover:underline ml-1 transition-colors duration-300 cursor-pointer"
                         onClick={() => handleNavigation('/signup')}
                     >Sign up</a>

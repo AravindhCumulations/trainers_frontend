@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from 'next/link';
-import { useLoading } from '@/context/LoadingContext';
-import { getUserDetails, getCurrentUserRole } from "@/lib/utils/auth.utils";
+
+import { getCurrentUserRole } from "@/lib/utils/auth.utils";
 import { useNavigation } from "@/lib/hooks/useNavigation";
 import Image from 'next/image';
 import { creditsApis } from "@/lib/apis/credits.apis";
 
-import { ChevronDownIcon, LogOutIcon, UserIcon, WalletIcon } from "lucide-react";
+import { LogOutIcon, UserIcon } from "lucide-react";
 import { authApis } from "@/lib/apis/auth.apis";
 import { useUser } from '@/context/UserContext';
 
@@ -18,13 +18,11 @@ interface NavBarProps {
 }
 
 export default function Page({ bgColor = "bg-white" }: NavBarProps) {
-    const [isOpen, setIsOpen] = useState(false);
+
     const [credit, setCredit] = useState(0);
     const [logged_in, setLogged_in] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [isTrainer, setIsTrainer] = useState(false);
-    const [isCompany, setIsCompany] = useState(false);
-    const { showLoader, hideLoader } = useLoading();
     const { handleNavigation } = useNavigation();
     const { resetUser, user } = useUser();
 
@@ -34,15 +32,12 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
 
             const role = getCurrentUserRole();
 
-
-
-
             if (role) {
                 if (role === 'Trainer') {
 
                     setIsTrainer(true);
                 } else {
-                    setIsCompany(true);
+
                     credits();
                 }
                 setLogged_in(true);
@@ -50,17 +45,16 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
             else {
                 console.warn("No user role found.");
                 setIsTrainer(false);
-                setIsCompany(false)
+
             }
         } catch (error) {
             console.error("Failed to parse user_details from localStorage", error);
             setIsTrainer(false);
-            setIsCompany(false)
 
         }
     }, [credit]);
 
-    const url = "http://3.94.205.118:8000";
+
 
     // Determine text and border color based on background color
     const textColor = bgColor === "bg-white" ? "text-blue-600" : "text-white";
@@ -113,7 +107,7 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
             >
                 <nav className="w-full mx-auto flex items-center justify-between py-4">
                     <Link href="/" className={`text-2xl font-extrabold tracking-tight ${textColor}`}>
-                        Trainer's Mart
+                        Trainer&apos;s Mart
                     </Link>
 
                     {logged_in ? (

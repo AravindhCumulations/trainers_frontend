@@ -1,7 +1,5 @@
 import React from 'react';
 import Image from 'next/image';
-import { useState, useEffect } from "react";
-import { log } from 'console';
 import parse from 'html-react-parser';
 
 
@@ -24,34 +22,14 @@ interface WorkshopDetailsProps {
 }
 
 const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose }) => {
-    const [userRole, setUserRole] = useState(null);
-    const [isTrainer, setIsTrainer] = useState(false);
 
 
 
 
 
 
-    useEffect(() => {
-        const role = localStorage.getItem("user_details");
-        try {
-            const userDetails = role ? JSON.parse(role) : null;
 
-            if (userDetails && userDetails.role_user) {
-                const Role = userDetails.role_user;
-                setUserRole(Role);
-                setIsTrainer(Role === "Trainer");
-            } else {
-                console.warn("No user role found.");
-                setUserRole(null);
-                setIsTrainer(false);
-            }
-        } catch (error) {
-            console.error("Failed to parse user_details from localStorage", error);
-            setUserRole(null);
-            setIsTrainer(false);
-        }
-    }, []);
+
 
     return (
         <div className="w-[1024px] flex flex-col mt-4 gap-3 p-6 bg-white rounded-2xl workshop-details">

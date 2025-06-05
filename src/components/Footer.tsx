@@ -5,7 +5,7 @@ const Footer = () => {
         <footer className="w-full bg-[#3B82F6] text-white py-6 px-[80px]">
             <div className="mx-auto flex flex-row items-start justify-between px-4 gap-4">
                 <div className="text-sm">
-                    <span className="font-semibold text-lg">Trainer's Mart.</span> <br />
+                    <span className="font-semibold text-lg">Trainer&apos;s Mart.</span> <br />
                     Bridging the gap between talent and opportunities.
                 </div>
                 <div className="flex gap-6 text-sm">

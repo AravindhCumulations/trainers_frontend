@@ -4,12 +4,12 @@ import { useLoading } from '@/context/LoadingContext';
 import { useRouter, usePathname } from 'next/navigation';
 
 export const useNavigation = () => {
-    const { showLoader, hideLoader } = useLoading();
+    const loading = useLoading();
     const router = useRouter();
     const currentPath = usePathname(); // <- get current path
 
     const handleNavigation = async (page: string, params?: Record<string, string>) => {
-        showLoader(); // Show loader immediately
+        loading.showLoader(); // Show loader immediately
         try {
             const query = params ? `?${new URLSearchParams(params).toString()}` : '';
             const fullPath = `${page}${query}`;
@@ -26,7 +26,7 @@ export const useNavigation = () => {
             console.error("Navigation error:", err);
         } finally {
             setTimeout(() => {
-                hideLoader();
+                loading.hideLoader();
             }, 300);
         }
     };

@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Star } from "lucide-react";
 import NavBar from "../../components/Navbar";
 import EditWorkshop from '@/components/EditWorkshop';
-import { Workshop, } from '@/models/workshop.models';
+// import { Workshop, } from '@/models/workshop.models';
 import Footer from "@/components/Footer";
 import WorkshopDetails from '@/components/WorkshopDetails';
 import TrainerGrid from "@/components/TrainerGrid";
@@ -13,17 +12,17 @@ import { trainerApis } from '@/lib/apis/trainer.apis';
 import { TrainerDetailsModel } from '@/models/trainerDetails.model';
 import { useLoading } from '@/context/LoadingContext';
 import { getCurrentUserName, getCurrentUserRole } from '@/lib/utils/auth.utils'
-import { TrainerCardModel } from '@/models/trainerCard.model'
+// import { TrainerCardModel } from '@/models/trainerCard.model'
 import { RatingStars } from "@/components/RatingStars";
-import { dummyTrainers } from "@/app/content/DummyTrainers";
+// import { dummyTrainers } from "@/app/content/DummyTrainers";
 import Loader from '@/components/Loader';
 import { useNavigation } from "@/lib/hooks/useNavigation";
 import { useErrorPopup } from '@/lib/hooks/useErrorPopup';
 import ErrorPopup from '@/components/ErrorPopup';
 import { creditsApis } from '@/lib/apis/credits.apis';
-import { useRouter } from 'next/navigation';
 import WorkshopCard from '@/components/WorkshopCard';
 import { useUser } from '@/context/UserContext';
+import Overlay from '@/components/Overlay';
 
 
 interface WorkshopDetailsData {
@@ -62,45 +61,46 @@ const WorkshopDetailsOverlay = ({ setOverlayState, workshop }: { setOverlayState
 };
 
 // Dynamic Overlay Component
-const Overlay = ({ isOpen, type, setOverlayState, data }: OverlayProps) => {
-    if (!isOpen) return null;
-
+const WorkshopOverlay = ({ isOpen, type, setOverlayState, data }: OverlayProps) => {
     const handleClose = () => {
         setOverlayState({ isOpen: false, type: null });
     };
 
     return (
-        <div className="absolute edit-overlay top-0 left-0 w-full h-full bg-black/40 z-30 flex justify-center items-start">
-            <div className="w-full max-w-5xl flex justify-around items-center">
-                {type === 'details' && <WorkshopDetailsOverlay setOverlayState={setOverlayState} workshop={data} />}
-                {type === 'edit' && (
-                    <div className="bg-white w-full rounded-2xl mt-4">
-                        <EditWorkshop
-                            onClose={handleClose}
-                            initialData={data}
-                            mode="edit"
-                        />
-                    </div>
-                )}
-                {type === 'create' && (
-                    <div className="bg-white w-full rounded-2xl mt-4">
-                        <EditWorkshop
-                            onClose={handleClose}
-                            mode="create"
-                        />
-                    </div>
-                )}
-            </div>
-        </div>
+        <Overlay isOpen={isOpen} onClose={handleClose}>
+            {type === 'details' && <WorkshopDetailsOverlay setOverlayState={setOverlayState} workshop={data} />}
+            {type === 'edit' && (
+                <div className="bg-white w-full rounded-2xl mt-4">
+                    <EditWorkshop
+                        onClose={handleClose}
+                        initialData={data}
+                        mode="edit"
+                    />
+                </div>
+            )}
+            {type === 'create' && (
+                <div className="bg-white w-full rounded-2xl mt-4">
+                    <EditWorkshop
+                        onClose={handleClose}
+                        mode="create"
+                    />
+                </div>
+            )}
+        </Overlay>
     );
 };
 
 export default function TrainerDetails() {
-    const router = useRouter();
-    const { setUser, user, setProfilePic } = useUser();
+    // const router = useRouter();
+    const { user, setProfilePic } = useUser();
 
     // globally
-    const [isCompany, setIsCompany] = useState(user.role === 'user_role');
+    const [isCompany, setIsCompany] = useState(false);
+    useEffect(() => {
+        setIsCompany(user.role === 'user_role');
+    });
+
+
     const [hasOverflow, setHasOverflow] = useState(false);
 
     // page specific
@@ -113,7 +113,6 @@ export default function TrainerDetails() {
 
     // featured trainers grid
     const [trainers, setTrainers] = useState([]);
-    const [totalTrainers, setTotalTrainers] = useState(0);
 
     //utilities
     const [loading, setLoading] = useState(true);
@@ -132,7 +131,6 @@ export default function TrainerDetails() {
         try {
             const allTrainersData = await trainerApis.getAllTrainers(userName, 1, 8);
             setTrainers(allTrainersData.All_trainers);
-            setTotalTrainers(allTrainersData.total);
         }
         catch (error) {
             console.error('Error fetching trainers:', error);
@@ -226,7 +224,7 @@ export default function TrainerDetails() {
                 showError('An error occurred while fetching trainer details');
             } finally {
                 setLoading(false);
-                console.log("user from details : ", user);
+
 
             }
         };
@@ -328,7 +326,7 @@ export default function TrainerDetails() {
                         <p className="text-xl text-gray-600">Trainer not found</p>
                     </div>
                 ) : (
-                    <Overlay
+                    <WorkshopOverlay
                         isOpen={overlayState.isOpen}
                         type={overlayState.type}
                         data={overlayState.data}
@@ -498,7 +496,7 @@ export default function TrainerDetails() {
                                 <div className="flex items-center gap-2 cursor-pointer">
                                     {isLoggedInUser && (
                                         <button
-                                            onClick={() => handleNavigation(`/workshop?workshops=${encodeURIComponent(JSON.stringify(trainerData?.workshop))}`)}
+                                            onClick={() => handleNavigation(`/workshop?trainer=${user.name}`)}
                                             className="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700"
                                         >
                                             view all
@@ -519,6 +517,11 @@ export default function TrainerDetails() {
                                                 targetAudience: casestudy.target_audience,
                                                 format: 'In-Person',
                                                 image: casestudy.workshop_image,
+                                                objectives: casestudy.description,
+                                                outcomes: casestudy.outcomes,
+                                                handouts: casestudy.handouts,
+                                                programFlow: casestudy.program_flow,
+                                                evaluation: casestudy.evaluation
                                             }}
                                             onClick={() => handleWorkshopClick('details', casestudy)}
                                             tag="CaseStudy"
@@ -535,6 +538,11 @@ export default function TrainerDetails() {
                                                 targetAudience: workshop.target_audience,
                                                 format: 'In-Person',
                                                 image: workshop.workshop_image,
+                                                objectives: workshop.description,
+                                                outcomes: workshop.outcomes,
+                                                handouts: workshop.handouts,
+                                                programFlow: workshop.program_flow,
+                                                evaluation: workshop.evaluation
                                             }}
                                             onClick={() => handleWorkshopClick('details', workshop)}
                                             tag="Workshop"
@@ -654,7 +662,6 @@ export default function TrainerDetails() {
 
                                     {trainerData?.testimonilas.map((test, index) => {
 
-                                        const isLastIndex = index === trainerData?.testimonilas.length - 1;
 
 
                                         return (

@@ -1,17 +1,15 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { SignupModel, SignupFormData, User } from '@/models/auth.models';
+import { SignupModel, User } from '@/models/auth.models';
 import { authApis } from "@/lib/apis/auth.apis"
-import { getCurrentUserRole, setUserDetailsToLocalStore } from '@/lib/utils/auth.utils';
+import { setUserDetailsToLocalStore } from '@/lib/utils/auth.utils';
 import { useNavigation } from "@/lib/hooks/useNavigation";
 
 
 export default function SignupPage() {
 
-    const router = useRouter();
     const [formData, setFormData] = useState<User>();
     const [rePassword, setRePassword] = useState<string>('');
     const [fullName, setFullName] = useState<string>('');
@@ -126,6 +124,12 @@ export default function SignupPage() {
                 className="bg-white/80 backdrop-blur-lg p-8 rounded-xl shadow-lg max-w-md w-full"
             >
                 <h2 className="text-3xl font-bold text-center text-gray-900">Sign Up</h2>
+
+                {error && (
+                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                        {error}
+                    </div>
+                )}
 
                 <form className="space-y-4">
                     <div className="flex mt-[2vh]">
@@ -243,7 +247,7 @@ export default function SignupPage() {
                     </div>
 
                     {formData?.password && rePassword && formData.password !== rePassword ? (
-                        <p className="text-red-600">Password doesn't match</p>
+                        <p className="text-red-600">Password doesn&apos;t match</p>
                     ) : (
                         <p></p>
                     )}

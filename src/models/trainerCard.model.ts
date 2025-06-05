@@ -34,6 +34,7 @@ export interface TrainerCardProps {
     trainer: TrainerCardModel;
     onClick: (trainer: TrainerCardModel) => void;
     viewMode?: string;
+    onWishlistUpdate?: (trainer: TrainerCardModel, isWishlisted: boolean) => void;
 }
 
 export interface PaginationControlsProps {

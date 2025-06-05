@@ -1,20 +1,17 @@
 "use client";
 
 import Navbar from '@/components/Navbar';
-import { useRouter } from 'next/navigation';
 import TrainerGrid from '@/components/TrainerGrid';
 import Footer from '@/components/Footer';
 import { useEffect, useState } from 'react';
-import Loader from '@/components/Loader';
 import SearchCategoriesRow from '@/components/SearchCategoriesRow';
 import { trainerApis } from '@/lib/apis/trainer.apis';
-import { getCurrentUserMail, getCurrentUserRole } from "@/lib/utils/auth.utils";
 import { useLoading } from '@/context/LoadingContext';
 import { getCurrentUserName } from "@/lib/utils//auth.utils";
-import { dummyTrainers } from "@/app/content/DummyTrainers";
 import { useNavigation } from "@/lib/hooks/useNavigation";
 import Image from 'next/image';
 import { useUser } from '@/context/UserContext';
+import { TrainerCardModel } from '@/models/trainerCard.model';
 
 
 
@@ -22,28 +19,11 @@ import { useUser } from '@/context/UserContext';
 
 export default function Home() {
 
-  const { user } = useUser();
-
-  // trainers list
-  const [trainers, setTrainers] = useState([]);
-  const [totalTrainers, setTotalTrainers] = useState(0);
-  const [unlockedTrainers, setUnlockedTrainers] = useState([]);
-  const [wishlistedTrainers, setWishlistedTrainers] = useState([]);
-
-
-  // helper variables
-  const [isCompany, setIsCompany] = useState(user.role === 'user_role');
-  const [isLoggedIn, setIsLoggedIn] = useState(user.isLoggedIn);
-
-  const [searchText, setSearchText] = useState(''); // global search
-
   // loaders and Navigations
   const { showLoader, hideLoader } = useLoading();
   const { handleNavigation } = useNavigation();
+  const { user } = useUser();
 
-  // tabs
-  const [activeTab, setActiveTab] = useState('Featured');
-  const tabs = ['Featured', 'Unlocked', 'Wish listed'];
 
 
   const locations = [
@@ -55,6 +35,49 @@ export default function Home() {
     { name: 'Mumbai', image: '/assets/mumbai.jpg' },
   ];
 
+  // tabs
+  const tabs = ['Featured', 'Unlocked', 'Wish listed'];
+  const [activeTab, setActiveTab] = useState('Featured');
+
+  // trainers list
+  const [trainers, setTrainers] = useState<TrainerCardModel[]>([]);
+  const [unlockedTrainers, setUnlockedTrainers] = useState<TrainerCardModel[]>([]);
+  const [wishlistedTrainers, setWishlistedTrainers] = useState<TrainerCardModel[]>([]);
+
+
+  // helper variables
+  const [isCompany, setIsCompany] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Update isLoggedIn and isCompany when user context changes
+  useEffect(() => {
+    setIsLoggedIn(user.isLoggedIn);
+    setIsCompany(user.role === 'user_role');
+    const initializeData = async () => {
+      try {
+        const userName = user.name;
+        showLoader();
+        await fetchAllTrainers(userName);
+
+        console.log("Company check - ", isCompany);
+
+        if (user.role === 'user_role') {
+          await fetchCompanyTrainers(userName);
+        }
+      } catch (error) {
+        console.error("Failed to initialize data:", error);
+      } finally {
+        hideLoader();
+      }
+    };
+
+    initializeData();
+  }, [user]);
+
+
+  const [searchText, setSearchText] = useState(''); // global search
+
+
   // custom methods 
 
   const fetchAllTrainers = async (userName: string) => {
@@ -62,7 +85,6 @@ export default function Home() {
     try {
       const allTrainersData = await trainerApis.getAllTrainers(userName, 1, 8);
       setTrainers(allTrainersData.All_trainers);
-      setTotalTrainers(allTrainersData.total);
     }
     catch (error) {
       console.error('Error fetching trainers:', error);
@@ -72,6 +94,9 @@ export default function Home() {
   };
 
   const fetchCompanyTrainers = async (userName: string) => {
+
+    console.log("Fetching Company Trainers");
+
     if (!userName) {
       return;
     }
@@ -88,30 +113,6 @@ export default function Home() {
       console.error('Error fetching trainers:', error);
     }
   };
-
-
-  // effects
-  useEffect(() => {
-    console.log(" use effect triggered");
-
-    const initializeData = async () => {
-      try {
-        const userName = user.name;
-        showLoader();
-        await fetchAllTrainers(userName);
-        if (isCompany) {
-          await fetchCompanyTrainers(userName);
-        }
-      } catch (error) {
-        console.error("Failed to initialize data:", error);
-      } finally {
-        hideLoader();
-      }
-    };
-
-    initializeData();
-  }, [user.name]);
-
 
 
   // handles
@@ -164,8 +165,27 @@ export default function Home() {
     }
   };
 
+  const handleWishlistUpdate = (trainer: TrainerCardModel, isWishlisted: boolean) => {
+    // Update the trainer in the main trainers list
+    setTrainers(prevTrainers =>
+      prevTrainers.map(t =>
+        t.name === trainer.name
+          ? { ...t, is_wishlisted: isWishlisted ? 1 : 0 }
+          : t
+      )
+    );
+
+    // Update wishlisted trainers list
+    if (isWishlisted) {
+      setWishlistedTrainers(prev => [...prev, { ...trainer, is_wishlisted: 1 }]);
+    } else {
+      setWishlistedTrainers(prev => prev.filter(t => t.name !== trainer.name));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#f8fafc] flex flex-col">
+
       {/* Header & Hero Section (overlapping) */}
       <section className="relative w-full mx-auto flex flex-col items-center header-hero-section">
         <div className="w-full bg-gradient-to-b  from-blue-400 to-blue-600 text-white pb-10 px-0 flex flex-col items-center rounded-b-[40px] relative z-10 header-hero-bg">
@@ -209,7 +229,6 @@ export default function Home() {
             <SearchCategoriesRow onCategoryClick={handleCategoryClick} />
           </div>
         </div>
-
 
 
         {/* Are you a Trainer? Section - overlapping upward */}
@@ -276,18 +295,21 @@ export default function Home() {
                 paginationMode="client"
                 paginationConfig={{ page: 1, pageSize: 8 }}
                 pageLocked={true}
+                onWishlistUpdate={handleWishlistUpdate}
               />}
 
               {activeTab === 'Wish listed' && <TrainerGrid
                 trainers={wishlistedTrainers}
                 paginationMode="client"
                 paginationConfig={{ page: 1, pageSize: 8 }}
+                onWishlistUpdate={handleWishlistUpdate}
               />}
 
               {activeTab === 'Unlocked' && <TrainerGrid
                 trainers={unlockedTrainers}
                 paginationMode="client"
                 paginationConfig={{ page: 1, pageSize: 8 }}
+                onWishlistUpdate={handleWishlistUpdate}
               />}
             </div>
           </div>
@@ -315,7 +337,7 @@ export default function Home() {
               <div className="flex flex-col justify-between py-10">
                 <p className="text-[30px] font-bold mb-4 ">Hire Trainers in 3 simple Steps </p>
                 <p className=" text-[16px] font-normal  mb-2">Hiring soft skills trainers is quick and hassle-free. Simply share your requirements, review curated trainer profiles and make your choice with ease--all in just three simple steps.</p>
-                <p className="font-semibold text-[16px]">it's that Easy</p>
+                <p className="font-semibold text-[16px]">it&apos;s that Easy</p>
               </div>
               <div className="flex flex-col justify-center items-center bg-blue-50 rounded-2xl text-center gap-2 py-6">
 
@@ -365,7 +387,6 @@ export default function Home() {
       }
 
       {/* Browse Trainers by Location Section - 2 rows, 3 columns, fixed size */}
-
       <section className="w-full max-w-7xl mx-auto px-4 py-10">
         <p className="text-[30px] font-bold mb-4">Browse Trainers by Locations</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -404,8 +425,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-
-
 
       {
         !isLoggedIn && (
@@ -486,8 +505,6 @@ export default function Home() {
         )
       }
 
-
-
       {/* How it Works Section - 2 columns, left stepper, right image */}
       <section className="w-full max-w-7xl mx-auto px-4 py-16">
         <div className="flex flex-row gap-20 items-start">
@@ -513,7 +530,7 @@ export default function Home() {
                   <span className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold z-10">2</span>
                   <div>
                     <h3 className="font-semibold text-[24px] mb-1">View Profiles & Programs</h3>
-                    <p className="text-gray-600">Assess trainers' portfolios and workshop details.</p>
+                    <p className="text-gray-600">Assess trainers portfolios and workshop details.</p>
                   </div>
                 </div>
 

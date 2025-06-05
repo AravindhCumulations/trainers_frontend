@@ -6,35 +6,11 @@ import React, { useState } from 'react';
 import { FaWallet, FaPlus, FaMinus } from 'react-icons/fa';
 import { useTheme } from '@/styles/ThemeProvider';
 
-interface Transaction {
-    id: string;
-    date: string;
-    type: 'purchase' | 'usage';
-    amount: number;
-    description: string;
-}
-
 const ManageCredits = () => {
 
     const { theme } = useTheme();
-    const [credits, setCredits] = useState(300);
+    const [credits] = useState(300);
     const [buyAmount, setBuyAmount] = useState(0);
-    const [transactions] = useState<Transaction[]>([
-        {
-            id: '1',
-            date: '2024-03-15',
-            type: 'purchase',
-            amount: 100,
-            description: 'Credit Purchase'
-        },
-        {
-            id: '2',
-            date: '2024-03-14',
-            type: 'usage',
-            amount: -50,
-            description: 'Workshop Creation'
-        }
-    ]);
 
     const handleBuyAmountChange = (amount: number) => {
         setBuyAmount(Math.max(0, buyAmount + amount));

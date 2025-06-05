@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import Loader from '@/components/Loader';
-import { p } from 'framer-motion/client';
 
 interface LoadingContextType {
     isLoading: boolean;

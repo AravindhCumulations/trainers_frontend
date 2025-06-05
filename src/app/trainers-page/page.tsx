@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import TrainerGrid from '../../components/TrainerGrid';
@@ -10,11 +10,7 @@ import { categories } from '@/app/content/categories'
 import { getCurrentUserName } from '@/lib/utils/auth.utils'
 import { useLoading } from '@/context/LoadingContext';
 
-
-
-
-export default function TrainersPage() {
-
+function TrainersPageContent() {
     const searchParams = useSearchParams();
     const [citySearch, setCitySearch] = useState('');
     const [searchText, setSearchText] = useState('');
@@ -24,7 +20,6 @@ export default function TrainersPage() {
     const [itemsPerPage, setItemsPerPage] = useState(16);
     const [totalItems, setTotalItems] = useState(0);
     const { showLoader, hideLoader } = useLoading();
-
 
     const cities = [
         { name: 'Hyderabad', image: '/assets/hydrabad.jpg' },
@@ -36,8 +31,6 @@ export default function TrainersPage() {
     ];
 
     const handleSearch = async (searchValue = searchText, cityValue = citySearch, page = currentPage, pageSize = itemsPerPage) => {
-
-
         try {
             const response = await trainerApis.searchTrainers(
                 getCurrentUserName(),
@@ -47,17 +40,12 @@ export default function TrainersPage() {
                 pageSize
             );
 
-
-
-            // Extract trainers and pagination info from the new response structure
             const trainers = response.data?.trainers || [];
             const total = response.data?.total || 0;
-
 
             setSearchResults(trainers);
             setTotalItems(total);
 
-            // Update search title after successful API call
             if (searchValue || cityValue) {
                 setSearchTitle(`Search Results for${searchValue ? ` "${searchValue}"` : ''}${cityValue ? ` in "${cityValue}"` : ''}`);
             } else {
@@ -68,7 +56,6 @@ export default function TrainersPage() {
             setSearchResults([]);
             setSearchTitle('All Trainers');
             setTotalItems(0);
-            // You might want to show an error message to the user here
         }
     };
 
@@ -109,13 +96,10 @@ export default function TrainersPage() {
     useEffect(() => {
         const initializeSearch = async () => {
             try {
-
                 showLoader();
 
                 const city = searchParams.get('city') || undefined;
                 const searchText = searchParams.get('search_text') || undefined;
-
-
 
                 if (city || searchText) {
                     if (city) setCitySearch(city);
@@ -136,13 +120,11 @@ export default function TrainersPage() {
             finally {
                 hideLoader()
             }
-
         };
 
         initializeSearch();
     }, [searchParams]);
 
-    // Add a debug effect to monitor searchResults
     useEffect(() => {
 
     }, [searchResults]);
@@ -220,7 +202,6 @@ export default function TrainersPage() {
             </section>
 
             <main className="flex-grow">
-                {/* Search Results Heading */}
                 <div className="w-full max-w-[1352px] mx-auto px-4 py-4">
                     <h2 className="text-2xl font-bold text-gray-900">
                         {searchTitle}
@@ -243,10 +224,8 @@ export default function TrainersPage() {
                     onPageChange={handlePageChange}
                 />
 
-
             </main>
 
-            {/* Similar Categories */}
             <div className="w-full max-w-[1352px] mx-auto px-4 py-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Similar Categories</h2>
                 <div className="flex flex-wrap gap-3">
@@ -268,5 +247,13 @@ export default function TrainersPage() {
 
             <Footer />
         </div>
+    );
+}
+
+export default function TrainersPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <TrainersPageContent />
+        </Suspense>
     );
 } 

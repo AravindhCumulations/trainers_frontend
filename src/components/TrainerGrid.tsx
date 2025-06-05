@@ -1,12 +1,10 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import TrainerCard from './TrainerCard';
 import PaginationControls from './PaginationControls';
 import { TrainerCardModel } from '../models/trainerCard.model';
-import { useLoading } from '@/context/LoadingContext';
-import { getCurrentUserName, getCurrentUserRole } from "@/lib/utils/auth.utils";
 import { useNavigation } from "@/lib/hooks/useNavigation";
 
 
@@ -22,6 +20,7 @@ export interface TrainerGridProps {
     paginationConfig: PaginationConfig;
     onPageChange?: (newConfig: PaginationConfig) => void;
     pageLocked?: boolean;
+    onWishlistUpdate?: (trainer: TrainerCardModel, isWishlisted: boolean) => void;
 }
 
 
@@ -30,19 +29,16 @@ export default function TrainerGrid({
     paginationMode = 'client',
     paginationConfig,
     onPageChange,
-    pageLocked = false
+    pageLocked = false,
+    onWishlistUpdate
 }: TrainerGridProps) {
     const router = useRouter();
     const { page, pageSize } = paginationConfig;
     const [localPage, setLocalPage] = useState(page);
-    const [isTrainer, setIsTrainer] = useState(false);
-    const { showLoader, hideLoader } = useLoading();
     const { handleNavigation } = useNavigation();
 
 
-    useEffect(() => {
-        setIsTrainer(getCurrentUserRole() === 'Trainer');
-    }, []);
+
 
     // Add debug logging
 
@@ -92,6 +88,7 @@ export default function TrainerGrid({
                             key={trainer.name}
                             trainer={trainer}
                             onClick={handleTrainerClick}
+                            onWishlistUpdate={onWishlistUpdate}
                         />
                     ))
                 ) : (

@@ -1,13 +1,8 @@
-import React, { useState, ReactElement } from 'react';
-import Link from 'next/link';
+import React, { useState } from 'react';
 import Loader from './Loader';
-import axios from 'axios';
 import { categories } from "@/app/content/categories";
 
-interface Category {
-    name: string;
-    icon: ReactElement;
-}
+
 
 interface SearchCategoriesRowProps {
     onCategoryClick: (categoryName: string) => void;

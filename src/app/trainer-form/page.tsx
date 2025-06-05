@@ -23,9 +23,8 @@ import { languages } from "@/app/content/Languages";
 import { trainerApis } from "@/lib/apis/trainer.apis";
 import { useLoading } from '@/context/LoadingContext';
 import { useNavigation } from "@/lib/hooks/useNavigation";
-import { getCurrentUserFullName, getCurrentUserMail, getCurrentUserName, setCurrentUserName } from '@/lib/utils/auth.utils';
+import { getCurrentUserName, setCurrentUserName } from '@/lib/utils/auth.utils';
 import { TrainerFormDto } from '@/models/trainerDetails.model';
-import { image } from 'framer-motion/client';
 import { expertise_in } from '@/app/content/ExpertiseIN';
 
 // Add type for tracking modified fields
@@ -128,7 +127,7 @@ export default function TrainerDetailsPage() {
         initialFormState.current = { ...formData };
     };
 
-    // console.log(initialFormState);
+    // 
 
 
 
@@ -448,16 +447,6 @@ export default function TrainerDetailsPage() {
         try {
             showLoader();
 
-            // if (validationErrors.length > 0) {
-            //     setErrors(validationErrors);
-            //     hideLoader()
-            //     return;
-            // }
-
-
-            console.log(modifiedFields);
-            console.log(form);
-
             let imageUrl = form.image; // Keep existing image URL by default
 
             // Only upload new image if a new file was selected
@@ -466,28 +455,45 @@ export default function TrainerDetailsPage() {
                 imageUrl = uploadResponse.message.file_url;
             }
 
+            let response;
             if (isEdit) {
                 const submitData = {
                     ...modifiedFields,
-                    ...(hasImageChanged && { image: imageUrl }) // Only include image if it was changed
+                    ...(hasImageChanged && { image: imageUrl }), // Only include image if it was changed
+                    phone: form.phone ? `+91-${form.phone.replace(/^\+91-/, '')}` : '' // Ensure phone has +91- prefix
                 };
 
-                const data = await trainerApis.trainerForm.editFormData(submitData);
+                response = await trainerApis.trainerForm.editFormData(submitData);
             } else {
                 const submitData = {
                     ...form,
-                    ...(hasImageChanged && { image: imageUrl }) // Only include image if it was changed
+                    ...(hasImageChanged && { image: imageUrl }), // Only include image if it was changed
+                    phone: form.phone ? `+91-${form.phone.replace(/^\+91-/, '')}` : '' // Ensure phone has +91- prefix
                 };
 
-                const data = await trainerApis.trainerForm.createFormData(submitData);
-                setCurrentUserName(data.data.name);
+                response = await trainerApis.trainerForm.createFormData(submitData);
+                setCurrentUserName(response.data.name);
             }
 
             // Reset image change state after successful submission
             setHasImageChanged(false);
             await handleNavigation('/trainer-details', { 'trainer': getCurrentUserName() });
-        } catch (error) {
-            setErrors(["submission failed check errors"]);
+        } catch (error: any) {
+            console.error('Submission error:', error);
+
+            // Handle API error response
+            if (error.response?.data?._server_messages) {
+                try {
+                    const serverMessages = JSON.parse(error.response.data._server_messages);
+                    const parsedMessage = JSON.parse(serverMessages[0]);
+                    setErrors([parsedMessage.message]);
+                } catch (parseError) {
+                    // If parsing fails, use the exception message
+                    setErrors([error.response.data.exception || "An error occurred during submission"]);
+                }
+            } else {
+                setErrors(["An error occurred during submission"]);
+            }
         } finally {
             hideLoader();
         }
@@ -555,6 +561,11 @@ export default function TrainerDetailsPage() {
             handleChanges('language', newValue);
         }
     };
+
+
+
+    // When preparing data for API submission
+
 
     return (
         <div className="min-h-screen"
@@ -899,8 +910,12 @@ export default function TrainerDetailsPage() {
                                             <span className="text-gray-500">+91</span>
                                             <input
                                                 type="tel"
-                                                value={form.phone}
-                                                onChange={(e) => handleChanges('phone', e.target.value)}
+                                                value={form.phone.replace(/^\+91-/, '')}
+                                                onChange={(e) => {
+                                                    // Remove any existing +91- prefix and any non-digit characters
+                                                    const cleanNumber = e.target.value.replace(/^\+91-/, '').replace(/\D/g, '');
+                                                    handleChanges('phone', cleanNumber);
+                                                }}
                                                 placeholder="Enter phone number"
                                                 className="w-full ml-2 outline-none"
                                             />
