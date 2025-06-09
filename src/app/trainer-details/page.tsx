@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Star } from "lucide-react";
 import NavBar from "../../components/Navbar";
 import EditWorkshop from '@/components/EditWorkshop';
@@ -90,7 +90,8 @@ const WorkshopOverlay = ({ isOpen, type, setOverlayState, data }: OverlayProps) 
     );
 };
 
-export default function TrainerDetails() {
+// Create a client component that uses useSearchParams
+const TrainerDetailsContent = () => {
     const { user, setProfilePic, updateCredits } = useUser();
     const searchParams = useSearchParams();
 
@@ -869,5 +870,14 @@ export default function TrainerDetails() {
 
             <Footer />
         </div>
+    );
+}
+
+// Main component with Suspense
+export default function TrainerDetails() {
+    return (
+        <Suspense fallback={<TrainerDetailsSkeleton />}>
+            <TrainerDetailsContent />
+        </Suspense>
     );
 } 
