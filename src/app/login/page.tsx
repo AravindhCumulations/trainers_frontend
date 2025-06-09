@@ -35,7 +35,6 @@ export default function LoginPage() {
         newPassword: '',
         confirmPassword: ''
     });
-    const [otpError, setOtpError] = useState<string | null>(null);
 
     // handles
     const handleLogin = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {

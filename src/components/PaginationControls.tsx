@@ -2,8 +2,6 @@ import { memo, useMemo } from 'react';
 import { PaginationControlsProps } from '../models/trainerCard.model';
 
 const PaginationControls = memo(({ currentPage, totalPages, onPageChange }: PaginationControlsProps) => {
-    if (totalPages <= 1) return null;
-
     const getPageNumbers = useMemo(() => {
         const delta = 2; // Number of pages to show on each side of current page
         const range: number[] = [];
@@ -34,6 +32,8 @@ const PaginationControls = memo(({ currentPage, totalPages, onPageChange }: Pagi
 
         return rangeWithDots;
     }, [currentPage, totalPages]);
+
+    if (totalPages <= 1) return null;
 
     return (
         <div className="flex justify-center items-center gap-2 mt-8" role="navigation" aria-label="Pagination">

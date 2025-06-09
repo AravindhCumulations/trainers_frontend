@@ -12,7 +12,6 @@ import { TrainerDetailsModel } from '@/models/trainerDetails.model';
 import { useLoading } from '@/context/LoadingContext';
 import { getCurrentUserName, getCurrentUserRole } from '@/lib/utils/auth.utils'
 import { RatingStars } from "@/components/RatingStars";
-import Loader from '@/components/Loader';
 import { useNavigation } from "@/lib/hooks/useNavigation";
 import { useErrorPopup } from '@/lib/hooks/useErrorPopup';
 import ErrorPopup from '@/components/ErrorPopup';

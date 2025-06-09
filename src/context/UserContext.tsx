@@ -35,7 +35,6 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User>(defaultUser);
-    const [isInitialized, setIsInitialized] = useState(false);
 
     // Initialize user state and fetch credits if needed
     useEffect(() => {
@@ -75,7 +74,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
             } else {
                 setUser(defaultUser);
             }
-            setIsInitialized(true);
         };
 
         initializeUser();

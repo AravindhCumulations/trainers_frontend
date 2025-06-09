@@ -4,7 +4,6 @@ import { isEqual } from 'lodash';
 import { useLoading } from '@/context/LoadingContext';
 import { useErrorPopup } from '@/lib/hooks/useErrorPopup';
 import { trainerApis } from '@/lib/apis/trainer.apis';
-import { TrainerFormValidator } from '@/models/trainerDetails.model';
 
 interface EditWorkshopProps {
     onClose: () => void;

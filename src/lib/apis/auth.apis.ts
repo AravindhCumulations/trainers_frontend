@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { getAuthHeaders } from '../utils/auth.utils';
 import { User } from "@/models/auth.models";
-import { Password } from '@mui/icons-material';
 
 export const authApis = {
     // Login
