@@ -82,10 +82,8 @@ const TrainerCard = memo(({ trainer, onClick, viewMode, onWishlistUpdate }: Trai
                 </span>
 
                 <div className="text-[#4B5563]">
-                    <span className="block text-[14px] font-semibold mb-1 flex items-center gap-1 trainer-card-skills">
-                        {/* {(trainer.expertise_in || []).map((e) => e.expetrise).join(', ')} */}
-                        {/* {(trainer.expertise_in || "")} */}
-                        {/* Devopment, Debugging, Management |  */}
+                    <span className="block text-[14px] font-semibold mb-1 flex items-center gap-1 trainer-card-skills line-clamp-2">
+
 
                         {(trainer.expertise_in)
                             .split(",")
@@ -95,12 +93,12 @@ const TrainerCard = memo(({ trainer, onClick, viewMode, onWishlistUpdate }: Trai
                             .join(", ")}{" "}
                     </span>
 
-                    <span className="block text-xs mb-1 trainer-card-exp">
+                    <span className="block text-xs mb-1 trainer-card-exp line-clamp-1">
                         {/* {trainer.experience} */}
                         12 years   • {trainer.city}
                     </span>
 
-                    <span className="block text-xs mb-1 trainer-card-lang">
+                    <span className="block text-xs mb-1 trainer-card-lang line-clamp-1">
                         Languages spoken: English
                     </span>
                 </div>

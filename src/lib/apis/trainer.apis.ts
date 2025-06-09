@@ -263,6 +263,26 @@ export const trainerApis = {
                 console.error('Error uploading file:', error);
                 throw error;
             }
+        },
+
+        // Ratings and Reviews
+        ratings: {
+            submitReview: async (data: {
+                user: string;
+                trainer: string;
+                rating: number;
+                review: string;
+            }) => {
+                try {
+                    const response = await axios.post('/api/resource/Ratings_Reviews', data, {
+                        headers: getAuthHeaders()
+                    });
+                    return response.data;
+                } catch (error) {
+                    console.error('Error submitting review:', error);
+                    throw error;
+                }
+            }
         }
     }
 }; 

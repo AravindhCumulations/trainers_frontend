@@ -147,8 +147,14 @@ export const setUserDetailsToLocalStore = (data: {
                 api_secret: keyDetails.api_secret ?? "",
             };
 
+            // Store in localStorage
             localStorage.setItem("user_details", JSON.stringify(details));
             localStorage.setItem("auth", JSON.stringify(keys));
+
+            // Store in cookies for middleware access
+            document.cookie = `user_details=${JSON.stringify(details)}; path=/; max-age=86400`; // 24 hours
+            document.cookie = `auth=${JSON.stringify(keys)}; path=/; max-age=86400`; // 24 hours
+
             return true;
         }
     } catch (error) {

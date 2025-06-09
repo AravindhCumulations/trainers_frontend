@@ -34,6 +34,7 @@ export default function SignupPage() {
         }));
     };
 
+
     const handleSignup = async () => {
         setError(null);
 
@@ -73,6 +74,9 @@ export default function SignupPage() {
 
                 const data = await authApis.singUp(newUser);
 
+
+
+
                 if (data.status === "success") {
                     if (data.user_details && data.key_details) {
                         const success: boolean = setUserDetailsToLocalStore(data);
@@ -92,6 +96,10 @@ export default function SignupPage() {
 
                     }
                 }
+                else {
+                    if (data.message.status === "error" && data.message.message)
+                        setError(data.message.message);
+                }
 
             }
         } catch (err) {
@@ -100,18 +108,10 @@ export default function SignupPage() {
     };
 
     useEffect(() => {
-        if (formData) {
-            const signupModel = new SignupModel(formData);
+        setError("")
 
-            const validationError = signupModel.validate();
+    }, [formData]);
 
-            if (validationError) {
-                setError(validationError);
-                return;
-            }
-        }
-
-    }, [formData])
 
     return (
 
@@ -255,10 +255,11 @@ export default function SignupPage() {
                     <button
                         type="button"
                         onClick={handleSignup}
-                        className={`w-full px-4 py-2 rounded-lg transition 
-          ${formData?.password !== rePassword
-                                ? "bg-blue-400 cursor-not-allowed"
-                                : "bg-blue-500 hover:bg-blue-700 text-white"}`}
+                        disabled={!formData?.email || !formData?.password || !formData?.first_name || !formData?.last_name || !formData?.roles?.length || formData.password !== rePassword}
+                        className={`w-full px-4 py-2 rounded-lg transition-colors duration-300 ${!formData?.email || !formData?.password || !formData?.first_name || !formData?.last_name || !formData?.roles?.length || formData.password !== rePassword
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-blue-500 hover:bg-blue-700 text-white"
+                            }`}
                     >
                         Continue
                     </button>

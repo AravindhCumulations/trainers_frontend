@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Star } from "lucide-react";
 import NavBar from "../../components/Navbar";
 import EditWorkshop from '@/components/EditWorkshop';
-// import { Workshop, } from '@/models/workshop.models';
 import Footer from "@/components/Footer";
 import WorkshopDetails from '@/components/WorkshopDetails';
 import TrainerGrid from "@/components/TrainerGrid";
@@ -12,9 +11,7 @@ import { trainerApis } from '@/lib/apis/trainer.apis';
 import { TrainerDetailsModel } from '@/models/trainerDetails.model';
 import { useLoading } from '@/context/LoadingContext';
 import { getCurrentUserName, getCurrentUserRole } from '@/lib/utils/auth.utils'
-// import { TrainerCardModel } from '@/models/trainerCard.model'
 import { RatingStars } from "@/components/RatingStars";
-// import { dummyTrainers } from "@/app/content/DummyTrainers";
 import Loader from '@/components/Loader';
 import { useNavigation } from "@/lib/hooks/useNavigation";
 import { useErrorPopup } from '@/lib/hooks/useErrorPopup';
@@ -23,6 +20,10 @@ import { creditsApis } from '@/lib/apis/credits.apis';
 import WorkshopCard from '@/components/WorkshopCard';
 import { useUser } from '@/context/UserContext';
 import Overlay from '@/components/Overlay';
+import { TrainerCardModel } from '@/models/trainerCard.model';
+import TrainerDetailsSkeleton from '@/components/TrainerDetailsSkeleton';
+import { useSearchParams } from 'next/navigation';
+
 
 
 interface WorkshopDetailsData {
@@ -91,8 +92,8 @@ const WorkshopOverlay = ({ isOpen, type, setOverlayState, data }: OverlayProps) 
 };
 
 export default function TrainerDetails() {
-    // const router = useRouter();
-    const { user, setProfilePic } = useUser();
+    const { user, setProfilePic, updateCredits } = useUser();
+    const searchParams = useSearchParams();
 
     // globally
     const [isCompany, setIsCompany] = useState(false);
@@ -112,7 +113,7 @@ export default function TrainerDetails() {
     const [trainerData, setTrainerData] = useState<TrainerDetailsModel | null>(null);
 
     // featured trainers grid
-    const [trainers, setTrainers] = useState([]);
+    const [trainers, setTrainers] = useState<TrainerCardModel[]>([]);
 
     //utilities
     const [loading, setLoading] = useState(true);
@@ -121,6 +122,17 @@ export default function TrainerDetails() {
     // looders
     const { showLoader, hideLoader } = useLoading();
     const { isOpen, message, showError, hideError } = useErrorPopup();
+
+    const handleWishlistUpdate = (trainer: TrainerCardModel, isWishlisted: boolean) => {
+        // Update the trainer in the trainers list
+        setTrainers(prevTrainers =>
+            prevTrainers.map(t =>
+                t.name === trainer.name
+                    ? { ...t, is_wishlisted: isWishlisted ? 1 : 0 }
+                    : t
+            )
+        );
+    };
 
     const fetchAllTrainers = async (userName: string) => {
         if (!userName) {
@@ -155,18 +167,11 @@ export default function TrainerDetails() {
     }, [trainerData]);
 
     useEffect(() => {
-
-
-
         const fetchTrainerData = async () => {
             try {
-                // Get trainer naname from URL query params
-                const searchParams = new URLSearchParams(window.location.search);
                 const trainerName = searchParams.get('trainer');
                 const userName = getCurrentUserName() || 'guest';
                 const userRole = getCurrentUserRole() || 'guest';
-
-
 
                 if (!trainerName || !userName) {
                     if (!trainerName) {
@@ -178,17 +183,13 @@ export default function TrainerDetails() {
                     return;
                 }
 
-                // setLoading(true);
-
                 if (userRole === 'Trainer' && userName === trainerName) {
                     setIsLoggedInUser(true);
-
 
                     const response = await trainerApis.getTrainerByName(trainerName);
 
                     setTrainerData(response.data);
                     setProfilePic(response.data.image)
-
 
                     if (!response.data) {
                         showError('Failed to fetch trainer details');
@@ -197,7 +198,6 @@ export default function TrainerDetails() {
                 }
                 else {
                     const res = await trainerApis.company.getTrainerByName(trainerName, userName);
-
 
                     if (!res || !res.message) {
                         showError('Failed to fetch trainer details');
@@ -216,28 +216,21 @@ export default function TrainerDetails() {
 
                     await fetchAllTrainers(userName);
 
-
                 }
 
             } catch (error) {
                 console.error('Error fetching trainer data:', error);
-                showError('An error occurred while fetching trainer details');
+                showError('Trainer Details not found');
             } finally {
                 setLoading(false);
-
-
             }
         };
 
         fetchTrainerData();
-    }, [showError, window.location.search]);
+    }, [showError, searchParams]);
 
     const handleUnlockTrainer = async () => {
-
-
         if (isCompany) {
-
-
             showLoader()
             if (!trainerData?.name) {
                 console.error('Trainer data is not available');
@@ -249,16 +242,13 @@ export default function TrainerDetails() {
                 const res = await creditsApis.unlockTrainer(trainerData.name);
 
                 if (res) {
-
                     setTrainerLocked(false);
-                    // window.location.reload();
+                    updateCredits()
                     return;
-
                 }
                 else {
-                    showError("Some error Occured");
+                    showError("Some error occured while unlocking trainer");
                 }
-
 
             } catch (error) {
                 console.error('Error unlocking trainer:', error);
@@ -268,8 +258,6 @@ export default function TrainerDetails() {
                 hideLoader()
             }
         } else {
-
-
             handleNavigation('/login');
         }
     };
@@ -277,6 +265,8 @@ export default function TrainerDetails() {
     // Trainer
     const [rating, setRating] = useState(0);
     const [hovered, setHovered] = useState(0);
+    const [reviewText, setReviewText] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [overlayState, setOverlayState] = useState<{
         isOpen: boolean;
         type: 'details' | 'edit' | 'create' | null;
@@ -318,9 +308,7 @@ export default function TrainerDetails() {
             {/* Main Content */}
             <main className="mx-auto px-4 py-8 bg-blue-100 rounded-t-2xl relative">
                 {loading ? (
-                    <div className="flex justify-center items-center min-h-[60vh]">
-                        <Loader isLoading={true} size="lg" />
-                    </div>
+                    <TrainerDetailsSkeleton />
                 ) : !trainerData ? (
                     <div className="flex justify-center items-center min-h-[10vh]">
                         <p className="text-xl text-gray-600">Trainer not found</p>
@@ -428,7 +416,7 @@ export default function TrainerDetails() {
                                             <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                             </svg>
-                                            <span className="text-sm text-gray-600">{trainerData?.full_name}@trainer.com</span>
+                                            <span className="text-sm text-gray-600">{trainerData?.trainer}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -453,6 +441,12 @@ export default function TrainerDetails() {
                                                         <img src="assets/lin24.png" alt="LinkedIn" />
                                                     </a>
                                                 )}
+                                                {trainerData?.personal_website && (
+                                                    <a href={trainerData.personal_website} target="_blank" rel="noopener noreferrer">
+                                                        <img src="assets/internet.png" alt="Website" />
+                                                    </a>
+                                                )}
+
                                             </div>
                                         </div>
                                     </div>
@@ -697,7 +691,7 @@ export default function TrainerDetails() {
                                         return (
                                             <div
                                                 key={index}
-                                                className="relative text-md font-thin flex justify-between gap-2 mb-2 "
+                                                className="relative text-md font-thin flex justify-start gap-2 mb-2 "
                                             >
                                                 {!isLast && (
                                                     <div className="absolute left-[7px] top-0 bottom-1 w-[2.5px] bg-blue-300 z-0"></div>
@@ -712,73 +706,59 @@ export default function TrainerDetails() {
                                                         <span className="text-orange-500"> ({education.year}) </span>
                                                     </p>
                                                     <p className="text-[16px] font-normal">{education.institution}</p>
-                                                    <p className="text-[14px] text-gray-500 font-light">
+                                                    {/* <p className="text-[14px] text-gray-500 font-light">
                                                         Specialized in Machine Learning and Artificial Intelligence
-                                                    </p>
+                                                    </p> */}
                                                 </div>
                                             </div>
                                         );
                                     })}
 
 
-                                    {/* <div className="relative text-md font-thin flex justify-between gap-2 mb-4">
-                                        <div className="absolute left-2 top-0 bottom-1 w-[2.5px] bg-blue-400  z-0"></div>
-                                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-400 text-white flex items-center justify-center font-semibold z-10"></span>
 
-                                        <div className="pt-4 pb-8">
-                                            <p className="text-[16px] font-normal ">Ph.D. in Computer Science &nbsp;&nbsp;<span className="text-orange-500">(2015-2019)</span></p>
-                                            <p className="text-[16px] font-normal">Stanford University</p>
-                                            <p className="text-[14px] text-gray-500 font-light">Specialized in Machine Learning and Artificial Intelligence</p>
-                                        </div>
-                                    </div>
-                                    <div className="relative text-md font-thin flex justify-between gap-2 ">
-                                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-400 text-white flex items-center justify-center font-semibold z-10"></span>
-
-                                        <div className="pt-4 pb-8">
-                                            <p className="text-[16px] font-normal ">Ph.D. in Computer Science &nbsp;&nbsp;<span className="text-orange-500">(2015-2019)</span></p>
-                                            <p className="text-[16px] font-normal">Stanford University</p>
-                                            <p className="text-[14px] text-gray-500 font-light">Specialized in Machine Learning and Artificial Intelligence</p>
-                                        </div>
-                                    </div> */}
                                 </div>
                             </div>
 
 
-                            {/* Reviews & Ratings */}
-                            <div className="break-inside-avoid bg-white rounded-xl p-6">
-                                <div className="flex justify-between pb-3">
-                                    <p className="border-b-2 border-blue-500 text-xl font-semibold pb-3">Reviews & Ratings</p>
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex">
-                                            <Star
-                                                className="w-4 h-4 fill-[#FE9A00] text-yellow-400"
-                                            />
-                                        </div>
-                                        <span>5.0 (23)</span>
-                                    </div>
-                                </div>
-                                {[{ name: 'John Doe' }, { name: 'Jane Smith' }].map((r, i) => (
-                                    <div key={i} className="bg-gray-100 rounded-xl p-4 mb-3">
-                                        <div className="flex justify-between">
-                                            <p className="text-md">{r.name}</p>
+                            {(trainerData?.total_reviews ?? 0) > 0 && (
+                                <>
+                                    {/* Reviews & Ratings */}
+                                    <div className="break-inside-avoid bg-white rounded-xl p-6">
+                                        <div className="flex justify-between pb-3">
+                                            <p className="border-b-2 border-blue-500 text-xl font-semibold pb-3">Reviews & Ratings</p>
                                             <div className="flex items-center gap-2">
                                                 <div className="flex">
-                                                    {[1, 2, 3, 4, 5].map((star) => (
-                                                        <Star
-                                                            key={star}
-                                                            className="w-4 h-4 fill-[#FE9A00] text-yellow-400"
-                                                        />
-                                                    ))}
+                                                    <Star
+                                                        className="w-4 h-4 fill-[#FE9A00] text-yellow-400"
+                                                    />
                                                 </div>
-                                                <span>5.0 (23)</span>
+                                                <span>{trainerData?.avg_rating} ({trainerData?.total_reviews})</span>
                                             </div>
                                         </div>
-                                        <p className="text-xs text-gray-500 pt-2">
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit...
-                                        </p>
+                                        {trainerData?.reviews?.slice(0, 3).map((review, i) => (
+                                            <div key={i} className="bg-gray-100 rounded-xl p-4 mb-3">
+                                                <div className="flex justify-between">
+                                                    <p className="text-md">{review.user_name}</p>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex">
+                                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                                <Star
+                                                                    key={star}
+                                                                    className={`w-4 h-4 ${star <= review.rating ? 'fill-[#FE9A00] text-yellow-400' : 'text-gray-300'}`}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                        {/* <span>{review.rating}</span> */}
+                                                    </div>
+                                                </div>
+                                                <p className="text-xs text-gray-500 pt-2">
+                                                    {review.review}
+                                                </p>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
+                                </>
+                            )}
 
                             {/* Post Your Review */}
                             {!isLoggedInUser && !trainerLocked && (
@@ -814,14 +794,48 @@ export default function TrainerDetails() {
                                         placeholder="Write your review here..."
                                         className="w-full border border-gray-300 rounded-md p-3 text-base resize-none mt-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         rows={4}
+                                        value={reviewText}
+                                        onChange={(e) => setReviewText(e.target.value)}
                                     />
 
                                     {/* Submit Button */}
                                     <button
-                                        className="w-full mt-4 px-6 py-2.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-base font-medium transition-all duration-200 hover:shadow-lg active:scale-95"
-                                        onClick={() => alert(`Submitted rating: ${rating} stars`)}
+                                        className="w-full mt-4 px-6 py-2.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-base font-medium transition-all duration-200 hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        onClick={async () => {
+                                            if (!rating || !reviewText.trim()) {
+                                                showError('Please provide both rating and review');
+                                                return;
+                                            }
+
+                                            setIsSubmitting(true);
+                                            try {
+                                                await trainerApis.fileUpload.ratings.submitReview({
+                                                    user: user.email,
+                                                    trainer: trainerData?.name || '',
+                                                    rating: rating,
+                                                    review: reviewText.trim()
+                                                });
+
+                                                // Reset form
+                                                setRating(0);
+                                                setReviewText('');
+                                                showError('Review submitted successfully!');
+                                                // Refresh trainer data to show new review
+                                                const trainerName = searchParams.get('trainer');
+                                                if (trainerName) {
+                                                    const response = await trainerApis.company.getTrainerByName(trainerName, user.name);
+                                                    setTrainerData(response.message);
+                                                }
+                                            } catch (error) {
+                                                console.error('Error submitting review:', error);
+                                                showError('Failed to submit review. Please try again.');
+                                            } finally {
+                                                setIsSubmitting(false);
+                                            }
+                                        }}
+                                        disabled={isSubmitting || !rating || !reviewText.trim()}
                                     >
-                                        Submit Review
+                                        {isSubmitting ? 'Submitting...' : 'Submit Review'}
                                     </button>
                                 </div>
                             )}
@@ -842,12 +856,13 @@ export default function TrainerDetails() {
             {!isLoggedInUser && (
                 <section className="w-full max-w-7xl mx-auto px-4 py-10 trainer-list-section">
                     <h2 className="text-[30px] font-bold mb-6 text-gray-800 trainer-list-title">Discover Related Trainers</h2>
-                    {/* <TrainerGrid trainers={dummyTrainers} limit={8} /> */}
                     <TrainerGrid
                         trainers={trainers}
                         paginationMode="client"
                         paginationConfig={{ page: 1, pageSize: 12 }}
                         pageLocked={true}
+                        onWishlistUpdate={handleWishlistUpdate}
+                        isLoading={loading}
                     />
                 </section>
 

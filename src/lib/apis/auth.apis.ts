@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { getAuthHeaders } from '../utils/auth.utils';
 import { User } from "@/models/auth.models";
+import { Password } from '@mui/icons-material';
 
 export const authApis = {
     // Login
@@ -62,6 +63,54 @@ export const authApis = {
         } catch (error) {
             console.error('Error fetching user permissions:', error);
             throw error;
+        }
+    },
+
+    otp: {
+        generateOTP: async (email: string) => {
+            try {
+                const response = await axios.post('/api/method/trainer.api.generate_otp', {
+                    email: email
+                });
+                return response.data;
+            } catch (error) {
+                console.error('Error generating OTP:', error);
+                throw error;
+            }
+        },
+
+        // Verify OTP
+        verifyOTP: async (email: string, enteredOTP: string) => {
+            try {
+                const response = await axios.post('/api/method/trainer.api.verify_otp', {
+                    email: email,
+                    entered_otp: enteredOTP
+                });
+                return response.data;
+            } catch (error) {
+                console.error('Error verifying OTP:', error);
+                throw error;
+            }
+        },
+
+
+    },
+
+    // Generate OTP
+
+    // Reset Password
+    Password: {
+        resetPassword: async (email: string, newPassword: string) => {
+            try {
+                const response = await axios.post('/api/method/trainer.api.reset_password', {
+                    email: email,
+                    new_password: newPassword
+                });
+                return response.data;
+            } catch (error) {
+                console.error('Error resetting password:', error);
+                throw error;
+            }
         }
     }
 }; 

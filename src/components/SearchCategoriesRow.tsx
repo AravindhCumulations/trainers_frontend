@@ -24,7 +24,7 @@ const SearchCategoriesRow: React.FC<SearchCategoriesRowProps> = ({ onCategoryCli
     };
 
     return (
-        <div className="max-w-6xl h-[60px] flex items-center gap-2 mt-0 justify-center bg-white/20 rounded-full py-4 px-3 shadow-md backdrop-blur-md hero-categories">
+        <div className=" hidden lg:flex max-w-6xl h-[60px] flex items-center gap-2 mt-0 justify-center bg-white/20 rounded-full py-4 px-3 shadow-md backdrop-blur-md hero-categories">
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-xl font-bold hover:bg-white/50 transition hero-categories-left">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000">
                     <path d="M560-267.69 347.69-480 560-692.31 588.31-664l-184 184 184 184L560-267.69Z" />

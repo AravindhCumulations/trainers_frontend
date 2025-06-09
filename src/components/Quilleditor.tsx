@@ -2,95 +2,86 @@ import { useEffect, useRef, useState } from 'react';
 
 export default function QuillEditor({
     value,
-    onChange
+    onChange,
+    className = ''
 }: {
     value: string;
     onChange: (val: string) => void;
+    className?: string;
 }) {
     const quillRef = useRef<HTMLDivElement>(null);
-    const quillInstance = useRef<any>(null);
-    const [isMounted, setIsMounted] = useState(false);
+    const [editor, setEditor] = useState<any>(null);
 
     useEffect(() => {
-        setIsMounted(true);
-    }, []);
+        const loadQuill = async () => {
+            if (!quillRef.current) return;
 
-    useEffect(() => {
-        if (!isMounted) return;
+            const Quill = (await import('quill')).default;
+            await import('quill/dist/quill.snow.css');
 
-        const initQuill = async () => {
-            if (quillRef.current && !quillInstance.current) {
-                const Quill = (await import('quill')).default;
-                await import('quill/dist/quill.snow.css');
-
-                quillInstance.current = new Quill(quillRef.current, {
-                    theme: 'snow',
-                    modules: {
-                        toolbar: [
-                            ['bold', 'italic', 'underline'],
-                            [{ list: 'bullet' }],
-                            ['clean']
-                        ]
-                    }
-                });
-
-                // Set initial content safely
-                if (value) {
-                    try {
-                        // Ensure the value is treated as HTML content
-                        const htmlContent = value.startsWith('<') ? value : `<p>${value}</p>`;
-                        quillInstance.current.clipboard.dangerouslyPasteHTML(htmlContent);
-                    } catch (error) {
-                        console.error('Error setting initial content:', error);
-                        quillInstance.current.clipboard.dangerouslyPasteHTML('<p></p>');
-                    }
+            const quill = new Quill(quillRef.current, {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ list: 'bullet' }]
+                    ]
                 }
+            });
 
-                // On content change, pass HTML to parent
-                quillInstance.current.on('text-change', () => {
-                    const html = quillInstance.current.root.innerHTML;
-                    if (html !== value) {
-                        onChange(html);
-                    }
-                });
+            // Set initial value
+            if (value) {
+                quill.root.innerHTML = value;
             }
+
+            // Handle changes
+            quill.on('text-change', () => {
+                const html = quill.root.innerHTML;
+                onChange(html);
+            });
+
+            setEditor(quill);
         };
 
-        initQuill();
-    }, [isMounted, onChange, value]);
+        loadQuill();
 
-    // Sync external value changes into editor
-    useEffect(() => {
-        if (
-            quillInstance.current &&
-            quillInstance.current.root.innerHTML !== value
-        ) {
-            try {
-                // Ensure the value is treated as HTML content
-                const htmlContent = value.startsWith('<') ? value : `<p>${value}</p>`;
-                quillInstance.current.clipboard.dangerouslyPasteHTML(htmlContent);
-            } catch (error) {
-                console.error('Error syncing content:', error);
+        return () => {
+            if (editor) {
+                editor.off('text-change');
             }
-        }
-    }, [value]);
+        };
+    }, []);
 
-    if (!isMounted) {
-        return (
-            <div
-                className="border border-blue-100 rounded-lg border-2xl overflow-hidden"
-                style={{ minHeight: '120px' }}
-            />
-        );
-    }
+    // Update content when value prop changes
+    useEffect(() => {
+        if (editor && value !== editor.root.innerHTML) {
+            editor.root.innerHTML = value;
+        }
+    }, [value, editor]);
 
     return (
-        <div className="border border-blue-100 rounded-lg border-2xl overflow-hidden">
-            <div
-                ref={quillRef}
-                style={{ minHeight: '120px', padding: '8px' }}
-                className="text-gray-700 font-normal"
-            />
+        <div className={`border border-blue-100 rounded-lg overflow-hidden ${className}`}>
+            <style jsx global>{`
+                .ql-editor {
+                    min-height: 120px;
+                    max-height: 300px;
+                    overflow-y: auto;
+                    padding: 12px;
+                    font-size: 16px;
+                    line-height: 24px;
+                    color: #374151;
+                }
+                .ql-toolbar {
+                    border-bottom: 1px solid #E5E7EB;
+                    background-color: #F9FAFB;
+                    border-top-left-radius: 0.5rem;
+                    border-top-right-radius: 0.5rem;
+                    padding: 8px;
+                }
+                .ql-container {
+                    border: none;
+                }
+            `}</style>
+            <div ref={quillRef} />
         </div>
     );
 }

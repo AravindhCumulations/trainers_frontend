@@ -4,7 +4,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import isEqual from 'lodash/isEqual';
 
 import NavBar from '../../components/Navbar';
-import { Education, Certification, Testimonial } from '@/models/trainer.models';
+import { Education, Certification, Testimonial, TrainerFormValidator } from '@/models/trainerDetails.model';
 import { useTheme } from '@/styles/ThemeProvider';
 import Footer from '@/components/Footer';
 import FacebookIcon from '@mui/icons-material/Facebook';
@@ -16,6 +16,7 @@ import {
     TextField,
     InputAdornment,
     IconButton,
+    Chip,
 } from '@mui/material';
 import { Add, Delete, CalendarToday } from "@mui/icons-material";
 import { indianCities } from "@/app/content/IndianCities";
@@ -26,6 +27,7 @@ import { useNavigation } from "@/lib/hooks/useNavigation";
 import { getCurrentUserName, setCurrentUserName } from '@/lib/utils/auth.utils';
 import { TrainerFormDto } from '@/models/trainerDetails.model';
 import { expertise_in } from '@/app/content/ExpertiseIN';
+import { useUser } from '@/context/UserContext';
 
 // Add type for tracking modified fields
 type ModifiedTrainerFields = Partial<TrainerFormDto>;
@@ -34,6 +36,8 @@ export default function TrainerDetailsPage() {
 
 
     const { theme } = useTheme();
+    const { setName } = useUser();
+
 
     // edit mode
     const [isEdit, setIsEdit] = useState(false);
@@ -73,7 +77,7 @@ export default function TrainerDetailsPage() {
         language: '',
         charge: 0,
         phone: '',
-        email: '',
+        // email: '',
         trainer: '',
         image: '',
 
@@ -87,11 +91,12 @@ export default function TrainerDetailsPage() {
         instagram: '',
         linkedin: '',
         twitter: '',
-        website: '',
+        personal_website: '',
 
         // testimonials
         testimonilas: [{ client_name: '', company: '', testimonials: '' }],
 
+        client_worked: [{ company: '', idx: 0 }],
     });
 
     // Add initial state reference
@@ -119,7 +124,8 @@ export default function TrainerDetailsPage() {
             instagram: trainerData.instagram || '',
             linkedin: trainerData.linkedin || '',
             twitter: trainerData.twitter || '',
-            website: trainerData.personal_website || '',
+            personal_website: trainerData.personal_website || '',
+            client_worked: trainerData.client_worked || [],
         };
 
         // Set both form and initial form state
@@ -208,6 +214,8 @@ export default function TrainerDetailsPage() {
                 showLoader();
                 const searchParams = new URLSearchParams(window.location.search);
                 const trainerParam = searchParams.get('trainer');
+
+
 
                 if (trainerParam) {
                     setIsEdit(true);
@@ -443,6 +451,12 @@ export default function TrainerDetailsPage() {
         e.preventDefault();
 
         setErrors([]);
+        // Validate form before submission
+        const validationErrors = TrainerFormValidator.validateForm(form);
+        if (validationErrors.length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
 
         try {
             showLoader();
@@ -455,24 +469,53 @@ export default function TrainerDetailsPage() {
                 imageUrl = uploadResponse.message.file_url;
             }
 
+
+
+
+
+
+
+
             let response;
             if (isEdit) {
+
+
+
                 const submitData = {
                     ...modifiedFields,
                     ...(hasImageChanged && { image: imageUrl }), // Only include image if it was changed
-                    phone: form.phone ? `+91-${form.phone.replace(/^\+91-/, '')}` : '' // Ensure phone has +91- prefix
                 };
+                if (modifiedFields.phone) {
+                    const phone = `+91-${modifiedFields.phone.replace(/^\+91-/, '')}`;
+                    TrainerFormValidator.validatePhoneNumber(phone)
+                    submitData.phone = phone; // ✅ Plain object assignment
+                }
+
 
                 response = await trainerApis.trainerForm.editFormData(submitData);
             } else {
+
+                form.trainer = getCurrentUserName();
+
                 const submitData = {
                     ...form,
                     ...(hasImageChanged && { image: imageUrl }), // Only include image if it was changed
                     phone: form.phone ? `+91-${form.phone.replace(/^\+91-/, '')}` : '' // Ensure phone has +91- prefix
                 };
+                if (form.phone) {
+                    const phone = `+91-${form.phone.replace(/^\+91-/, '')}`;
+                    TrainerFormValidator.validatePhoneNumber(phone)
+                    submitData.phone = phone; // ✅ Plain object assignment
+                }
 
                 response = await trainerApis.trainerForm.createFormData(submitData);
-                setCurrentUserName(response.data.name);
+                const responseName = response.data.name
+
+                // updating username in both localStorage & userContext
+                setCurrentUserName(responseName)
+                setName(responseName)
+
+
             }
 
             // Reset image change state after successful submission
@@ -923,10 +966,9 @@ export default function TrainerDetailsPage() {
                                     </div>
 
                                     {/* Email ID */}
-                                    <div>
+                                    {/* <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Email ID</label>
                                         <div className="flex items-center border border-gray-300 rounded-md h-[42px] focus-within:ring-2 focus-within:ring-blue-500">
-                                            {/* Invisible prefix span to match ₹ and +91 spacing */}
                                             <span className="text-transparent select-none">--</span>
                                             <input
                                                 type="email"
@@ -936,8 +978,69 @@ export default function TrainerDetailsPage() {
                                                 className="w-full ml-2 outline-none"
                                             />
                                         </div>
-                                    </div>
+                                    </div> */}
 
+                                </div>
+
+                                {/* Clients Worked */}
+                                <div className="mb-6">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Companies Worked With
+                                    </label>
+                                    <div className="flex flex-wrap gap-2 mb-2">
+                                        {form.client_worked.map((client, index) => (
+                                            <Chip
+                                                key={index}
+                                                label={client.company}
+                                                onDelete={() => {
+                                                    const newClients = form.client_worked.filter((_, i) => i !== index);
+                                                    setForm(prev => ({
+                                                        ...prev,
+                                                        client_worked: newClients
+                                                    }));
+                                                    if (!isEqual(newClients, initialFormState.current.client_worked)) {
+                                                        setModifiedFields(prev => ({
+                                                            ...prev,
+                                                            client_worked: newClients
+                                                        }));
+                                                    }
+                                                }}
+                                                className="bg-blue-100 text-blue-800"
+                                            />
+                                        ))}
+                                    </div>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        placeholder="Type company name and press Enter"
+                                        variant="outlined"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                const input = e.target as HTMLInputElement;
+                                                const company = input.value.trim();
+
+                                                if (company && !form.client_worked.some(client => client.company === company)) {
+                                                    const newClient = {
+                                                        company,
+                                                        idx: form.client_worked.length + 1
+                                                    };
+                                                    const newClients = [...form.client_worked, newClient];
+                                                    setForm(prev => ({
+                                                        ...prev,
+                                                        client_worked: newClients
+                                                    }));
+                                                    if (!isEqual(newClients, initialFormState.current.client_worked)) {
+                                                        setModifiedFields(prev => ({
+                                                            ...prev,
+                                                            client_worked: newClients
+                                                        }));
+                                                    }
+                                                    input.value = '';
+                                                }
+                                            }
+                                        }}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -1002,7 +1105,8 @@ export default function TrainerDetailsPage() {
                                 <button
                                     type="button"
                                     onClick={addEducation}
-                                    className="flex items-center text-green-600 font-medium mt-2"
+                                    disabled={form.education.length >= 3}
+                                    className={`flex items-center font-medium mt-2 ${form.education.length >= 3 ? 'text-gray-400 cursor-not-allowed' : 'text-green-600'}`}
                                 >
                                     <Add fontSize="small" className="mr-1" /> Add another Education
                                 </button>
@@ -1064,7 +1168,8 @@ export default function TrainerDetailsPage() {
                                 <button
                                     type="button"
                                     onClick={addCertification}
-                                    className="flex items-center text-green-600 font-medium mt-2"
+                                    disabled={form.certificates.length >= 3}
+                                    className={`flex items-center font-medium mt-2 ${form.certificates.length >= 3 ? 'text-gray-400 cursor-not-allowed' : 'text-green-600'}`}
                                 >
                                     <Add fontSize="small" className="mr-1" /> Add another Certificate
                                 </button>
@@ -1129,7 +1234,8 @@ export default function TrainerDetailsPage() {
                                 <button
                                     type="button"
                                     onClick={addTestimonial}
-                                    className="flex items-center text-green-600 font-medium mt-2"
+                                    disabled={form.testimonilas.length >= 3}
+                                    className={`flex items-center font-medium mt-2 ${form.testimonilas.length >= 3 ? 'text-gray-400 cursor-not-allowed' : 'text-green-600'}`}
                                 >
                                     <Add fontSize="small" className="mr-1" /> Add another Testimonial
                                 </button>
@@ -1216,14 +1322,23 @@ export default function TrainerDetailsPage() {
                                         size="small"
                                         placeholder="Your website URL (if available)"
                                         variant="outlined"
-                                        value={form.website}
-                                        onChange={(e) => handleChanges('website', e.target.value)}
+                                        value={form.personal_website}
+                                        onChange={(e) => handleChanges('personal_website', e.target.value)}
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex justify-end">
+                        <div className="flex flex-col gap-4">
+                            {isEdit && (
+                                <button
+                                    type="button"
+                                    onClick={() => handleNavigation('/trainer-details', { 'trainer': getCurrentUserName() })}
+                                    className="w-full px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                            )}
                             <button
                                 type="submit"
                                 disabled={!hasFormChanges}

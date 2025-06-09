@@ -2,7 +2,7 @@
 export const indianCities = [
     "Adoni", "Agartala", "Ahmedabad", "Ahmednagar", "Aizawl", "Ajmer", "Akola", "Aligarh", "Alwar", "Ambernath",
     "Amravati", "Amritsar", "Anand", "Anantapur", "Anantnag", "Arrah", "Asansol", "Aurangabad", "Avadi", "Bahraich",
-    "Bally", "Bangalore", "Baranagar", "Barasat", "Bareilly", "Barrackpore", "Bathinda", "Begusarai", "Belgaum",
+    "Bally", "Bengaluru", "Baranagar", "Barasat", "Bareilly", "Barrackpore", "Bathinda", "Begusarai", "Belgaum",
     "Bellary", "Berhampore", "Berhampur", "Betiah", "Bhadrak", "Bhadravati", "Bhagalpur", "Bharatpur", "Bhatpara",
     "Bhavnagar", "Bhilai", "Bhilwara", "Bhind", "Bhiwandi", "Bhiwani", "Bhopal", "Bhubaneswar", "Bhuj", "Bidar",
     "Bidhan Nagar", "Bijapur", "Bilaspur", "Bokaro", "Burhanpur", "Chandannagar", "Chandigarh", "Chandrapur",

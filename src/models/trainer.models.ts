@@ -12,6 +12,14 @@ export interface Certification {
 
 }
 
+export interface Review {
+    user_name: string;
+    rating: number;
+    review: string;
+    creation: string;
+
+}
+
 export interface PersonalInfo {
     bio: string;
     trainerApproch: string;

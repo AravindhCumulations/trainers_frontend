@@ -6,7 +6,7 @@ import TrainerCard from './TrainerCard';
 import PaginationControls from './PaginationControls';
 import { TrainerCardModel } from '../models/trainerCard.model';
 import { useNavigation } from "@/lib/hooks/useNavigation";
-
+import TrainerCardSkeleton from './TrainerCardSkeleton';
 
 export interface PaginationConfig {
     page: number;
@@ -21,8 +21,8 @@ export interface TrainerGridProps {
     onPageChange?: (newConfig: PaginationConfig) => void;
     pageLocked?: boolean;
     onWishlistUpdate?: (trainer: TrainerCardModel, isWishlisted: boolean) => void;
+    isLoading?: boolean;
 }
-
 
 export default function TrainerGrid({
     trainers,
@@ -30,28 +30,18 @@ export default function TrainerGrid({
     paginationConfig,
     onPageChange,
     pageLocked = false,
-    onWishlistUpdate
+    onWishlistUpdate,
+    isLoading = false
 }: TrainerGridProps) {
     const router = useRouter();
     const { page, pageSize } = paginationConfig;
     const [localPage, setLocalPage] = useState(page);
     const { handleNavigation } = useNavigation();
 
-
-
-
-    // Add debug logging
-
-
-
-
     const totalPages = useMemo(() =>
         Math.ceil((paginationConfig.totalItems || trainers.length) / pageSize),
         [paginationConfig.totalItems, trainers.length, pageSize]
     );
-
-
-
 
     const handlePageChange = useCallback((newPage: number) => {
         if (paginationMode === 'server') {
@@ -72,17 +62,18 @@ export default function TrainerGrid({
     }, [trainers, paginationMode, localPage, pageSize, pageLocked]);
 
     const handleTrainerClick = useCallback((trainer: TrainerCardModel) => {
-
         handleNavigation('/trainer-details', { 'trainer': trainer.name })
-
-    }, [router]);
-
-
+    }, [handleNavigation]);
 
     return (
-        <section className="w-full max-w-[1352px] mx-auto flex flex-col px-4 py-10 trainer-list-section">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-7 trainer-list-grid">
-                {paginatedTrainers.length > 0 ? (
+        <section className="w-full max-w-[1352px] mx-auto flex flex-col px-2 sm:px-4 py-6 sm:py-10 trainer-list-section">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-7 lg:gap 3 trainer-list-grid">
+                {isLoading ? (
+                    // Show skeleton loaders based on pageSize
+                    Array.from({ length: pageSize }).map((_, index) => (
+                        <TrainerCardSkeleton key={index} />
+                    ))
+                ) : paginatedTrainers.length > 0 ? (
                     paginatedTrainers.map((trainer) => (
                         <TrainerCard
                             key={trainer.name}
@@ -92,17 +83,17 @@ export default function TrainerGrid({
                         />
                     ))
                 ) : (
-                    <div className="col-span-full row-span-full text-center text-gray-500 text-lg font-semibold py-14 h-full">
+                    <div className="col-span-full row-span-full text-center text-gray-500 text-base sm:text-lg font-semibold py-8 sm:py-14 h-full">
                         Nothing to display
                     </div>
                 )}
             </div>
 
             {pageLocked && trainers.length != 0 ? (
-                <div className="flex justify-center mt-8">
+                <div className="flex justify-center mt-6 sm:mt-8">
                     <button
                         onClick={() => router.push("/trainers-page")}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                        className="px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm sm:text-base"
                     >
                         View All
                     </button>

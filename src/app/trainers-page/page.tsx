@@ -9,29 +9,24 @@ import { trainerApis } from '../../lib/apis/trainer.apis';
 import { categories } from '@/app/content/categories'
 import { getCurrentUserName } from '@/lib/utils/auth.utils'
 import { useLoading } from '@/context/LoadingContext';
+import { TrainerCardModel } from '@/models/trainerCard.model';
+import { indianCities } from '@/app/content/IndianCities';
 
 function TrainersPageContent() {
     const searchParams = useSearchParams();
     const [citySearch, setCitySearch] = useState('');
     const [searchText, setSearchText] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
+    const [searchResults, setSearchResults] = useState<TrainerCardModel[]>([]);
     const [searchTitle, setSearchTitle] = useState('All Trainers');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(16);
     const [totalItems, setTotalItems] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
     const { showLoader, hideLoader } = useLoading();
-
-    const cities = [
-        { name: 'Hyderabad', image: '/assets/hydrabad.jpg' },
-        { name: 'Bengaluru', image: '/assets/Bangalore.jpg' },
-        { name: 'Delhi', image: '/assets/delhi.jpg' },
-        { name: 'Chennai', image: '/assets/chennai.jpg' },
-        { name: 'Kochi', image: '/assets/kochi.jpg' },
-        { name: 'Mumbai', image: '/assets/mumbai.jpg' },
-    ];
 
     const handleSearch = async (searchValue = searchText, cityValue = citySearch, page = currentPage, pageSize = itemsPerPage) => {
         try {
+            setIsLoading(true);
             const response = await trainerApis.searchTrainers(
                 getCurrentUserName(),
                 searchValue,
@@ -56,6 +51,8 @@ function TrainersPageContent() {
             setSearchResults([]);
             setSearchTitle('All Trainers');
             setTotalItems(0);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -90,6 +87,26 @@ function TrainersPageContent() {
             setCurrentPage(1);
             setSearchResults([]);
             handleSearch();
+        }
+    };
+
+    const handleWishlistUpdate = async (trainer: TrainerCardModel, isWishlisted: boolean) => {
+        try {
+            // Update the trainer in the search results
+            setSearchResults(prevResults =>
+                prevResults.map(t =>
+                    t.name === trainer.name
+                        ? { ...t, is_wishlisted: isWishlisted ? 1 : 0 }
+                        : t
+                )
+            );
+
+            // If we're on a specific page, refresh the current page data to maintain consistency
+            if (currentPage > 1) {
+                await handleSearch(searchText, citySearch, currentPage, itemsPerPage);
+            }
+        } catch (error) {
+            console.error('Error updating wishlist:', error);
         }
     };
 
@@ -170,7 +187,7 @@ function TrainersPageContent() {
                                     </svg>
                                 </div>
                             </div>
-                            <div className=" w-[40%] flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md mb-5 hero-search-city-bar ">
+                            <div className=" w-[40%] flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md mb-5 hero-search-city-bar relative">
                                 <select
                                     value={citySearch}
                                     onChange={(e) => {
@@ -179,17 +196,22 @@ function TrainersPageContent() {
                                         setSearchResults([]);
                                         handleSearch(searchText, e.target.value, 1, itemsPerPage);
                                     }}
-                                    className="flex-1 px-5 py-2 rounded-full outline-none text-white bg-transparent placeholder-white/80 text-[16px] font-normal hero-search-input appearance-none"
+                                    className="flex-1 px-5 py-2 rounded-full outline-none text-white bg-transparent placeholder-white/80 text-[16px] font-normal hero-search-input appearance-none cursor-pointer hover:bg-white/10 transition-colors duration-200"
                                 >
-                                    <option value="" className="text-gray-900 ">Choose City</option>
-                                    {cities.map((city) => (
-                                        <option key={city.name} value={city.name} className="text-gray-900">
-                                            {city.name}
+                                    <option value="" className="text-gray-900 bg-white">Choose City</option>
+                                    {indianCities.map((city) => (
+                                        <option key={city} value={city} className="text-gray-900 bg-white hover:bg-blue-50">
+                                            {city}
                                         </option>
                                     ))}
                                 </select>
+                                <div className="absolute right-12 pointer-events-none">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M7 10l5 5 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </div>
                                 {citySearch && (
-                                    <div className="pr-2 cursor-pointer " onClick={handleClearCity}>
+                                    <div className="pr-2 cursor-pointer hover:bg-white/10 rounded-full p-1 transition-colors duration-200" onClick={handleClearCity}>
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="white" />
                                         </svg>
@@ -222,6 +244,8 @@ function TrainersPageContent() {
                         totalItems: totalItems
                     }}
                     onPageChange={handlePageChange}
+                    onWishlistUpdate={handleWishlistUpdate}
+                    isLoading={isLoading}
                 />
 
             </main>

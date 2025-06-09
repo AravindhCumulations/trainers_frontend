@@ -11,6 +11,7 @@ import EditWorkshop from '@/components/EditWorkshop';
 import { trainerApis } from '@/lib/apis/trainer.apis';
 import { TrainerDetailsModel } from '@/models/trainerDetails.model';
 import Overlay from '@/components/Overlay';
+import WorkshopDetails from '@/components/WorkshopDetails';
 
 export default function WorkshopsPage() {
     const [workshops, setWorkshops] = useState<Workshop[]>([]);
@@ -177,7 +178,8 @@ export default function WorkshopsPage() {
             key={item.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-lg shadow-lg overflow-hidden relative group"
+            className="bg-white rounded-lg shadow-lg overflow-hidden relative group cursor-pointer"
+            onClick={() => setOverlayState({ isOpen: true, type: 'details', data: item })}
         >
             <div className="relative h-48">
                 <Image
@@ -186,7 +188,7 @@ export default function WorkshopsPage() {
                     fill
                     className="object-cover"
                 />
-                <div className="absolute top-2 right-2 flex gap-">
+                <div className="absolute top-2 right-2 flex gap-2">
                     <button
                         onClick={(e) => handleEditClick(item, e, isCaseStudy)}
                         className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition"
@@ -218,16 +220,15 @@ export default function WorkshopsPage() {
                         ))}
                     </div>
                     <span className="text-green-600 font-bold">  ₹ {item.price.toFixed(2)}</span>
-
                 </div>
             </div>
         </motion.div>
     );
 
     return (
-        <div className="min-h-screen bg-blue-100">
+        <div className="min-h-screen bg-blue-100 flex flex-col">
             <NavBar />
-            <div className="container mx-auto my-4 w-full">
+            <div className="container mx-auto my-4 w-full flex-grow">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-4xl font-bold text-gray-800">Workshops & Case Studies</h1>
                     <button
@@ -236,201 +237,356 @@ export default function WorkshopsPage() {
                         }}
                         className="flex items-center bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
                     >
-                        <Plus className="mr-2" /> Add Workshop
+                        <Plus className="mr-2" /> Add
                     </button>
                 </div>
 
                 {/* Workshops Section */}
-                <div className="mb-12">
-                    <h2 className="text-2xl font-semibold mb-6 text-gray-800">Workshops</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {workshops.map((workshop) => renderCard(workshop))}
+                {workshops.length > 0 && (
+                    <div className="mb-12">
+                        <h2 className="text-2xl font-semibold mb-6 text-gray-800">Workshops</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {workshops.map((workshop) => renderCard(workshop))}
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Case Studies Section */}
-                <div className="mb-12">
-                    <h2 className="text-2xl font-semibold mb-6 text-gray-800">Case Studies</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {caseStudies.map((caseStudy) => renderCard(caseStudy, true))}
-                    </div>
-                </div>
+                {caseStudies.length > 0 && (
 
-                {/* Overlay for Edit/Create */}
+                    <div className="mb-12">
+                        <h2 className="text-2xl font-semibold mb-6 text-gray-800">Case Studies</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {caseStudies.map((caseStudy) => renderCard(caseStudy, true))}
+                        </div>
+                    </div>
+                )}
+                {workshops.length === 0 && caseStudies.length === 0 && (
+                    <p>Add workshop or casestudy to display</p>
+                )}
+
+
+                {/* Overlay for Edit/Create/Details */}
                 <Overlay
                     isOpen={overlayState.isOpen}
                     onClose={() => setOverlayState({ isOpen: false, type: null })}
                 >
-                    <div className="bg-white w-full rounded-2xl mt-4 max-h-[90vh] overflow-y-auto">
-                        <EditWorkshop
+                    {overlayState.type === 'details' && overlayState.data && (
+                        <WorkshopDetails
+                            workshop={overlayState.data}
                             onClose={() => setOverlayState({ isOpen: false, type: null })}
-                            initialData={overlayState.type === 'edit' && overlayState.data ? {
-                                id: overlayState.data.id,
-                                title: overlayState.data.title,
-                                description: overlayState.data.description,
-                                price: overlayState.data.price,
-                                targetAudience: overlayState.data.targetAudience,
-                                format: overlayState.data.format,
-                                image: overlayState.data.image,
-                                objectives: overlayState.data.objectives || '',
-                                outcomes: overlayState.data.outcomes || '',
-                                handouts: overlayState.data.handouts || '',
-                                programFlow: overlayState.data.programFlow || '',
-                                evaluation: overlayState.data.evaluation || '',
-                                isCaseStudy: overlayState.data.isCaseStudy
-                            } : undefined}
-                            mode={overlayState.type === 'create' ? 'create' : 'edit'}
-                            onUpdate={async (workshopData) => {
-                                const isCreate = overlayState.type === 'create';
-                                const isCaseStudy = workshopData.isCaseStudy || false;
-
-                                try {
-                                    // First, update the local state
-                                    let updatedWorkshops, updatedCaseStudies;
-                                    if (isCreate) {
-                                        // Add new item to the appropriate list
-                                        if (isCaseStudy) {
-                                            updatedCaseStudies = [...caseStudies, {
-                                                id: workshopData.id,
-                                                title: workshopData.title,
-                                                description: workshopData.description,
-                                                price: workshopData.price,
-                                                targetAudience: workshopData.targetAudience,
-                                                format: workshopData.format as 'virtual' | 'In-Person',
-                                                image: workshopData.image,
-                                                objectives: workshopData.objectives,
-                                                outcomes: workshopData.outcomes,
-                                                handouts: workshopData.handouts,
-                                                programFlow: workshopData.programFlow,
-                                                evaluation: workshopData.evaluation
-                                            }];
-                                            updatedWorkshops = [...workshops];
-                                        } else {
-                                            updatedWorkshops = [...workshops, {
-                                                id: workshopData.id,
-                                                title: workshopData.title,
-                                                description: workshopData.description,
-                                                price: workshopData.price,
-                                                targetAudience: workshopData.targetAudience,
-                                                format: workshopData.format as 'virtual' | 'In-Person',
-                                                image: workshopData.image,
-                                                objectives: workshopData.objectives,
-                                                outcomes: workshopData.outcomes,
-                                                handouts: workshopData.handouts,
-                                                programFlow: workshopData.programFlow,
-                                                evaluation: workshopData.evaluation
-                                            }];
-                                            updatedCaseStudies = [...caseStudies];
-                                        }
-                                    } else {
-                                        // Update existing item in the appropriate list
-                                        if (isCaseStudy) {
-                                            updatedCaseStudies = caseStudies.map(caseStudy =>
-                                                caseStudy.id === workshopData.id ? {
-                                                    ...caseStudy,
-                                                    title: workshopData.title,
-                                                    description: workshopData.description,
-                                                    price: workshopData.price,
-                                                    targetAudience: workshopData.targetAudience,
-                                                    format: workshopData.format as 'virtual' | 'In-Person',
-                                                    image: workshopData.image,
-                                                    objectives: workshopData.objectives,
-                                                    outcomes: workshopData.outcomes,
-                                                    handouts: workshopData.handouts,
-                                                    programFlow: workshopData.programFlow,
-                                                    evaluation: workshopData.evaluation
-                                                } : caseStudy
-                                            );
-                                            updatedWorkshops = [...workshops];
-                                        } else {
-                                            updatedWorkshops = workshops.map(workshop =>
-                                                workshop.id === workshopData.id ? {
-                                                    ...workshop,
-                                                    title: workshopData.title,
-                                                    description: workshopData.description,
-                                                    price: workshopData.price,
-                                                    targetAudience: workshopData.targetAudience,
-                                                    format: workshopData.format as 'virtual' | 'In-Person',
-                                                    image: workshopData.image,
-                                                    objectives: workshopData.objectives,
-                                                    outcomes: workshopData.outcomes,
-                                                    handouts: workshopData.handouts,
-                                                    programFlow: workshopData.programFlow,
-                                                    evaluation: workshopData.evaluation
-                                                } : workshop
-                                            );
-                                            updatedCaseStudies = [...caseStudies];
-                                        }
-                                    }
-
-                                    // Get trainer ID from URL
-                                    const searchParams = new URLSearchParams(window.location.search);
-                                    const trainerName = searchParams.get('trainer');
-                                    if (!trainerName) {
-                                        throw new Error('Trainer name not found in URL');
-                                    }
-
-                                    // Get trainer details to get the trainer ID
-                                    const trainerResponse = await trainerApis.getTrainerByName(trainerName);
-                                    const trainerId = trainerResponse.data.name;
-
-                                    // Create payload with only the modified list
-                                    const payload = {
-                                        name: trainerId,
-                                        ...(isCaseStudy ? {
-                                            casestudy: updatedCaseStudies.map((caseStudy) => ({
-                                                title: caseStudy.title,
-                                                description: caseStudy.description,
-                                                price: caseStudy.price,
-                                                target_audience: caseStudy.targetAudience,
-                                                format: caseStudy.format,
-                                                casestudy_image: caseStudy.image,
-                                                outcomes: caseStudy.outcomes,
-                                                handouts: caseStudy.handouts,
-                                                program_flow: caseStudy.programFlow,
-                                                evaluation: caseStudy.evaluation
-                                            }))
-                                        } : {
-                                            workshop: updatedWorkshops.map((workshop) => ({
-                                                title: workshop.title,
-                                                description: workshop.description,
-                                                price: workshop.price,
-                                                target_audience: workshop.targetAudience,
-                                                format: workshop.format,
-                                                workshop_image: workshop.image,
-                                                outcomes: workshop.outcomes,
-                                                handouts: workshop.handouts,
-                                                program_flow: workshop.programFlow,
-                                                evaluation: workshop.evaluation
-                                            }))
-                                        })
-                                    } as any;
-
-                                    console.log("Payload");
-
-                                    console.log(payload);
-
-
-
-
-
-                                    // Make API call to update trainer with the modified list
-                                    await trainerApis.trainerForm.editFormData(payload);
-
-                                    // Update local state with the new data
-                                    if (isCaseStudy) {
-                                        setCaseStudies(updatedCaseStudies);
-                                    } else {
-                                        setWorkshops(updatedWorkshops);
-                                    }
-                                    setOverlayState({ isOpen: false, type: null });
-                                } catch (error) {
-                                    console.error(`Error ${overlayState.type === 'create' ? 'creating' : 'updating'} ${isCaseStudy ? 'case study' : 'workshop'}:`, error);
-                                    alert(`Failed to ${overlayState.type === 'create' ? 'create' : 'update'} ${isCaseStudy ? 'case study' : 'workshop'}`);
-                                }
-                            }}
                         />
-                    </div>
+                    )}
+                    {overlayState.type === 'edit' && (
+                        <div className="bg-white w-full rounded-2xl mt-4">
+                            <EditWorkshop
+                                onClose={() => setOverlayState({ isOpen: false, type: null })}
+                                initialData={overlayState.data}
+                                mode="edit"
+                                onUpdate={async (workshopData) => {
+                                    const isCreate = overlayState.type === 'create';
+                                    const isCaseStudy = workshopData.isCaseStudy || false;
+
+                                    try {
+                                        // First, update the local state
+                                        let updatedWorkshops, updatedCaseStudies;
+                                        if (isCreate) {
+                                            // Add new item to the appropriate list
+                                            if (isCaseStudy) {
+                                                updatedCaseStudies = [...caseStudies, {
+                                                    id: workshopData.id,
+                                                    title: workshopData.title,
+                                                    description: workshopData.description,
+                                                    price: workshopData.price,
+                                                    targetAudience: workshopData.targetAudience,
+                                                    format: workshopData.format as 'virtual' | 'In-Person',
+                                                    image: workshopData.image,
+                                                    objectives: workshopData.objectives,
+                                                    outcomes: workshopData.outcomes,
+                                                    handouts: workshopData.handouts,
+                                                    programFlow: workshopData.programFlow,
+                                                    evaluation: workshopData.evaluation
+                                                }];
+                                                updatedWorkshops = [...workshops];
+                                            } else {
+                                                updatedWorkshops = [...workshops, {
+                                                    id: workshopData.id,
+                                                    title: workshopData.title,
+                                                    description: workshopData.description,
+                                                    price: workshopData.price,
+                                                    targetAudience: workshopData.targetAudience,
+                                                    format: workshopData.format as 'virtual' | 'In-Person',
+                                                    image: workshopData.image,
+                                                    objectives: workshopData.objectives,
+                                                    outcomes: workshopData.outcomes,
+                                                    handouts: workshopData.handouts,
+                                                    programFlow: workshopData.programFlow,
+                                                    evaluation: workshopData.evaluation
+                                                }];
+                                                updatedCaseStudies = [...caseStudies];
+                                            }
+                                        } else {
+                                            // Update existing item in the appropriate list
+                                            if (isCaseStudy) {
+                                                updatedCaseStudies = caseStudies.map(caseStudy =>
+                                                    caseStudy.id === workshopData.id ? {
+                                                        ...caseStudy,
+                                                        title: workshopData.title,
+                                                        description: workshopData.description,
+                                                        price: workshopData.price,
+                                                        targetAudience: workshopData.targetAudience,
+                                                        format: workshopData.format as 'virtual' | 'In-Person',
+                                                        image: workshopData.image,
+                                                        objectives: workshopData.objectives,
+                                                        outcomes: workshopData.outcomes,
+                                                        handouts: workshopData.handouts,
+                                                        programFlow: workshopData.programFlow,
+                                                        evaluation: workshopData.evaluation
+                                                    } : caseStudy
+                                                );
+                                                updatedWorkshops = [...workshops];
+                                            } else {
+                                                updatedWorkshops = workshops.map(workshop =>
+                                                    workshop.id === workshopData.id ? {
+                                                        ...workshop,
+                                                        title: workshopData.title,
+                                                        description: workshopData.description,
+                                                        price: workshopData.price,
+                                                        targetAudience: workshopData.targetAudience,
+                                                        format: workshopData.format as 'virtual' | 'In-Person',
+                                                        image: workshopData.image,
+                                                        objectives: workshopData.objectives,
+                                                        outcomes: workshopData.outcomes,
+                                                        handouts: workshopData.handouts,
+                                                        programFlow: workshopData.programFlow,
+                                                        evaluation: workshopData.evaluation
+                                                    } : workshop
+                                                );
+                                                updatedCaseStudies = [...caseStudies];
+                                            }
+                                        }
+
+                                        // Get trainer ID from URL
+                                        const searchParams = new URLSearchParams(window.location.search);
+                                        const trainerName = searchParams.get('trainer');
+                                        if (!trainerName) {
+                                            throw new Error('Trainer name not found in URL');
+                                        }
+
+                                        // Get trainer details to get the trainer ID
+                                        const trainerResponse = await trainerApis.getTrainerByName(trainerName);
+                                        const trainerId = trainerResponse.data.name;
+
+                                        // Create payload with only the modified list
+                                        const payload = {
+                                            name: trainerId,
+                                            ...(isCaseStudy ? {
+                                                casestudy: updatedCaseStudies.map((caseStudy) => ({
+                                                    title: caseStudy.title,
+                                                    description: caseStudy.description,
+                                                    price: caseStudy.price,
+                                                    target_audience: caseStudy.targetAudience,
+                                                    format: caseStudy.format,
+                                                    casestudy_image: caseStudy.image,
+                                                    outcomes: caseStudy.outcomes,
+                                                    handouts: caseStudy.handouts,
+                                                    program_flow: caseStudy.programFlow,
+                                                    evaluation: caseStudy.evaluation
+                                                }))
+                                            } : {
+                                                workshop: updatedWorkshops.map((workshop) => ({
+                                                    title: workshop.title,
+                                                    description: workshop.description,
+                                                    price: workshop.price,
+                                                    target_audience: workshop.targetAudience,
+                                                    format: workshop.format,
+                                                    workshop_image: workshop.image,
+                                                    outcomes: workshop.outcomes,
+                                                    handouts: workshop.handouts,
+                                                    program_flow: workshop.programFlow,
+                                                    evaluation: workshop.evaluation
+                                                }))
+                                            })
+                                        } as any;
+
+
+
+
+                                        // Make API call to update trainer with the modified list
+                                        await trainerApis.trainerForm.editFormData(payload);
+
+                                        // Update local state with the new data
+                                        if (isCaseStudy) {
+                                            setCaseStudies(updatedCaseStudies);
+                                        } else {
+                                            setWorkshops(updatedWorkshops);
+                                        }
+                                        setOverlayState({ isOpen: false, type: null });
+                                    } catch (error) {
+                                        console.error(`Error ${overlayState.type === 'create' ? 'creating' : 'updating'} ${isCaseStudy ? 'case study' : 'workshop'}:`, error);
+                                        alert(`Failed to ${overlayState.type === 'create' ? 'create' : 'update'} ${isCaseStudy ? 'case study' : 'workshop'}`);
+                                    }
+                                }}
+                            />
+                        </div>
+                    )}
+                    {overlayState.type === 'create' && (
+                        <div className="bg-white w-full rounded-2xl mt-4">
+                            <EditWorkshop
+                                onClose={() => setOverlayState({ isOpen: false, type: null })}
+                                mode="create"
+                                onUpdate={async (workshopData) => {
+                                    const isCreate = overlayState.type === 'create';
+                                    const isCaseStudy = workshopData.isCaseStudy || false;
+
+                                    try {
+                                        // First, update the local state
+                                        let updatedWorkshops, updatedCaseStudies;
+                                        if (isCreate) {
+                                            // Add new item to the appropriate list
+                                            if (isCaseStudy) {
+                                                updatedCaseStudies = [...caseStudies, {
+                                                    id: workshopData.id,
+                                                    title: workshopData.title,
+                                                    description: workshopData.description,
+                                                    price: workshopData.price,
+                                                    targetAudience: workshopData.targetAudience,
+                                                    format: workshopData.format as 'virtual' | 'In-Person',
+                                                    image: workshopData.image,
+                                                    objectives: workshopData.objectives,
+                                                    outcomes: workshopData.outcomes,
+                                                    handouts: workshopData.handouts,
+                                                    programFlow: workshopData.programFlow,
+                                                    evaluation: workshopData.evaluation
+                                                }];
+                                                updatedWorkshops = [...workshops];
+                                            } else {
+                                                updatedWorkshops = [...workshops, {
+                                                    id: workshopData.id,
+                                                    title: workshopData.title,
+                                                    description: workshopData.description,
+                                                    price: workshopData.price,
+                                                    targetAudience: workshopData.targetAudience,
+                                                    format: workshopData.format as 'virtual' | 'In-Person',
+                                                    image: workshopData.image,
+                                                    objectives: workshopData.objectives,
+                                                    outcomes: workshopData.outcomes,
+                                                    handouts: workshopData.handouts,
+                                                    programFlow: workshopData.programFlow,
+                                                    evaluation: workshopData.evaluation
+                                                }];
+                                                updatedCaseStudies = [...caseStudies];
+                                            }
+                                        } else {
+                                            // Update existing item in the appropriate list
+                                            if (isCaseStudy) {
+                                                updatedCaseStudies = caseStudies.map(caseStudy =>
+                                                    caseStudy.id === workshopData.id ? {
+                                                        ...caseStudy,
+                                                        title: workshopData.title,
+                                                        description: workshopData.description,
+                                                        price: workshopData.price,
+                                                        targetAudience: workshopData.targetAudience,
+                                                        format: workshopData.format as 'virtual' | 'In-Person',
+                                                        image: workshopData.image,
+                                                        objectives: workshopData.objectives,
+                                                        outcomes: workshopData.outcomes,
+                                                        handouts: workshopData.handouts,
+                                                        programFlow: workshopData.programFlow,
+                                                        evaluation: workshopData.evaluation
+                                                    } : caseStudy
+                                                );
+                                                updatedWorkshops = [...workshops];
+                                            } else {
+                                                updatedWorkshops = workshops.map(workshop =>
+                                                    workshop.id === workshopData.id ? {
+                                                        ...workshop,
+                                                        title: workshopData.title,
+                                                        description: workshopData.description,
+                                                        price: workshopData.price,
+                                                        targetAudience: workshopData.targetAudience,
+                                                        format: workshopData.format as 'virtual' | 'In-Person',
+                                                        image: workshopData.image,
+                                                        objectives: workshopData.objectives,
+                                                        outcomes: workshopData.outcomes,
+                                                        handouts: workshopData.handouts,
+                                                        programFlow: workshopData.programFlow,
+                                                        evaluation: workshopData.evaluation
+                                                    } : workshop
+                                                );
+                                                updatedCaseStudies = [...caseStudies];
+                                            }
+                                        }
+
+                                        // Get trainer ID from URL
+                                        const searchParams = new URLSearchParams(window.location.search);
+                                        const trainerName = searchParams.get('trainer');
+                                        if (!trainerName) {
+                                            throw new Error('Trainer name not found in URL');
+                                        }
+
+                                        // Get trainer details to get the trainer ID
+                                        const trainerResponse = await trainerApis.getTrainerByName(trainerName);
+                                        const trainerId = trainerResponse.data.name;
+
+                                        // Create payload with only the modified list
+                                        const payload = {
+                                            name: trainerId,
+                                            ...(isCaseStudy ? {
+                                                casestudy: updatedCaseStudies.map((caseStudy) => ({
+                                                    title: caseStudy.title,
+                                                    description: caseStudy.description,
+                                                    price: caseStudy.price,
+                                                    target_audience: caseStudy.targetAudience,
+                                                    format: caseStudy.format,
+                                                    casestudy_image: caseStudy.image,
+                                                    outcomes: caseStudy.outcomes,
+                                                    handouts: caseStudy.handouts,
+                                                    program_flow: caseStudy.programFlow,
+                                                    evaluation: caseStudy.evaluation
+                                                }))
+                                            } : {
+                                                workshop: updatedWorkshops.map((workshop) => ({
+                                                    title: workshop.title,
+                                                    description: workshop.description,
+                                                    price: workshop.price,
+                                                    target_audience: workshop.targetAudience,
+                                                    format: workshop.format,
+                                                    workshop_image: workshop.image,
+                                                    outcomes: workshop.outcomes,
+                                                    handouts: workshop.handouts,
+                                                    program_flow: workshop.programFlow,
+                                                    evaluation: workshop.evaluation
+                                                }))
+                                            })
+                                        } as any;
+
+
+
+
+
+
+
+
+
+                                        // Make API call to update trainer with the modified list
+                                        await trainerApis.trainerForm.editFormData(payload);
+
+                                        // Update local state with the new data
+                                        if (isCaseStudy) {
+                                            setCaseStudies(updatedCaseStudies);
+                                        } else {
+                                            setWorkshops(updatedWorkshops);
+                                        }
+                                        setOverlayState({ isOpen: false, type: null });
+                                    } catch (error) {
+                                        console.error(`Error ${overlayState.type === 'create' ? 'creating' : 'updating'} ${isCaseStudy ? 'case study' : 'workshop'}:`, error);
+                                        alert(`Failed to ${overlayState.type === 'create' ? 'create' : 'update'} ${isCaseStudy ? 'case study' : 'workshop'}`);
+                                    }
+                                }}
+                            />
+                        </div>
+                    )}
                 </Overlay>
             </div>
             <Footer />

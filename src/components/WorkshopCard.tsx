@@ -10,7 +10,7 @@ interface WorkshopCardProps {
 
 const WorkshopCard = ({ workshop, onClick, tag = "workshop" }: WorkshopCardProps) => {
     // Determine appropriate dimensions and text sizes based on isSmall prop
-    const cardClasses = `bg-white border-2 rounded-lg shadow-lg overflow-hidden max-w-lg cursor-pointer h-[300px] min-w-[320px]`;
+    const cardClasses = `bg-white border-2 rounded-lg shadow-lg overflow-hidden max-w-lg cursor-pointer h-[300px] w-[320px]`;
     const imageClasses = `relative h-32`;
     const titleClasses = `text-md font-semibold mb-1 line-clamp-1 py-1`;
     const descriptionClasses = `text-sm text-gray-600 mb-4 line-clamp-2`;

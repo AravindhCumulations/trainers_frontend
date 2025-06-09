@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { getCurrentUserName, getCurrentUserRole, getCurrentUserMail } from '@/lib/utils/auth.utils';
+import { creditsApis } from '@/lib/apis/credits.apis';
 
 type User = {
     name: string;
@@ -9,6 +10,7 @@ type User = {
     role: 'guest' | 'Trainer' | 'user_role';
     profilePic: string;
     isLoggedIn: boolean;
+    credits?: number;
 };
 
 type UserContextType = {
@@ -16,6 +18,8 @@ type UserContextType = {
     setUser: (user: User) => void;
     resetUser: () => void;
     setProfilePic: (profilePic: string) => void;
+    setName: (name: string) => void;
+    updateCredits: () => Promise<void>;
 };
 
 const defaultUser: User = {
@@ -24,6 +28,7 @@ const defaultUser: User = {
     role: 'guest',
     profilePic: '',
     isLoggedIn: false,
+    credits: 0
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -32,15 +37,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User>(defaultUser);
     const [isInitialized, setIsInitialized] = useState(false);
 
-    // Initialize user state from localStorage on mount
+    // Initialize user state and fetch credits if needed
     useEffect(() => {
-        const initializeUser = () => {
+        if (typeof window === 'undefined') return;
 
+        const initializeUser = async () => {
             const name = getCurrentUserName();
             const email = getCurrentUserMail();
             const role = getCurrentUserRole();
-
-
 
             if (name && email && role) {
                 const userData = {
@@ -48,25 +52,36 @@ export function UserProvider({ children }: { children: ReactNode }) {
                     email,
                     role: role as 'guest' | 'Trainer' | 'user_role',
                     profilePic: '',
-                    isLoggedIn: true
+                    isLoggedIn: true,
+                    credits: 0
                 };
 
                 setUser(userData);
-            } else {
 
+                // Fetch credits immediately if user has user_role
+                if (role === 'user_role') {
+                    try {
+                        const response = await creditsApis.getUserCredits();
+                        if (response?.data?.length > 0) {
+                            setUser(prev => ({
+                                ...prev,
+                                credits: response.data[0].credits
+                            }));
+                        }
+                    } catch (error) {
+                        console.error("Error fetching credits:", error);
+                    }
+                }
+            } else {
                 setUser(defaultUser);
             }
             setIsInitialized(true);
         };
 
-        // Wait for window to be available (client-side)
-        if (typeof window !== 'undefined') {
-            initializeUser();
-        }
-    }, []);
+        initializeUser();
+    }, []); // Only run on mount
 
     const resetUser = () => {
-
         setUser(defaultUser);
     };
 
@@ -77,15 +92,29 @@ export function UserProvider({ children }: { children: ReactNode }) {
         }));
     };
 
-    // Log whenever user state changes
-    useEffect(() => {
-        if (isInitialized) {
+    const setName = (name: string) => {
+        setUser(prevUser => ({
+            ...prevUser,
+            name
+        }));
+    };
 
+    const updateCredits = async () => {
+        try {
+            const response = await creditsApis.getUserCredits();
+            if (response && response.data && response.data.length > 0) {
+                setUser(prevUser => ({
+                    ...prevUser,
+                    credits: response.data[0].credits
+                }));
+            }
+        } catch (error) {
+            console.error("Error fetching credits:", error);
         }
-    }, [user, isInitialized]);
+    };
 
     return (
-        <UserContext.Provider value={{ user, setUser, resetUser, setProfilePic }}>
+        <UserContext.Provider value={{ user, setUser, resetUser, setProfilePic, setName, updateCredits }}>
             {children}
         </UserContext.Provider>
     );

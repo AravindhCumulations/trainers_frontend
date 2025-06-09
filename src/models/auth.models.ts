@@ -43,6 +43,9 @@ export class LoginModel {
         if (!this.password) {
             return 'Password is required';
         }
+        if (this.password.length < 8) {
+            return 'Password should be atleast 8 characters';
+        }
         return null;
     }
 

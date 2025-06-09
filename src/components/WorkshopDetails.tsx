@@ -23,14 +23,6 @@ interface WorkshopDetailsProps {
 
 const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose }) => {
 
-
-
-
-
-
-
-
-
     return (
         <div className="w-[1024px] flex flex-col mt-4 gap-3 p-6 bg-white rounded-2xl workshop-details">
             <div className="flex justify-between items-center w-full">

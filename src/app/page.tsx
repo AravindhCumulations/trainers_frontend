@@ -43,6 +43,7 @@ export default function Home() {
   const [trainers, setTrainers] = useState<TrainerCardModel[]>([]);
   const [unlockedTrainers, setUnlockedTrainers] = useState<TrainerCardModel[]>([]);
   const [wishlistedTrainers, setWishlistedTrainers] = useState<TrainerCardModel[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
 
   // helper variables
@@ -57,9 +58,10 @@ export default function Home() {
       try {
         const userName = user.name;
         showLoader();
+        setIsLoading(true);
         await fetchAllTrainers(userName);
 
-        console.log("Company check - ", isCompany);
+
 
         if (user.role === 'user_role') {
           await fetchCompanyTrainers(userName);
@@ -68,11 +70,12 @@ export default function Home() {
         console.error("Failed to initialize data:", error);
       } finally {
         hideLoader();
+        setIsLoading(false);
       }
     };
 
     initializeData();
-  }, [user]);
+  }, [user, user.isLoggedIn]);
 
 
   const [searchText, setSearchText] = useState(''); // global search
@@ -95,7 +98,7 @@ export default function Home() {
 
   const fetchCompanyTrainers = async (userName: string) => {
 
-    console.log("Fetching Company Trainers");
+
 
     if (!userName) {
       return;
@@ -193,7 +196,7 @@ export default function Home() {
           <Navbar bgColor="transparent" />
           {/* Hero Content */}
           <div className="flex flex-col gap-3 items-center h-[40vh] w-full mt-6 px-4 hero-content">
-            <h1 className="text-5xl font-extrabold mb-2 text-center leading-tight hero-title">
+            <h1 className="text-[clamp(2.5rem,5vw+1rem,3rem)] font-extrabold mb-2 text-center leading-tight hero-title">
               Find & Hire Soft Skills Trainers
             </h1>
             <p className="mb-5 text-center max-w-2xl text-[18px] font-normal font-medium hero-desc">
@@ -296,6 +299,7 @@ export default function Home() {
                 paginationConfig={{ page: 1, pageSize: 8 }}
                 pageLocked={true}
                 onWishlistUpdate={handleWishlistUpdate}
+                isLoading={isLoading}
               />}
 
               {activeTab === 'Wish listed' && <TrainerGrid
@@ -303,6 +307,7 @@ export default function Home() {
                 paginationMode="client"
                 paginationConfig={{ page: 1, pageSize: 8 }}
                 onWishlistUpdate={handleWishlistUpdate}
+                isLoading={isLoading}
               />}
 
               {activeTab === 'Unlocked' && <TrainerGrid
@@ -310,6 +315,7 @@ export default function Home() {
                 paginationMode="client"
                 paginationConfig={{ page: 1, pageSize: 8 }}
                 onWishlistUpdate={handleWishlistUpdate}
+                isLoading={isLoading}
               />}
             </div>
           </div>
@@ -323,6 +329,7 @@ export default function Home() {
             paginationMode="client"
             paginationConfig={{ page: 1, pageSize: 12 }}
             pageLocked={true}
+            isLoading={isLoading}
           />
         </section>
       )}
@@ -409,7 +416,7 @@ export default function Home() {
               <div className="text-2xl font-light absolute bottom-0 left-0 text-white bg-black/50 px-6 py-4 w-full rounded-t-lg flex items-center justify-between">
                 <div className="flex flex-col">
                   <p className="text-[24px] font-semibold">{city.name}</p>
-                  <p className="text-xs">424 trainers available</p>
+                  {/* <p className="text-xs">424 trainers available</p> */}
                 </div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
