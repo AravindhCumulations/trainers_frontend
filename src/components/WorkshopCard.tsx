@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Workshop } from "@/models/workshop.models";
+import { getPlainText } from "@/utils/common.utils";
 
 interface WorkshopCardProps {
     workshop: Workshop;
@@ -40,7 +41,7 @@ const WorkshopCard = ({ workshop, onClick, tag = "workshop" }: WorkshopCardProps
                 {/* Reduced padding */}
 
                 <h2 className={titleClasses}>{workshop.title}</h2>
-                <p className={descriptionClasses}>{workshop.description}</p>
+                <p className={descriptionClasses}>{getPlainText(workshop.description)}</p>
                 <div className="flex flex-col justify-between items-start">
                     <div className="flex gap-2 overflow-x-auto whitespace-nowrap">
                         {workshop.targetAudience?.split(',').map((audience, index) => (

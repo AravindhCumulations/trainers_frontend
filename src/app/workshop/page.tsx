@@ -12,6 +12,7 @@ import { trainerApis } from '@/lib/apis/trainer.apis';
 import { TrainerDetailsModel } from '@/models/trainerDetails.model';
 import Overlay from '@/components/Overlay';
 import WorkshopDetails from '@/components/WorkshopDetails';
+import { getPlainText } from '@/utils/common.utils';
 
 export default function WorkshopsPage() {
     const [workshops, setWorkshops] = useState<Workshop[]>([]);
@@ -210,7 +211,7 @@ export default function WorkshopsPage() {
                         {item.format}
                     </span>
                 </div>
-                <p className="text-gray-600 mb-4 line-clamp-3">{item.description}</p>
+                <p className="text-gray-600 mb-4 line-clamp-3">{getPlainText(item.description)}</p>
                 <div className="flex flex-col justify-center items-start gap-2">
                     <div className="flex flex-wrap gap-2">
                         {item.targetAudience.split(',').map((audience, index) => (

@@ -10,65 +10,76 @@ export function middleware(request: NextRequest) {
         url: request.url,
         method: request.method,
         timestamp: new Date().toISOString(),
-        allCookies: request.cookies.getAll().map(c => c.name) // Log all cookie names
+        allCookies: request.cookies.getAll().map(c => c.name)
     });
 
-    // Only check for root path
-    if (path === '/') {
-        // Get user details from localStorage (which is stored in cookies in middleware)
+    // Check for root path and login/signup paths
+    if (path === '/' || path === '/login' || path === '/signup') {
+        // Get user details from cookies
         const userDetails = request.cookies.get('user_details')?.value
+        const authCookie = request.cookies.get('auth')?.value
 
-        console.log('👤 User Details from Cookie:', {
+        console.log('👤 Auth State:', {
             hasUserDetails: !!userDetails,
-            rawUserDetails: userDetails,
+            hasAuthCookie: !!authCookie,
             cookieNames: request.cookies.getAll().map(c => c.name)
         });
 
-        if (userDetails) {
+        // If we have both user details and auth cookie, user is logged in
+        if (userDetails && authCookie) {
             try {
                 const parsedUserDetails = JSON.parse(userDetails)
                 console.log('🔑 Parsed User Details:', {
                     role: parsedUserDetails.role_user,
                     userId: parsedUserDetails.id,
                     email: parsedUserDetails.email,
-                    name: parsedUserDetails.name,
-                    fullDetails: parsedUserDetails // Log full details for debugging
+                    name: parsedUserDetails.name
                 });
 
-                // If user has role 'Trainer', redirect to trainer-details with their name
-                if (parsedUserDetails.role_user === 'Trainer') {
-                    const trainerName = parsedUserDetails.name || '';
-                    const redirectUrl = new URL('/trainer-details', request.url);
-                    redirectUrl.searchParams.set('trainer', trainerName);
+                // If trying to access login/signup pages while logged in, redirect to appropriate page
+                if (path === '/login' || path === '/signup') {
+                    if (parsedUserDetails.role_user === 'Trainer') {
+                        const trainerName = parsedUserDetails.name || '';
+                        const redirectUrl = new URL('/trainer-details', request.url);
+                        redirectUrl.searchParams.set('trainer', trainerName);
+                        return NextResponse.redirect(redirectUrl);
+                    } else {
+                        return NextResponse.redirect(new URL('/', request.url));
+                    }
+                }
 
-                    console.log('🔄 Redirecting Trainer to trainer-details:', {
-                        trainerName,
-                        redirectUrl: redirectUrl.toString(),
-                        role: parsedUserDetails.role_user
-                    });
-
-                    return NextResponse.redirect(redirectUrl);
-                } else {
-                    console.log('ℹ️ User is not a Trainer:', {
-                        role: parsedUserDetails.role_user
-                    });
+                // If on root path, handle routing based on role
+                if (path === '/') {
+                    if (parsedUserDetails.role_user === 'Trainer') {
+                        const trainerName = parsedUserDetails.name || '';
+                        const redirectUrl = new URL('/trainer-details', request.url);
+                        redirectUrl.searchParams.set('trainer', trainerName);
+                        return NextResponse.redirect(redirectUrl);
+                    }
+                    // For regular users, allow access to root path
                 }
             } catch (error) {
-                console.error('❌ Error parsing user details:', error, {
-                    rawUserDetails: userDetails
-                });
+                console.error('❌ Error parsing user details:', error);
+                // If there's an error parsing user details, clear cookies and allow access
+                const response = NextResponse.next();
+                response.cookies.delete('user_details');
+                response.cookies.delete('auth');
+                return response;
             }
         } else {
-            console.log('ℹ️ No user details found in cookies');
+            // If no auth cookies but trying to access protected routes
+            if (path === '/') {
+                // Allow access to root path for non-logged in users
+                return NextResponse.next();
+            }
         }
     }
 
     console.log('✅ Allowing request to continue');
-    // Allow the request to continue for all other cases
     return NextResponse.next()
 }
 
 // Configure which paths the middleware should run on
 export const config = {
-    matcher: '/'
+    matcher: ['/', '/login', '/signup']
 } 

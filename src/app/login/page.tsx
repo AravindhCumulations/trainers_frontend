@@ -68,16 +68,13 @@ export default function LoginPage() {
                 });
 
                 if (data.user_details.role_user === "Trainer") {
-
                     if (data.user_details.is_first_login) {
                         handleNavigation('/trainer-form');
                         return;
                     }
-
-                    handleNavigation('/trainer-details', { 'trainer': data.user_details.name })
-
+                    handleNavigation('/trainer-details', { 'trainer': data.user_details.name });
                 } else {
-                    router.push("/");
+                    handleNavigation('/');
                 }
             }
         } catch (err) {

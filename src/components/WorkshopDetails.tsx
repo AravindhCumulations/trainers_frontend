@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import parse from 'html-react-parser';
+import { getPlainText } from '@/utils/common.utils';
 
 
 interface WorkshopDetailsProps {
@@ -53,7 +54,7 @@ const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose }) 
                 <div className="w-[320px] flex flex-col justify-between ">
                     <div className=''>
                         <p className="font-semibold">🎯 Objectives</p>
-                        <p className="text-gray-600 py-2">{workshop.objectives || workshop.description}</p>
+                        <p className="text-gray-600 py-2">{getPlainText(workshop.objectives || workshop.description)}</p>
                     </div>
                     <div >
                         <p className="font-semibold">👥 Target Audience</p>
