@@ -37,23 +37,41 @@ export default function SignupPage() {
         }));
     };
 
-    // const isFormValid = () => {
-    //     return (
-    //         formData.email.trim() !== '' &&
-    //         formData.password.trim() !== '' &&
-    //         formData.first_name.trim() !== '' &&
-    //         formData.last_name.trim() !== '' &&
-    //         formData.roles.length > 0 &&
-    //         formData.password === rePassword
-    //     );
-    // };
+    const isFormValid = () => {
+        if (!formData.email.trim()) {
+            setError('Email is required');
+            return false;
+        }
+        if (!formData.password.trim()) {
+            setError('Password is required');
+            return false;
+        }
+        if (!formData.first_name.trim()) {
+            setError('First name is required');
+            return false;
+        }
+        if (!formData.last_name.trim()) {
+            setError('Last name is required');
+            return false;
+        }
+        if (formData.roles.length === 0) {
+            setError('Please select a role');
+            return false;
+        }
+        if (formData.password !== rePassword) {
+            setError('Passwords do not match');
+            return false;
+        }
+        return true;
+    };
 
 
     const handleSignup = async () => {
         setError(null);
 
-
-
+        if (!isFormValid()) {
+            return;
+        }
 
         try {
             if (formData) {
