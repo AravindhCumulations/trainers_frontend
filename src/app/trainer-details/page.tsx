@@ -27,7 +27,7 @@ import Popup from '@/components/Popup';
 
 
 interface WorkshopDetailsData {
-    id: string;
+    idx: string;
     title: string;
     price: number;
     targetAudience: string;
@@ -284,7 +284,7 @@ const TrainerDetailsContent = () => {
     const handleWorkshopClick = (type: 'details' | 'edit' | 'create', item: any) => {
         // Map the item to the expected WorkshopDetailsData interface
         const workshopData: WorkshopDetailsData = {
-            id: item.idx.toString(),
+            idx: item.idx.toString(),
             title: item.title,
             price: item.price || 0,
             targetAudience: item.target_audience || "",
@@ -547,7 +547,7 @@ const TrainerDetailsContent = () => {
                                         <WorkshopCard
                                             key={casestudy.idx.toString()}
                                             workshop={{
-                                                id: casestudy.idx.toString(),
+                                                idx: casestudy.idx.toString(),
                                                 title: casestudy.title,
                                                 objectives: casestudy.objectives || "",
                                                 price: casestudy.price,
@@ -567,7 +567,7 @@ const TrainerDetailsContent = () => {
                                         <WorkshopCard
                                             key={workshop.idx.toString()}
                                             workshop={{
-                                                id: workshop.idx.toString(),
+                                                idx: workshop.idx.toString(),
                                                 title: workshop.title,
                                                 objectives: workshop.objectives,
                                                 price: workshop.price,
