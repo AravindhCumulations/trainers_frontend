@@ -37,16 +37,16 @@ export default function SignupPage() {
         }));
     };
 
-    const isFormValid = () => {
-        return (
-            formData.email.trim() !== '' &&
-            formData.password.trim() !== '' &&
-            formData.first_name.trim() !== '' &&
-            formData.last_name.trim() !== '' &&
-            formData.roles.length > 0 &&
-            formData.password === rePassword
-        );
-    };
+    // const isFormValid = () => {
+    //     return (
+    //         formData.email.trim() !== '' &&
+    //         formData.password.trim() !== '' &&
+    //         formData.first_name.trim() !== '' &&
+    //         formData.last_name.trim() !== '' &&
+    //         formData.roles.length > 0 &&
+    //         formData.password === rePassword
+    //     );
+    // };
 
 
     const handleSignup = async () => {
