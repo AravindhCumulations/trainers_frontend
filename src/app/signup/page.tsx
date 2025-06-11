@@ -266,11 +266,12 @@ export default function SignupPage() {
                     <button
                         type="button"
                         onClick={handleSignup}
-                        disabled={!isFormValid()}
-                        className={`w-full px-4 py-2 rounded-lg transition-colors duration-300 ${!isFormValid()
-                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            : "bg-blue-500 hover:bg-blue-700 text-white"
-                            }`}
+                        // disabled={!isFormValid()}
+                        className={`w-full px-4 py-2 rounded-lg transition-colors duration-300 bg-blue-500 hover:bg-blue-700 text-white}`}
+
+                    // ${!isFormValid()
+                    //     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    //     :
                     >
                         Continue
                     </button>
