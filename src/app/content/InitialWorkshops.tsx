@@ -2,9 +2,9 @@ import { Workshop } from "@/models/workshop.models";
 
 export const initialWorkshops: Workshop[] = [
     {
-        id: '1',
+        idx: '1',
         title: 'Fitness Fundamentals',
-        description: 'Learn the basics of physical fitness and create a strong foundation for your health journey.',
+
         price: 99.99,
         targetAudience: 'Beginners',
         format: 'virtual',
@@ -17,9 +17,9 @@ export const initialWorkshops: Workshop[] = [
 
     },
     {
-        id: '2',
+        idx: '2',
         title: 'Advanced Nutrition Masterclass',
-        description: 'Deep dive into nutrition science, meal planning, and optimal dietary strategies.',
+
         price: 149.99,
         targetAudience: 'Intermediate',
         format: 'In-Person',
@@ -33,9 +33,9 @@ export const initialWorkshops: Workshop[] = [
 
     },
     {
-        id: '3',
+        idx: '3',
         title: 'Mental Wellness Workshop',
-        description: 'Techniques for stress management, mindfulness, and improving mental health.',
+
         price: 129.99,
         targetAudience: 'All Levels',
         format: 'virtual',
@@ -47,9 +47,9 @@ export const initialWorkshops: Workshop[] = [
         programFlow: 'dsomething',
     },
     {
-        id: '4',
+        idx: '4',
         title: 'High-Intensity Training Program',
-        description: 'Intensive workout strategies for maximum fitness results and performance.',
+
         price: 199.99,
         targetAudience: 'Advanced',
         format: 'In-Person',
