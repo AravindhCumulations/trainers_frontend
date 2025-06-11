@@ -1,19 +1,17 @@
 import React from 'react';
 import Image from 'next/image';
 import parse from 'html-react-parser';
-import { getPlainText } from '@/utils/common.utils';
 
 
 interface WorkshopDetailsProps {
     workshop: {
-        id: string;
+        idx: string;
         title: string;
-        description: string;
         price: number;
         targetAudience: string;
         format: string;
         image: string;
-        objectives?: string;
+        objectives: string;
         outcomes?: string;
         handouts?: string;
         programFlow?: string;
@@ -54,7 +52,7 @@ const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose }) 
                 <div className="w-[320px] flex flex-col justify-between ">
                     <div className=''>
                         <p className="font-semibold">🎯 Objectives</p>
-                        <p className="text-gray-600 py-2">{getPlainText(workshop.objectives || workshop.description)}</p>
+                        <p className="text-gray-600 py-2">{workshop.objectives}</p>
                     </div>
                     <div >
                         <p className="font-semibold">👥 Target Audience</p>
@@ -73,7 +71,7 @@ const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose }) 
                         className="text-gray-600 py-2 template-container"
 
                     >
-                        {parse(workshop.outcomes || 'outcomes here')}
+                        {workshop.outcomes}
                     </div>
                 </div>
                 <div className='w-[50%] '>
@@ -81,7 +79,7 @@ const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose }) 
                     <div
                         className="text-gray-600 py-2 template-container"
                     >
-                        {parse(workshop.handouts || 'handouts here')}
+                        {workshop.handouts}
                     </div>
                 </div>
             </div>
@@ -100,7 +98,7 @@ const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose }) 
                     <div
                         className="text-gray-600 py-2 template-container"
                     >
-                        {parse(workshop.evaluation || 'eval here')}
+                        {workshop.evaluation}
                     </div>
                 </div>
             </div>

@@ -27,6 +27,20 @@ const nextConfig = {
             }
         ]
     },
+
+    async headers() {
+        return [
+            {
+                source: '/files/:path*',
+                headers: [
+                    {
+                        key: 'x-encoded-path',
+                        value: ':path*'
+                    }
+                ]
+            }
+        ]
+    }
 };
 
 module.exports = nextConfig; 

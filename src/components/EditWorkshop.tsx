@@ -2,20 +2,20 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import QuillEditor from '@/components/Quilleditor';
 import { isEqual } from 'lodash';
 import { useLoading } from '@/context/LoadingContext';
-import { useErrorPopup } from '@/lib/hooks/useErrorPopup';
+import { usePopup } from '@/lib/hooks/usePopup';
 import { trainerApis } from '@/lib/apis/trainer.apis';
+import { TextField, Chip } from '@mui/material';
 
 interface EditWorkshopProps {
     onClose: () => void;
     initialData?: {
-        id: string;
+        idx: string;
         title: string;
-        description: string;
+        objectives: string;
         price: number;
         targetAudience: string;
         format: string;
         image: string;
-        objectives?: string;
         outcomes?: string;
         handouts?: string;
         programFlow?: string;
@@ -32,12 +32,12 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
 
 
     const { showLoader, hideLoader } = useLoading();
-    const { showError } = useErrorPopup();
+    const { showError } = usePopup();
     const [errors, setErrors] = useState<string[]>([]);
 
     const initialFormData = {
         title: initialData?.title || '',
-        description: initialData?.description || '',
+        objectives: initialData?.objectives || '',
         targetAudience: initialData?.targetAudience || '',
         format: initialData?.format || 'In-Person',
         outcomes: initialData?.outcomes || '',
@@ -46,7 +46,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
         evaluation: initialData?.evaluation || '',
         price: initialData?.price || 0,
         image: initialData?.image || '',
-        isCaseStudy: initialData?.isCaseStudy || false
+        isCaseStudy: initialData?.isCaseStudy ?? false
     };
 
     const [formData, setFormData] = useState(initialFormData);
@@ -55,7 +55,11 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const initialFormState = useRef(initialFormData);
 
+    // Add isEditMode state
+    const isEditMode = Boolean(initialData);
+
     const MAX_CHAR_LIMIT = 300;
+
 
     // Function to strip HTML and count characters
     const getTextLength = (htmlContent: string): number => {
@@ -64,16 +68,13 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
         return tempDiv.textContent?.length || 0;
     };
 
-    // Function to handle QuillEditor changes with character limit
-    const handleQuillChange = (field: keyof typeof formData, value: string) => {
-        const textLength = getTextLength(value);
-        if (textLength <= MAX_CHAR_LIMIT) {
-            handleChange(field, value);
-        }
-    };
-
     // Function to handle changes with deep comparison
     const handleChange = (field: keyof typeof formData, value: string | number | boolean) => {
+        const textLength = typeof value === 'string' ? value.length : 0;
+        if (typeof value === 'string' && ['objectives', 'outcomes', 'handouts', 'evaluation'].includes(field) && textLength > MAX_CHAR_LIMIT) {
+            return; // Don't update if exceeding character limit
+        }
+
         setFormData(prev => ({
             ...prev,
             [field]: value
@@ -115,13 +116,25 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
         }
     };
 
+    // Function to handle QuillEditor changes with character limit
+    const handleQuillChange = (field: keyof typeof formData, value: string) => {
+        const textLength = getTextLength(value);
+        if (textLength <= MAX_CHAR_LIMIT) {
+            handleChange(field, value);
+        } else {
+            // If text is too long, truncate it to MAX_CHAR_LIMIT
+            const truncatedText = value.substring(0, MAX_CHAR_LIMIT);
+            handleChange(field, truncatedText);
+        }
+    };
+
     // Update form data when initialData changes
     useEffect(() => {
         if (initialData) {
             // Ensure HTML content is properly handled for QuillEditor fields
             const newInitialData = {
                 title: initialData.title || '',
-                description: initialData.description || '',
+                objectives: initialData.objectives || '',
                 targetAudience: initialData.targetAudience || '',
                 format: initialData.format || 'In-Person',
                 outcomes: initialData.outcomes || '',
@@ -130,7 +143,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                 evaluation: initialData.evaluation || '',
                 price: initialData.price || 0,
                 image: initialData.image || '',
-                isCaseStudy: initialData.isCaseStudy || false
+                isCaseStudy: initialData.isCaseStudy ?? false
             };
 
             // Set the form data
@@ -141,9 +154,18 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
         }
     }, [initialData]);
 
+
+
+
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!hasFormChanges) return;
+
+        console.log("Form here");
+
+        console.log(formData);
+
 
         // Clear previous errors
         setErrors([]);
@@ -154,11 +176,11 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
         if (!formData.title.trim()) {
             errors.push('Title is Required');
         }
-        if (!formData.description.trim()) {
-            errors.push('Description is Required');
+        if (!formData.objectives.trim()) {
+            errors.push('Objectives is Required');
         }
-        if (getTextLength(formData.description) > MAX_CHAR_LIMIT) {
-            errors.push('Description should be less than 200 characters');
+        if (formData.objectives.length > MAX_CHAR_LIMIT) {
+            errors.push('Objectives should be less than 300 characters');
         }
         if (formData.price <= 0) {
             errors.push('Price should be greater than 0');
@@ -169,26 +191,26 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
         if (!formData.outcomes.trim()) {
             errors.push('Outcomes is Required');
         }
-        if (getTextLength(formData.outcomes) > MAX_CHAR_LIMIT) {
-            errors.push('Description should be less than 200 characters');
+        if (formData.outcomes.length > MAX_CHAR_LIMIT) {
+            errors.push('Outcomes should be less than 300 characters');
         }
         if (!formData.handouts.trim()) {
             errors.push('Handouts is Required');
         }
-        if (getTextLength(formData.handouts) > MAX_CHAR_LIMIT) {
-            errors.push('Description should be less than 200 characters');
+        if (formData.handouts.length > MAX_CHAR_LIMIT) {
+            errors.push('Handouts should be less than 300 characters');
         }
         if (!formData.programFlow.trim()) {
             errors.push('Program Flow is Required');
         }
         if (getTextLength(formData.programFlow) > MAX_CHAR_LIMIT) {
-            errors.push('Description should be less than 200 characters');
+            errors.push('Program Flow should be less than 300 characters');
         }
         if (!formData.evaluation.trim()) {
             errors.push('Evaluation is Required');
         }
-        if (getTextLength(formData.evaluation) > MAX_CHAR_LIMIT) {
-            errors.push('Description should be less than 200 characters');
+        if (formData.evaluation.length > MAX_CHAR_LIMIT) {
+            errors.push('Evaluation should be less than 300 characters');
         }
 
         if (errors.length > 0) {
@@ -212,10 +234,9 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                 ...initialData,
                 ...modifiedFields,
                 image: imageUrl,
-                isCaseStudy: formData.isCaseStudy
+                isCaseStudy: formData.isCaseStudy,
+                format: formData.format // Ensure format is included
             };
-
-            // Log the data being submitted
 
             // Call the onUpdate callback with the data
             if (onUpdate) {
@@ -314,83 +335,137 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
 
                         {/* Objectives */}
                         <div className="flex flex-col gap-2">
-                            <div className="flex justify-between items-center">
-                                <p className="text-base font-normal text-blue-700">Objectives</p>
-                                <span className="text-base text-gray-500 font-normal">
-                                    {getTextLength(formData.description)}/{MAX_CHAR_LIMIT} characters
+                            <p className="text-base font-normal text-blue-700">Objectives</p>
+                            <div className="relative">
+                                <textarea
+                                    value={formData.objectives}
+                                    onChange={(e) => handleChange('objectives', e.target.value)}
+                                    className="min-h-[100px] rounded-lg w-full p-2 border border-blue-100 text-base text-gray-700 font-normal leading-6 placeholder:text-gray-400 placeholder:text-base placeholder:font-light resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pb-8"
+                                    placeholder="Enter workshop objectives"
+                                />
+                                <span className="absolute bottom-2 right-2 text-sm text-gray-500">
+                                    {formData.objectives.length}/{MAX_CHAR_LIMIT}
                                 </span>
                             </div>
-                            <QuillEditor
-                                value={formData.description}
-                                onChange={(val) => handleQuillChange('description', val)}
-                            />
                         </div>
 
                         {/* Target Audience */}
                         <div className="flex flex-col gap-2">
                             <p className="text-base font-normal text-blue-700">Target Audience</p>
-                            <textarea
-                                value={formData.targetAudience}
-                                onChange={(e) => handleChange('targetAudience', e.target.value)}
-                                className="h-[45px] rounded-lg w-full p-2 border border-blue-100 text-base text-gray-700 font-normal leading-6 placeholder:text-gray-400 placeholder:text-base placeholder:font-light resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="Who is this for?"
-                            ></textarea>
+                            <div className="flex flex-wrap gap-2 mb-2">
+                                {formData.targetAudience.split(',').map((audience, index) => (
+                                    audience.trim() && (
+                                        <Chip
+                                            key={index}
+                                            label={audience.trim()}
+                                            onDelete={() => {
+                                                const audiences = formData.targetAudience.split(',').map(a => a.trim());
+                                                audiences.splice(index, 1);
+                                                handleChange('targetAudience', audiences.join(', '));
+                                            }}
+                                            className="bg-blue-100 text-blue-800"
+                                        />
+                                    )
+                                ))}
+                            </div>
+                            <TextField
+                                fullWidth
+                                size="small"
+                                placeholder="Type target audience and press Enter"
+                                variant="outlined"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        const input = e.target as HTMLInputElement;
+                                        const audience = input.value.trim();
+
+                                        if (audience) {
+                                            const currentAudiences = formData.targetAudience ? formData.targetAudience.split(',').map(a => a.trim()) : [];
+                                            if (!currentAudiences.includes(audience)) {
+                                                const newAudiences = [...currentAudiences, audience];
+                                                handleChange('targetAudience', newAudiences.join(', '));
+                                            }
+                                            input.value = '';
+                                        }
+                                    }
+                                }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '0.5rem',
+                                        '& fieldset': {
+                                            borderColor: '#E5E7EB'
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: '#93C5FD'
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: '#3B82F6'
+                                        }
+                                    }
+                                }}
+                            />
                         </div>
 
                         {/* Program Flow */}
                         <div className="flex flex-col gap-2">
-                            <div className="flex justify-between items-center">
-                                <p className="text-base font-normal text-blue-700">Program Flow</p>
-                                <span className="text-base text-gray-500 font-normal">
-                                    {getTextLength(formData.programFlow)}/{MAX_CHAR_LIMIT} characters
+                            <p className="text-base font-normal text-blue-700">Program Flow</p>
+                            <div className="relative">
+                                <QuillEditor
+                                    value={formData.programFlow}
+                                    onChange={(val) => handleQuillChange('programFlow', val)}
+                                />
+                                <span className="absolute bottom-2 right-2 text-sm text-gray-500">
+                                    {getTextLength(formData.programFlow)}/{MAX_CHAR_LIMIT}
                                 </span>
                             </div>
-                            <QuillEditor
-                                value={formData.programFlow}
-                                onChange={(val) => handleQuillChange('programFlow', val)}
-                            />
                         </div>
 
                         {/* Outcomes */}
                         <div className="flex flex-col gap-2">
-                            <div className="flex justify-between items-center">
-                                <p className="text-base font-normal text-blue-700">Outcomes</p>
-                                <span className="text-base text-gray-500 font-normal">
-                                    {getTextLength(formData.outcomes)}/{MAX_CHAR_LIMIT} characters
+                            <p className="text-base font-normal text-blue-700">Outcomes</p>
+                            <div className="relative">
+                                <textarea
+                                    value={formData.outcomes}
+                                    onChange={(e) => handleChange('outcomes', e.target.value)}
+                                    className="min-h-[100px] rounded-lg w-full p-2 border border-blue-100 text-base text-gray-700 font-normal leading-6 placeholder:text-gray-400 placeholder:text-base placeholder:font-light resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pb-8"
+                                    placeholder="Enter workshop outcomes"
+                                />
+                                <span className="absolute bottom-2 right-2 text-sm text-gray-500">
+                                    {formData.outcomes.length}/{MAX_CHAR_LIMIT}
                                 </span>
                             </div>
-                            <QuillEditor
-                                value={formData.outcomes}
-                                onChange={(val) => handleQuillChange('outcomes', val)}
-                            />
                         </div>
 
                         {/* Handouts */}
                         <div className="flex flex-col gap-2">
-                            <div className="flex justify-between items-center">
-                                <p className="text-base font-normal text-blue-700">Handouts</p>
-                                <span className="text-base text-gray-500 font-normal">
-                                    {getTextLength(formData.handouts)}/{MAX_CHAR_LIMIT} characters
+                            <p className="text-base font-normal text-blue-700">Handouts</p>
+                            <div className="relative">
+                                <textarea
+                                    value={formData.handouts}
+                                    onChange={(e) => handleChange('handouts', e.target.value)}
+                                    className="min-h-[100px] rounded-lg w-full p-2 border border-blue-100 text-base text-gray-700 font-normal leading-6 placeholder:text-gray-400 placeholder:text-base placeholder:font-light resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pb-8"
+                                    placeholder="Enter workshop handouts"
+                                />
+                                <span className="absolute bottom-2 right-2 text-sm text-gray-500">
+                                    {formData.handouts.length}/{MAX_CHAR_LIMIT}
                                 </span>
                             </div>
-                            <QuillEditor
-                                value={formData.handouts}
-                                onChange={(val) => handleQuillChange('handouts', val)}
-                            />
                         </div>
 
                         {/* Evaluations */}
                         <div className="flex flex-col gap-2">
-                            <div className="flex justify-between items-center">
-                                <p className="text-base font-normal text-blue-700">Evaluations</p>
-                                <span className="text-base text-gray-500 font-normal">
-                                    {getTextLength(formData.evaluation)}/{MAX_CHAR_LIMIT} characters
+                            <p className="text-base font-normal text-blue-700">Evaluations</p>
+                            <div className="relative">
+                                <textarea
+                                    value={formData.evaluation}
+                                    onChange={(e) => handleChange('evaluation', e.target.value)}
+                                    className="min-h-[100px] rounded-lg w-full p-2 border border-blue-100 text-base text-gray-700 font-normal leading-6 placeholder:text-gray-400 placeholder:text-base placeholder:font-light resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pb-8"
+                                    placeholder="Enter workshop evaluation criteria"
+                                />
+                                <span className="absolute bottom-2 right-2 text-sm text-gray-500">
+                                    {formData.evaluation.length}/{MAX_CHAR_LIMIT}
                                 </span>
                             </div>
-                            <QuillEditor
-                                value={formData.evaluation}
-                                onChange={(val) => handleQuillChange('evaluation', val)}
-                            />
                         </div>
 
                         {/* Format Selection */}
@@ -399,23 +474,21 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                             <div className="flex gap-4 text-base text-gray-700">
                                 <div className="flex items-center gap-2">
                                     <input
-                                        type="radio"
-                                        name="format"
+                                        type="checkbox"
                                         id="in-person"
                                         checked={formData.format === 'In-Person'}
                                         onChange={() => handleChange('format', 'In-Person')}
-                                        className="text-base"
+                                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                     />
                                     <label htmlFor="in-person" className="text-base font-normal">In-person</label>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <input
-                                        type="radio"
-                                        name="format"
+                                        type="checkbox"
                                         id="virtual"
                                         checked={formData.format === 'Virtual'}
                                         onChange={() => handleChange('format', 'Virtual')}
-                                        className="text-base"
+                                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                     />
                                     <label htmlFor="virtual" className="text-base font-normal">Virtual</label>
                                 </div>
@@ -428,27 +501,32 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                             <div className="flex gap-4 text-base text-gray-700">
                                 <div className="flex items-center gap-2">
                                     <input
-                                        type="radio"
-                                        name="type"
+                                        type="checkbox"
                                         id="workshop"
                                         checked={!formData.isCaseStudy}
                                         onChange={() => handleChange('isCaseStudy', false)}
-                                        className="text-base"
+                                        disabled={isEditMode}
+                                        className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${isEditMode ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     />
-                                    <label htmlFor="workshop" className="text-base font-normal">Workshop</label>
+                                    <label htmlFor="workshop" className={`text-base font-normal ${isEditMode ? 'text-gray-500' : ''}`}>Workshop</label>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <input
-                                        type="radio"
-                                        name="type"
+                                        type="checkbox"
                                         id="case-study"
                                         checked={formData.isCaseStudy}
                                         onChange={() => handleChange('isCaseStudy', true)}
-                                        className="text-base"
+                                        disabled={isEditMode}
+                                        className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${isEditMode ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     />
-                                    <label htmlFor="case-study" className="text-base font-normal">Case Study</label>
+                                    <label htmlFor="case-study" className={`text-base font-normal ${isEditMode ? 'text-gray-500' : ''}`}>Case Study</label>
                                 </div>
                             </div>
+                            {isEditMode && (
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Type cannot be changed in edit mode
+                                </p>
+                            )}
                         </div>
 
                         {/* Save Button */}

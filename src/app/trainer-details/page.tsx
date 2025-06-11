@@ -13,8 +13,7 @@ import { useLoading } from '@/context/LoadingContext';
 import { getCurrentUserName, getCurrentUserRole } from '@/lib/utils/auth.utils'
 import { RatingStars } from "@/components/RatingStars";
 import { useNavigation } from "@/lib/hooks/useNavigation";
-import { useErrorPopup } from '@/lib/hooks/useErrorPopup';
-import ErrorPopup from '@/components/ErrorPopup';
+
 import { creditsApis } from '@/lib/apis/credits.apis';
 import WorkshopCard from '@/components/WorkshopCard';
 import { useUser } from '@/context/UserContext';
@@ -22,18 +21,19 @@ import Overlay from '@/components/Overlay';
 import { TrainerCardModel } from '@/models/trainerCard.model';
 import TrainerDetailsSkeleton from '@/components/TrainerDetailsSkeleton';
 import { useSearchParams } from 'next/navigation';
+import { usePopup } from '@/lib/hooks/usePopup';
+import Popup from '@/components/Popup';
 
 
 
 interface WorkshopDetailsData {
     id: string;
     title: string;
-    description: string;
     price: number;
     targetAudience: string;
     format: string;
     image: string;
-    objectives?: string;
+    objectives: string;
     outcomes?: string;
     handouts?: string;
     programFlow?: string;
@@ -121,7 +121,7 @@ const TrainerDetailsContent = () => {
 
     // looders
     const { showLoader, hideLoader } = useLoading();
-    const { isOpen, message, showError, hideError } = useErrorPopup();
+    const { popupState, showError, hidePopup, showConfirmation, toastSuccess, showSuccess, toastError } = usePopup();
 
     const handleWishlistUpdate = (trainer: TrainerCardModel, isWishlisted: boolean) => {
         // Update the trainer in the trainers list
@@ -231,32 +231,37 @@ const TrainerDetailsContent = () => {
 
     const handleUnlockTrainer = async () => {
         if (isCompany) {
-            showLoader()
             if (!trainerData?.name) {
                 console.error('Trainer data is not available');
-                showError('Trainer data is not available');
+                toastError('Trainer data is not available');
                 return;
             }
 
-            try {
-                const res = await creditsApis.unlockTrainer(trainerData.name);
-
-                if (res) {
-                    setTrainerLocked(false);
-                    updateCredits()
-                    return;
+            showConfirmation(
+                "10 Credits will be deducted to unlock this Trainer",
+                async () => {
+                    showLoader();
+                    try {
+                        const res = await creditsApis.unlockTrainer(trainerData.name);
+                        if (res) {
+                            setTrainerLocked(false);
+                            updateCredits();
+                            showSuccess('Trainer unlocked successfully!');
+                        } else {
+                            toastError("Some error occurred while unlocking trainer");
+                        }
+                    } catch (error) {
+                        console.error('Error unlocking trainer:', error);
+                        toastError('An error occurred while trying to unlock the trainer');
+                    } finally {
+                        hideLoader();
+                    }
+                },
+                {
+                    confirmText: 'Proceed',
+                    cancelText: 'Cancel'
                 }
-                else {
-                    showError("Some error occured while unlocking trainer");
-                }
-
-            } catch (error) {
-                console.error('Error unlocking trainer:', error);
-                showError('An error occurred while trying to unlock the trainer');
-            }
-            finally {
-                hideLoader()
-            }
+            );
         } else {
             handleNavigation('/login');
         }
@@ -281,12 +286,11 @@ const TrainerDetailsContent = () => {
         const workshopData: WorkshopDetailsData = {
             id: item.idx.toString(),
             title: item.title,
-            description: item.description || "",
             price: item.price || 0,
             targetAudience: item.target_audience || "",
             format: 'In-Person',
             image: item.workshop_image || "/assets/w1.jpg",
-            objectives: item.description || "",
+            objectives: item.objectives || "",
             outcomes: item.outcomes || "",
             handouts: item.handouts || "",
             programFlow: item.program_flow || "",
@@ -295,12 +299,51 @@ const TrainerDetailsContent = () => {
         setOverlayState({ isOpen: true, type, data: workshopData });
     };
 
+    const handleSubmitReview = async () => {
+        if (!rating || !reviewText.trim()) {
+            toastError('Please provide both rating and review');
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            await trainerApis.fileUpload.ratings.submitReview({
+                user: user.email,
+                trainer: trainerData?.name || '',
+                rating: rating,
+                review: reviewText.trim()
+            });
+
+            // Reset form
+            setRating(0);
+            setReviewText('');
+            toastSuccess('Review submitted successfully!');
+
+            // Refresh trainer data to show new review
+            const trainerName = searchParams.get('trainer');
+            if (trainerName) {
+                const response = await trainerApis.company.getTrainerByName(trainerName, user.name);
+                setTrainerData(response.message);
+            }
+        } catch (error) {
+            console.error('Error submitting review:', error);
+            toastError('Failed to submit review. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-[#f8fafc]">
-            <ErrorPopup
-                isOpen={isOpen}
-                message={message}
-                onClose={hideError}
+            <Popup
+                isOpen={popupState.isOpen}
+                type={popupState.type}
+                message={popupState.message}
+                title={popupState.title}
+                onClose={hidePopup}
+                onConfirm={popupState.onConfirm}
+                confirmText={popupState.confirmText}
+                cancelText={popupState.cancelText}
             />
             {/* Header */}
             <NavBar bgColor="bg-white" />
@@ -506,12 +549,11 @@ const TrainerDetailsContent = () => {
                                             workshop={{
                                                 id: casestudy.idx.toString(),
                                                 title: casestudy.title,
-                                                description: casestudy.description || "",
+                                                objectives: casestudy.objectives || "",
                                                 price: casestudy.price,
                                                 targetAudience: casestudy.target_audience,
                                                 format: 'In-Person',
-                                                image: casestudy.workshop_image,
-                                                objectives: casestudy.description,
+                                                image: casestudy.image,
                                                 outcomes: casestudy.outcomes,
                                                 handouts: casestudy.handouts,
                                                 programFlow: casestudy.program_flow,
@@ -527,12 +569,11 @@ const TrainerDetailsContent = () => {
                                             workshop={{
                                                 id: workshop.idx.toString(),
                                                 title: workshop.title,
-                                                description: workshop.description,
+                                                objectives: workshop.objectives,
                                                 price: workshop.price,
                                                 targetAudience: workshop.target_audience,
                                                 format: 'In-Person',
-                                                image: workshop.workshop_image,
-                                                objectives: workshop.description,
+                                                image: workshop.image,
                                                 outcomes: workshop.outcomes,
                                                 handouts: workshop.handouts,
                                                 programFlow: workshop.program_flow,
@@ -801,38 +842,7 @@ const TrainerDetailsContent = () => {
                                     {/* Submit Button */}
                                     <button
                                         className="w-full mt-4 px-6 py-2.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-base font-medium transition-all duration-200 hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                                        onClick={async () => {
-                                            if (!rating || !reviewText.trim()) {
-                                                showError('Please provide both rating and review');
-                                                return;
-                                            }
-
-                                            setIsSubmitting(true);
-                                            try {
-                                                await trainerApis.fileUpload.ratings.submitReview({
-                                                    user: user.email,
-                                                    trainer: trainerData?.name || '',
-                                                    rating: rating,
-                                                    review: reviewText.trim()
-                                                });
-
-                                                // Reset form
-                                                setRating(0);
-                                                setReviewText('');
-                                                showError('Review submitted successfully!');
-                                                // Refresh trainer data to show new review
-                                                const trainerName = searchParams.get('trainer');
-                                                if (trainerName) {
-                                                    const response = await trainerApis.company.getTrainerByName(trainerName, user.name);
-                                                    setTrainerData(response.message);
-                                                }
-                                            } catch (error) {
-                                                console.error('Error submitting review:', error);
-                                                showError('Failed to submit review. Please try again.');
-                                            } finally {
-                                                setIsSubmitting(false);
-                                            }
-                                        }}
+                                        onClick={handleSubmitReview}
                                         disabled={isSubmitting || !rating || !reviewText.trim()}
                                     >
                                         {isSubmitting ? 'Submitting...' : 'Submit Review'}

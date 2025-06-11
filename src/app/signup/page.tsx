@@ -10,7 +10,13 @@ import { useNavigation } from "@/lib/hooks/useNavigation";
 
 export default function SignupPage() {
 
-    const [formData, setFormData] = useState<User>();
+    const [formData, setFormData] = useState<User>({
+        email: '',
+        first_name: '',
+        last_name: '',
+        password: '',
+        roles: []
+    });
     const [rePassword, setRePassword] = useState<string>('');
     const [fullName, setFullName] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
@@ -27,11 +33,19 @@ export default function SignupPage() {
         setFormData(prev => ({
             ...prev,
             first_name: firstName,
-            last_name: lastName,
-            roles: prev?.roles || [],
-            email: prev?.email || '',
-            password: prev?.password || ''
+            last_name: lastName
         }));
+    };
+
+    const isFormValid = () => {
+        return (
+            formData.email.trim() !== '' &&
+            formData.password.trim() !== '' &&
+            formData.first_name.trim() !== '' &&
+            formData.last_name.trim() !== '' &&
+            formData.roles.length > 0 &&
+            formData.password === rePassword
+        );
     };
 
 
@@ -61,9 +75,6 @@ export default function SignupPage() {
                 const validationError = signupModel.validate();
 
                 if (validationError) {
-
-
-
 
                     setError(validationError);
                     return;
@@ -255,10 +266,10 @@ export default function SignupPage() {
                     <button
                         type="button"
                         onClick={handleSignup}
-                        disabled={!formData?.email || !formData?.password || !formData?.first_name || !formData?.last_name || !formData?.roles?.length || formData.password !== rePassword}
-                        className={`w-full px-4 py-2 rounded-lg transition-colors duration-300 ${!formData?.email || !formData?.password || !formData?.first_name || !formData?.last_name || !formData?.roles?.length || formData.password !== rePassword
-                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                : "bg-blue-500 hover:bg-blue-700 text-white"
+                        disabled={!isFormValid()}
+                        className={`w-full px-4 py-2 rounded-lg transition-colors duration-300 ${!isFormValid()
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-blue-500 hover:bg-blue-700 text-white"
                             }`}
                     >
                         Continue

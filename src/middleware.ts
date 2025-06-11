@@ -5,6 +5,19 @@ export function middleware(request: NextRequest) {
     // Get the pathname of the request
     const path = request.nextUrl.pathname
 
+    // Handle file requests with URL encoding
+    if (path.startsWith('/files/')) {
+        const filePath = path.replace('/files/', '')
+        const encodedPath = encodeURIComponent(filePath)
+
+        // Create a new URL with the encoded path
+        const url = new URL(request.url)
+        url.pathname = `/files/${encodedPath}`
+
+        // Return a rewritten response
+        return NextResponse.rewrite(url)
+    }
+
     console.log('🔍 Middleware - Processing request:', {
         path,
         url: request.url,
@@ -81,5 +94,5 @@ export function middleware(request: NextRequest) {
 
 // Configure which paths the middleware should run on
 export const config = {
-    matcher: ['/', '/login', '/signup']
+    matcher: ['/', '/login', '/signup', '/files/:path*']
 } 

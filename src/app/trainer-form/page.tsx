@@ -705,7 +705,7 @@ export default function TrainerDetailsPage() {
                                     htmlFor="trainerApproch"
                                     className="block text-sm font-medium text-gray-700 mb-1"
                                 >
-                                    Trainer Approch
+                                    Training Approch
                                 </label>
                                 <div className="relative">
                                     <textarea

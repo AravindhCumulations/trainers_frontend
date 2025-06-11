@@ -2,9 +2,11 @@ import { memo, useState } from 'react';
 import { TrainerCardProps } from '../models/trainerCard.model';
 import { trainerApis } from '../lib/apis/trainer.apis';
 import Image from 'next/image';
+import { usePopup } from '@/lib/hooks/usePopup';
 
 const TrainerCard = memo(({ trainer, onClick, viewMode, onWishlistUpdate }: TrainerCardProps) => {
     const [isWishlisted, setIsWishlisted] = useState(trainer.is_wishlisted === 1 || viewMode === "wishlisted");
+    const { toastSuccess, toastError } = usePopup();
 
     const handleWishlist = async (name: string, is_wishlisted: number) => {
         try {
@@ -12,15 +14,18 @@ const TrainerCard = memo(({ trainer, onClick, viewMode, onWishlistUpdate }: Trai
                 await trainerApis.wishlist.removeFromWishlist(name);
                 setIsWishlisted(false);
                 onWishlistUpdate?.(trainer, false);
+                toastSuccess('Trainer removed from wishlist');
             } else {
                 await trainerApis.wishlist.addToWishlist(name);
                 setIsWishlisted(true);
                 onWishlistUpdate?.(trainer, true);
+                toastSuccess('Trainer added to wishlist');
             }
         } catch (error) {
             console.error('Error handling wishlist:', error);
             // Revert the state if the API call fails
             setIsWishlisted(is_wishlisted === 1 || viewMode === "wishlisted");
+            toastError('Failed to update wishlist. Please try again.');
         }
     };
 
@@ -42,7 +47,7 @@ const TrainerCard = memo(({ trainer, onClick, viewMode, onWishlistUpdate }: Trai
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover hover:scale-110 transition-all duration-300 ease-in-out"
                         placeholder="blur"
-                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                     />
                 </div>
                 <button
@@ -107,7 +112,7 @@ const TrainerCard = memo(({ trainer, onClick, viewMode, onWishlistUpdate }: Trai
             {/* Trainer bottom info */}
             <div className="flex items-center w-full justify-between mt-1.5 trainer-card-bottom h-[30px]">
                 <span className="text-[14px] font-semibold trainer-card-price">
-                    ₹{trainer.charge}
+                    ₹{trainer.charge}/hour
                 </span>
                 <span className="flex items-end text-xs text-gray-400 trainer-card-views justify-between gap-[4px] text-center">
                     <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">

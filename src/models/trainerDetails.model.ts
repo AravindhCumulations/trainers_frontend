@@ -30,11 +30,11 @@ export interface Workshop {
 
     idx: number,
     title: string,
-    description: string,
+    objectives: string,
     price: number,
     target_audience: string,
     format: string,
-    workshop_image: string,
+    image: string,
     outcomes: string;
     handouts: string;
     program_flow: string;
@@ -46,11 +46,11 @@ export interface CaseStudy {
 
     idx: number,
     title: string,
-    description: string,
+    objectives: string,
     price: number,
-    target_audience: "marketing, sales",
+    target_audience: string,
     format: string,
-    workshop_image: string,
+    image: string,
     outcomes: string;
     handouts: string;
     program_flow: string;
@@ -363,10 +363,10 @@ export class TrainerFormValidator {
         if (!workshop.title.trim()) {
             errors.push('Title is Required');
         }
-        if (!workshop.description.trim()) {
+        if (!workshop.objectives.trim()) {
             errors.push('Description is Required');
         }
-        if (workshop.description.length > 200) {
+        if (workshop.objectives.length > 200) {
             errors.push('Description should be between < 200 characters');
         }
         if (workshop.price === 0) {

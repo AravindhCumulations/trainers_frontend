@@ -5,6 +5,7 @@ import { UserProvider } from '@/context/UserContext';
 import { ThemeProvider } from "@/styles/ThemeProvider";
 // import { ThemeToggle } from "@/components/ThemeToggle";
 import { LoadingProvider } from '@/context/LoadingContext';
+import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,7 +33,7 @@ export default function RootLayout({
             </LoadingProvider>
           </ThemeProvider>
         </UserProvider>
-
+        <Toaster />
       </body>
     </html>
   );

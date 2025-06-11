@@ -4,5 +4,5 @@ export const languages = [
     "Kannada", "Odia", "Malayalam", "Punjabi", "Assamese", "Maithili",
     "Sanskrit", "Konkani", "Sindhi", "Dogri", "Santhali", "Manipuri",
     "Bodo", "Kashmiri", "Nepali", "Tulu", "Bhili/Bhilodi", "Gondi",
-    "Rajasthani"
+    "Rajasthani", "English"
 ];
