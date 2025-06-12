@@ -66,7 +66,7 @@ export default function TrainerGrid({
     }, [handleNavigation]);
 
     return (
-        <section className="w-full max-w-[1352px] mx-auto flex flex-col px-2 sm:px-4 py-6 sm:py-10 trainer-list-section">
+        <section className="w-full max-w-[1352px] mx-auto flex flex-col trainer-list-section">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-7 lg:gap 3 trainer-list-grid">
                 {isLoading ? (
                     // Show skeleton loaders based on pageSize

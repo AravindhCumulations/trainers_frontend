@@ -77,8 +77,9 @@ export default function LoginPage() {
                     handleNavigation('/');
                 }
             }
-        } catch (err) {
-            setError('Login failed. Please try again.');
+        } catch (err: any) {
+            const errorMessage = err?.response?.data?.message || 'Login failed. Please try again.';
+            setError(errorMessage);
         } finally {
             hideLoader()
         }
@@ -142,7 +143,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="flexCenter h-screen  transition-colors duration-300"
+        <div className="flex justify-center items-center h-screen  transition-colors duration-300"
             style={{ background: theme.gradients.primary }}
         >
             <motion.div
@@ -220,7 +221,10 @@ export default function LoginPage() {
 
                         <p
                             className='forgot-password text-blue-600 dark:text-blue-400 cursor-pointer hover:underline text-center mt-4'
-                            onClick={() => setShowForgotPassword(true)}
+                            onClick={() => {
+                                setShowForgotPassword(true);
+                                setError(null);
+                            }}
                         >
                             Forgot Password?
                         </p>
@@ -228,7 +232,10 @@ export default function LoginPage() {
                         <p className="text-center text-gray-600 dark:text-gray-400 mt-4 transition-colors duration-300">
                             Don&apos;t have an account?
                             <a className="text-blue-600 dark:text-blue-400 font-semibold hover:underline ml-1 transition-colors duration-300 cursor-pointer"
-                                onClick={() => handleNavigation('/signup')}
+                                onClick={() => {
+                                    handleNavigation('/signup');
+                                    setError(null);
+                                }}
                             >Sign up</a>
                         </p>
                     </>

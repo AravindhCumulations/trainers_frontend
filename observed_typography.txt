@@ -1,0 +1,480 @@
+/* Typography System Documentation */
+
+/* Common Section Titles (Used in: Hero, Trainer List, How it Works, FAQ, Workshop, About Me, Education, Reviews) */
+.section-title {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 36px;
+  color: #111827;
+}
+
+/* Common Subsection Titles (Used in: Contact Info, Analytics, Workshop, About Me, Certifications, Reviews, Education) */
+.subsection-title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 28px;
+  color: #1E2939;
+}
+
+/* Common Body Text (Used in: Hero Description, About Me, Workshop Description, Reviews, Testimonials) */
+.body-text {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #111827;
+}
+
+/* Common Secondary Text (Used in: Certificates, Reviews, Testimonials, Analytics) */
+.secondary-text {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: #4A5565;
+}
+
+/* Common Button Text (Used in: Search, CTA, Review Submit, Workshop Actions) */
+.button-text {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+/* Color System */
+.primary-text {
+  color: #1E2939;
+}
+
+.secondary-text {
+  color: #4A5565;
+}
+
+.tertiary-text {
+  color: #6B7280;
+}
+
+.accent-text {
+  color: #F54900;
+}
+
+.blue-text {
+  color: #2563EB;
+}
+
+/* Font Weights */
+.font-regular {
+  font-weight: 400;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-extrabold {
+  font-weight: 800;
+}
+
+/* Font Sizes */
+.text-xs {
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.text-sm {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.text-base {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.text-lg {
+  font-size: 18px;
+  line-height: 28px;
+}
+
+.text-xl {
+  font-size: 20px;
+  line-height: 30px;
+}
+
+.text-2xl {
+  font-size: 24px;
+  line-height: 32px;
+}
+
+.text-3xl {
+  font-size: 30px;
+  line-height: 36px;
+}
+
+.text-4xl {
+  font-size: 36px;
+  line-height: 48px;
+}
+
+/* Special Cases */
+
+/* Hero Title - Responsive */
+.hero-title {
+  font-size: clamp(2.5rem, 5vw + 1rem, 3rem);
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* Analytics Values */
+.analytics-value {
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 36px;
+}
+
+/* Certificate Name - Specific Size */
+.certificate-name {
+  font-size: 15.88px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #1E2939;
+}
+
+/* Testimonial Company - Specific Font */
+.testimonial-company {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  font-family: 'Segoe UI', sans-serif;
+  color: #1E2939;
+}
+
+/* Note: All font families default to system fonts unless specified otherwise */
+
+/* Typography Observations from Home Page */
+
+/* Hero Section */
+.hero-title {
+  font-size: clamp(2.5rem, 5vw + 1rem, 3rem);
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.hero-desc {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: normal;
+  text-align: center;
+}
+
+/* Search Bar */
+.hero-search-input {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.hero-search-btn {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* "Are you a Trainer?" Section */
+.are-you-a-trainer-title {
+  font-family: Arial, sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 54px;
+  letter-spacing: 0;
+}
+
+.are-you-a-trainer-desc {
+  font-family: Arial, sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 48px;
+  letter-spacing: 0;
+}
+
+/* Trainer List Section */
+.trainer-list-title {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 36px;
+  letter-spacing: 0%;
+  color: #111827;
+}
+
+/* Location Cards */
+.location-title {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* How it Works Section */
+.how-it-works-title {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 48px;
+  color: #000000;
+}
+
+.step-title {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 36px;
+  color: #000000;
+}
+
+.step-description {
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 36px;
+  color: #A4A4A4;
+}
+
+/* FAQ Section */
+.faq-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 32px;
+}
+
+.faq-question {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.faq-answer {
+  font-size: 16px;
+  color: #4B5563;
+}
+
+/* Call to Action */
+.cta-text {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 26px;
+  color: #2563EB;
+}
+
+.cta-button {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0%;
+  text-align: center;
+}
+
+/* General Text Styles */
+.body-text {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #111827;
+}
+
+.section-title {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 45px;
+  color: #111827;
+}
+
+/* Button Text */
+.button-text {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+/* Typography Observations from Trainer Details Page */
+
+/* Profile Section */
+.trainer-name {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+  color: #1E2939;
+}
+
+.trainer-details {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #4A5565;
+}
+
+/* Contact Information */
+.contact-title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 28px;
+  color: #1E2939;
+}
+
+.contact-text {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #1E2939;
+}
+
+/* Analytics Section */
+.analytics-title {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 30px;
+}
+
+.analytics-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6B7280;
+}
+
+.analytics-value {
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 36px;
+}
+
+/* Workshop Section */
+.workshop-title {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 30px;
+}
+
+/* About Me Section */
+.about-title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 28px;
+  color: #1E2939;
+}
+
+.about-text {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+}
+
+/* Certifications */
+.certificate-name {
+  font-size: 15.88px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #1E2939;
+}
+
+.certificate-date {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: #4A5565;
+}
+
+.certificate-issuer {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: #4A5565;
+}
+
+/* Reviews Section */
+.review-title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.reviewer-name {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #1E2939;
+}
+
+.review-text {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: #4A5565;
+}
+
+/* Education Section */
+.education-title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.course-name {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #1E2939;
+}
+
+.course-year {
+  color: #F54900;
+}
+
+/* Testimonials */
+.testimonial-name {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #1E2939;
+}
+
+.testimonial-company {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  font-family: 'Segoe UI', sans-serif;
+  color: #1E2939;
+}
+
+.testimonial-text {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: #4A5565;
+}
+
+/* Post Review Section */
+.review-form-title {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 36px;
+}
+
+.review-label {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.review-textarea {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.review-submit {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+} 

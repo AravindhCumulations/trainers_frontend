@@ -37,6 +37,7 @@ export default function TrainerDetailsPage() {
 
     const { theme } = useTheme();
     const { setName } = useUser();
+    const errorContainerRef = useRef<HTMLDivElement>(null);
 
 
     // edit mode
@@ -455,6 +456,11 @@ export default function TrainerDetailsPage() {
         const validationErrors = TrainerFormValidator.validateForm(form);
         if (validationErrors.length > 0) {
             setErrors(validationErrors);
+            // Scroll to error container and focus it
+            setTimeout(() => {
+                errorContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                errorContainerRef.current?.focus();
+            }, 100);
             return;
         }
 
@@ -537,6 +543,11 @@ export default function TrainerDetailsPage() {
             } else {
                 setErrors(["An error occurred during submission"]);
             }
+            // Scroll to error container for API errors as well
+            setTimeout(() => {
+                errorContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                errorContainerRef.current?.focus();
+            }, 100);
         } finally {
             hideLoader();
         }
@@ -624,7 +635,11 @@ export default function TrainerDetailsPage() {
                     </div>
 
                     {errors.length > 0 && (
-                        <div className="p-4 bg-red-50 border border-red-200 rounded-lg m-4">
+                        <div
+                            ref={errorContainerRef}
+                            tabIndex={-1}
+                            className="p-4 bg-red-50 border border-red-200 rounded-lg m-4 focus:outline-none focus:ring-2 focus:ring-red-500"
+                        >
                             <ul className="list-disc list-inside text-red-600">
                                 {errors.map((error, index) => (
                                     <li key={index}>{error}</li>
@@ -805,14 +820,22 @@ export default function TrainerDetailsPage() {
                                     >
                                         Year of Birth
                                     </label>
-                                    <input
+                                    <select
                                         id="dob"
-                                        type="date"
-                                        max={new Date().toISOString().split('T')[0]}
                                         value={form.dob}
                                         onChange={(e) => handleChanges('dob', e.target.value)}
                                         className="w-full px-4 py-2.5 h-[46px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                                    />
+                                    >
+                                        <option value="">Select Year</option>
+                                        {Array.from({ length: new Date().getFullYear() - 1949 }, (_, i) => {
+                                            const year = new Date().getFullYear() - i;
+                                            return (
+                                                <option key={year} value={year}>
+                                                    {year}
+                                                </option>
+                                            );
+                                        })}
+                                    </select>
                                 </div>
                             </div>
                         </div>

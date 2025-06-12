@@ -7,7 +7,6 @@ import { FaWallet, FaPlus, FaMinus } from 'react-icons/fa';
 import { useTheme } from '@/styles/ThemeProvider';
 
 const ManageCredits = () => {
-
     const { theme } = useTheme();
     const [credits] = useState(300);
     const [buyAmount, setBuyAmount] = useState(0);
@@ -18,23 +17,47 @@ const ManageCredits = () => {
 
     const totalPrice = (buyAmount / 50) * 10;
 
+    const loadRazorpayScript = () => {
+        if (buyAmount < 10) {
+            alert("Minimum 10 credits required to purchase.");
+            return;
+        }
+
+        const existingForm = document.getElementById("razorpay-form");
+        if (existingForm) {
+            existingForm.remove(); // Remove any previous form/script
+        }
+
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/payment-button.js";
+        script.setAttribute("data-payment_button_id", "pl_QgEvH9iSHqlibR");
+        script.async = true;
+
+        const form = document.createElement("form");
+        form.id = "razorpay-form";
+        form.appendChild(script);
+
+        document.body.appendChild(form);
+    };
+
     return (
         <div className="bg-[#F0F4F8] min-h-screen font-sans">
-
             <NavBar bgColor="bg-white" />
 
-
             <div className="bg-blue-100 py-4">
-                <div className="w-[1024px] mx-auto bg-white my-4 rounded-2xl overflow-hidden " >
-                    {/* Header */}
-                    <div className="bg-gradient-to-r text-white py-4 px-6 text-center"
-                        style={{ background: theme.gradients.header }}>
+                <div className="w-[1024px] mx-auto bg-white my-4 rounded-2xl overflow-hidden">
+                    <div
+                        className="bg-gradient-to-r text-white py-4 px-6 text-center"
+                        style={{ background: theme.gradients.header }}
+                    >
                         <h1 className="text-[32px] font-bold mb-2">Manage Your Credits</h1>
-                        <p className="text-[16px] text-white/90">Purchase credits to book sessions with trainers and unlock premium features</p>
+                        <p className="text-[16px] text-white/90">
+                            Purchase credits to book sessions with trainers and unlock premium features
+                        </p>
                     </div>
 
-                    <div className="max-w-[900px] mx-auto  relative p-8">
-                        {/* Current Balance Card */}
+                    <div className="max-w-[900px] mx-auto relative p-8">
+                        {/* Balance */}
                         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                             <div className="flex justify-between items-center">
                                 <div>
@@ -52,25 +75,24 @@ const ManageCredits = () => {
                             </div>
                         </div>
 
+                        {/* Buy Section */}
                         <div className="p-4 pb-6">
-                            {/* Buy Credits Section */}
                             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-
                                 <h2 className="text-[20px] font-semibold text-[#1F2937] mb-6">Buy Credits</h2>
 
-                                {/* Rate */}
+                                {/* Rate Info */}
                                 <div className="mb-8">
                                     <p className="text-[14px] text-[#1F2937] mb-3">Rate:</p>
                                     <div className="relative mb-4">
                                         <div className="h-1 bg-[#E5E7EB] rounded-full">
-                                            <div className="h-1 bg-[#4F80FF] rounded-full w-1/3"></div> {/* Example fill */}
+                                            <div className="h-1 bg-[#4F80FF] rounded-full w-1/3"></div>
                                         </div>
                                         <span className="absolute -top-20 right-0 text-[12px] font-medium text-[#4F80FF] bg-[#E0E7FF] px-2 py-0.5 rounded-full">Best Value</span>
                                         <span className="absolute -top-8 right-0 text-[14px] text-[#1F2937]">50 credits = ₹10</span>
                                     </div>
                                 </div>
 
-                                {/* Amount Input */}
+                                {/* Input */}
                                 <div className="flex flex-col justify-between items-center mb-6">
                                     <div className='w-full'>
                                         <div className="flex justify-between items-end">
@@ -79,15 +101,15 @@ const ManageCredits = () => {
                                         </div>
                                         <div className="flex items-center border border-[#E5E7EB] rounded-md overflow-hidden w-full">
                                             <button
-                                                className="p-3 hover:bg-[#F3F4F6] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                                className="p-3 hover:bg-[#F3F4F6] disabled:opacity-50"
                                                 onClick={() => handleBuyAmountChange(-10)}
                                                 disabled={buyAmount <= 0}
                                             >
                                                 <FaMinus className="text-[#4B5563]" />
                                             </button>
-                                            <div className=" flex-grow text-center text-[20px] font-medium text-[#1F2937] px-4 ">{buyAmount}</div>
+                                            <div className="flex-grow text-center text-[20px] font-medium text-[#1F2937] px-4">{buyAmount}</div>
                                             <button
-                                                className="p-3 hover:bg-[#F3F4F6] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                                className="p-3 hover:bg-[#F3F4F6]"
                                                 onClick={() => handleBuyAmountChange(10)}
                                             >
                                                 <FaPlus className="text-[#4B5563]" />
@@ -108,90 +130,53 @@ const ManageCredits = () => {
                                     </div>
                                 </div>
 
-                                {/* Buy Button (Disabled state as in image) */}
-                                <button className="w-full bg-[#E5E7EB] text-[#6B7280] py-3 rounded-lg text-[16px] font-medium flex items-center justify-center cursor-not-allowed" disabled>
+                                {/* Razorpay Button */}
+                                <button
+                                    className="w-full bg-[#4F80FF] hover:bg-[#3b65cc] text-white py-3 rounded-lg text-[16px] font-medium flex items-center justify-center transition-colors"
+                                    onClick={loadRazorpayScript}
+                                    disabled={buyAmount < 10}
+                                >
                                     <FaWallet className="mr-2" />
                                     Buy Credits
                                 </button>
-                            </div>
-
-                            {/* Credit Packages */}
-                            <div className="flex  flex-col items-center p-6 ">
-                                <div className=" w-[max content] flex gap-4 ">
-                                    <div className="w-[224px] border border-[#E5E7EB] rounded-lg p-6 text-center">
-                                        <p className="text-[16px] font-medium text-[#1F2937] mb-2">Basic</p>
-                                        <p className="text-[24px] font-semibold text-[#1F2937] mb-1">50 credits</p>
-                                        <p className="text-[14px] text-[#6B7280]">₹10</p>
-                                    </div>
-                                    {/* Popular */}
-                                    <div className="w-[224px] border border-[#4F80FF] rounded-lg p-6 text-center relative bg-white shadow-md">
-                                        <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-[#4F80FF] text-white text-[11px] font-medium px-2 py-1 rounded-full">Most Popular</span>
-                                        <p className="text-[16px] font-medium text-[#1F2937] mb-2 mt-2">Popular</p>
-                                        <p className="text-[24px] font-semibold text-[#4F80FF] mb-1">150 credits</p>
-                                        <p className="text-[14px] text-[#6B7280]">₹30</p>
-                                    </div>
-                                    {/* Power User */}
-                                    <div className=" w-[224px] border border-[#E5E7EB] rounded-lg p-6 text-center">
-                                        <p className="text-[16px] font-medium text-[#1F2937] mb-2">Power User</p>
-                                        <p className="text-[24px] font-semibold text-[#1F2937] mb-1">500 credits</p>
-                                        <p className="text-[14px] text-[#6B7280]">₹100</p>
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* */}
+            {/* How It Works Section */}
             <section className="w-full bg-white py-16 px-4 text-center">
-                <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
-                    How Credits Work
-                </h2>
+                <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">How Credits Work</h2>
                 <p className="text-gray-600 max-w-3xl mx-auto mb-12 text-base md:text-lg">
                     Credits are the currency used on ThoughtBulb to book sessions with trainers. Different trainers may charge
                     different amounts based on their expertise and session duration.
                 </p>
-
                 <div className="flex flex-col md:flex-row justify-center gap-10">
                     {/* Step 1 */}
                     <div className="flex flex-col items-center max-w-xs">
-                        <div className="w-12 h-12 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center text-lg font-bold mb-4">
-                            1
-                        </div>
+                        <div className="w-12 h-12 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center text-lg font-bold mb-4">1</div>
                         <h3 className="font-bold text-lg mb-1">Buy Credits</h3>
-                        <p className="text-gray-600 text-sm">
-                            Purchase credits through our secure payment system
-                        </p>
+                        <p className="text-gray-600 text-sm">Purchase credits through our secure payment system</p>
                     </div>
-
                     {/* Step 2 */}
                     <div className="flex flex-col items-center max-w-xs">
-                        <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center text-lg font-bold mb-4">
-                            2
-                        </div>
+                        <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center text-lg font-bold mb-4">2</div>
                         <h3 className="font-bold text-lg mb-1">Book Sessions</h3>
-                        <p className="text-gray-600 text-sm">
-                            Use your credits to book sessions with your preferred trainers
-                        </p>
+                        <p className="text-gray-600 text-sm">Use your credits to book sessions with your preferred trainers</p>
                     </div>
-
                     {/* Step 3 */}
                     <div className="flex flex-col items-center max-w-xs">
-                        <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center text-lg font-bold mb-4">
-                            3
-                        </div>
+                        <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center text-lg font-bold mb-4">3</div>
                         <h3 className="font-bold text-lg mb-1">Learn & Grow</h3>
-                        <p className="text-gray-600 text-sm">
-                            Attend your sessions and track your progress
-                        </p>
+                        <p className="text-gray-600 text-sm">Attend your sessions and track your progress</p>
                     </div>
                 </div>
             </section>
+
             <Footer />
         </div>
     );
 };
 
-export default ManageCredits; 
+export default ManageCredits;

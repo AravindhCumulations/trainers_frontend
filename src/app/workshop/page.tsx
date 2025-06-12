@@ -175,6 +175,13 @@ export default function WorkshopsPage() {
     // Initial load when page loads
     useEffect(() => {
         fetchWorkshops();
+
+        // Check for action=create parameter
+        const searchParams = new URLSearchParams(window.location.search);
+        const action = searchParams.get('action');
+        if (action === 'create') {
+            setOverlayState({ isOpen: true, type: 'create' });
+        }
     }, []);
 
     const handleDeleteWorkshop = async (idx: string, isCaseStudy: boolean = false) => {
@@ -333,21 +340,23 @@ export default function WorkshopsPage() {
                         </button>
                     </div>
                 </div>
+
                 <div className="p-6 flex flex-col flex-grow">
+                    <span className="whitespace-nowrap w-fit self-end text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        {item.format}
+                    </span>
                     <div className="flex justify-between items-start mb-2">
                         <h2 className="text-2xl font-semibold">{item.title}</h2>
-                        <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                            {item.format}
-                        </span>
+
                     </div>
                     <p className="text-gray-600 mb-4 flex-grow line-clamp-3">{item.objectives}</p>
                     <div className="flex flex-col justify-end items-start gap-2 mt-auto">
                         <div className="flex flex-wrap gap-2">
-                            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                            <span className="text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded-md">
                                 {isCaseStudy ? 'Case Study' : 'Workshop'}
                             </span>
                         </div>
-                        <span className="text-green-600 font-bold">₹ {item.price}&nbsp;/hour</span>
+                        <span className="text-green-600 font-bold">₹ {item.price}/hour</span>
                     </div>
                 </div>
             </motion.div>

@@ -49,27 +49,9 @@ export function middleware(request: NextRequest) {
                     name: parsedUserDetails.name
                 });
 
-                // If trying to access login/signup pages while logged in, redirect to appropriate page
+                // If trying to access login/signup pages while logged in, redirect to home
                 if (path === '/login' || path === '/signup') {
-                    if (parsedUserDetails.role_user === 'Trainer') {
-                        const trainerName = parsedUserDetails.name || '';
-                        const redirectUrl = new URL('/trainer-details', request.url);
-                        redirectUrl.searchParams.set('trainer', trainerName);
-                        return NextResponse.redirect(redirectUrl);
-                    } else {
-                        return NextResponse.redirect(new URL('/', request.url));
-                    }
-                }
-
-                // If on root path, handle routing based on role
-                if (path === '/') {
-                    if (parsedUserDetails.role_user === 'Trainer') {
-                        const trainerName = parsedUserDetails.name || '';
-                        const redirectUrl = new URL('/trainer-details', request.url);
-                        redirectUrl.searchParams.set('trainer', trainerName);
-                        return NextResponse.redirect(redirectUrl);
-                    }
-                    // For regular users, allow access to root path
+                    return NextResponse.redirect(new URL('/', request.url));
                 }
             } catch (error) {
                 console.error('❌ Error parsing user details:', error);
@@ -78,12 +60,6 @@ export function middleware(request: NextRequest) {
                 response.cookies.delete('user_details');
                 response.cookies.delete('auth');
                 return response;
-            }
-        } else {
-            // If no auth cookies but trying to access protected routes
-            if (path === '/') {
-                // Allow access to root path for non-logged in users
-                return NextResponse.next();
             }
         }
     }

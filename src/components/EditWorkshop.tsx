@@ -27,13 +27,10 @@ interface EditWorkshopProps {
 }
 
 const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpdate }) => {
-
-
-
-
     const { showLoader, hideLoader } = useLoading();
     const { showError } = usePopup();
     const [errors, setErrors] = useState<string[]>([]);
+    const errorContainerRef = useRef<HTMLDivElement>(null);
 
     const initialFormData = {
         title: initialData?.title || '',
@@ -54,18 +51,25 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
     const [imagePreview, setImagePreview] = useState<string>(initialData?.image || '');
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const initialFormState = useRef(initialFormData);
+    const initialImageRef = useRef(initialData?.image || '');
 
     // Add isEditMode state
     const isEditMode = Boolean(initialData);
 
     const MAX_CHAR_LIMIT = 300;
 
-
     // Function to strip HTML and count characters
     const getTextLength = (htmlContent: string): number => {
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = htmlContent;
         return tempDiv.textContent?.length || 0;
+    };
+
+    // Function to check if image has changed
+    const hasImageChanged = () => {
+        if (selectedImage) return true;
+        if (!initialImageRef.current && !imagePreview) return false;
+        return initialImageRef.current !== imagePreview;
     };
 
     // Function to handle changes with deep comparison
@@ -99,8 +103,8 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
 
     // Check if form has changes using useMemo
     const hasFormChanges = useMemo(() => {
-        return Object.keys(modifiedFields).length > 0;
-    }, [modifiedFields]);
+        return Object.keys(modifiedFields).length > 0 || hasImageChanged();
+    }, [modifiedFields, selectedImage, imagePreview]);
 
     // Function to handle image upload
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,6 +115,11 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
             reader.onloadend = () => {
                 const base64String = reader.result as string;
                 setImagePreview(base64String);
+                // Add image to modified fields
+                setModifiedFields(prev => ({
+                    ...prev,
+                    image: base64String
+                }));
             };
             reader.readAsDataURL(file);
         }
@@ -154,18 +163,9 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
         }
     }, [initialData]);
 
-
-
-
-
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!hasFormChanges) return;
-
-        console.log("Form here");
-
-        console.log(formData);
-
 
         // Clear previous errors
         setErrors([]);
@@ -212,9 +212,17 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
         if (formData.evaluation.length > MAX_CHAR_LIMIT) {
             errors.push('Evaluation should be less than 300 characters');
         }
+        if (!imagePreview && !isEditMode) {
+            errors.push('Image is Required');
+        }
 
         if (errors.length > 0) {
             setErrors(errors);
+            // Scroll to error container and focus it
+            setTimeout(() => {
+                errorContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                errorContainerRef.current?.focus();
+            }, 100);
             return;
         }
 
@@ -270,7 +278,11 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                     </div>
 
                     {errors.length > 0 && (
-                        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <div
+                            ref={errorContainerRef}
+                            tabIndex={-1}
+                            className="p-4 bg-red-50 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                        >
                             <ul className="list-disc list-inside text-red-600">
                                 {errors.map((error, index) => (
                                     <li key={index}>{error}</li>
@@ -546,7 +558,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     }`}
                             >
-                                {hasFormChanges ? 'Save Workshop' : 'No Changes'}
+                                {hasFormChanges ? 'Save' : 'No Changes'}
                             </button>
                         </div>
                     </form>

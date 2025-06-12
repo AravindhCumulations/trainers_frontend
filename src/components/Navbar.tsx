@@ -198,14 +198,14 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
 
                                     {/* Dropdown Menu */}
                                     {showDropdown && (
-                                        <div className="absolute top-11 right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
-                                            <button
+                                        <div className="absolute top-11 right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-1 border-gray-200">
+                                            {/* <button
                                                 onClick={handleProfile}
                                                 className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                                             >
                                                 <UserIcon className="w-4 h-4" />
                                                 Profile
-                                            </button>
+                                            </button> */}
                                             <button
                                                 onClick={handleLogout}
                                                 className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
@@ -219,19 +219,19 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                             ) : (
                                 <div className="flex items-center gap-4">
                                     <button
-                                        className={`font-medium text-base cursor-pointer ${textColor}`}
+                                        className="font-semibold text-[16px] leading-[24px] tracking-[0%] align-middle cursor-pointer"
                                         onClick={handleLogin}
                                     >
                                         Login
                                     </button>
                                     <button
                                         className={`${bgColor === "bg-white"
-                                            ? "bg-primary text-white"
-                                            : "bg-white text-primary"
-                                            } px-5 py-1.5 rounded-full font-semibold text-base shadow-sm hover:bg-primary-light transition cursor-pointer hover:scale-105`}
+                                            ? "bg-[#2563EB] text-white"
+                                            : "bg-white text-[#2563EB]"
+                                            } h-[37.2px] rounded-full px-4 py-[6.6px] flex items-center justify-center cursor-pointer hover:scale-105 transition`}
                                         onClick={handleSignup}
                                     >
-                                        Sign Up
+                                        <span className="font-semibold text-[16px] leading-[24px] tracking-[0%] align-middle">Sign Up</span>
                                     </button>
                                 </div>
                             )

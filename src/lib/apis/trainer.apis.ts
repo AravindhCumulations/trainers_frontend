@@ -20,7 +20,6 @@ export const trainerApis = {
         try {
             const response = await axios.get('/api/method/trainer.api.get_all_trainers', {
                 params,
-                withCredentials: true,
             });
             return response.data.message;
         } catch (error) {

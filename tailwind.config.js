@@ -46,6 +46,9 @@ module.exports = {
                 // Small helper text or secondary links (e.g., "Back to Login")
                 'text-helper-sm': ['12px', { lineHeight: '18px', fontWeight: '400' }], // New for 12px regular
 
+            },
+            HeroHeader: {
+                'custom-gradient': 'linear-gradient(180deg, #7196FF 0%, #2563EB 100%)',
             }
         },
     },

@@ -46,7 +46,7 @@ const WorkshopCard = ({ workshop, onClick, tag = "workshop" }: WorkshopCardProps
                 </div>
                 <div className="flex justify-between items-center mt-auto">
                     <span className={priceClasses}>
-                        ₹ {workshop.price.toFixed(2)}
+                        ₹ {workshop.price.toFixed(0)}/hour
                     </span>
                     <div className=" bg-blue-100 px-2 py-1 rounded-md shadow-sm ">
                         <p className="text-semibold text-sm text-blue-600">{tag}</p>
