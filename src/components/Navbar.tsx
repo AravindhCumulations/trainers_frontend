@@ -7,7 +7,7 @@ import { useNavigation } from "@/lib/hooks/useNavigation";
 import Image from 'next/image';
 import { creditsApis } from "@/lib/apis/credits.apis";
 
-import { LogOutIcon, UserIcon } from "lucide-react";
+import { LogOutIcon } from "lucide-react";
 import { authApis } from "@/lib/apis/auth.apis";
 import { useUser } from '@/context/UserContext';
 
@@ -112,9 +112,6 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
         handleNavigation("/manage-credits");
     }
 
-    const handleProfile = () => {
-        handleNavigation("/profile");
-    };
 
     return (
         <>

@@ -2,46 +2,145 @@
 
 import Footer from '@/components/Footer';
 import NavBar from '@/components/Navbar';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaWallet, FaPlus, FaMinus } from 'react-icons/fa';
 import { useTheme } from '@/styles/ThemeProvider';
+import { useUser } from '@/context/UserContext';
+import { creditsApis } from '@/lib/apis/credits.apis';
+import { usePopup } from '@/lib/hooks/usePopup';
+import Popup from '@/components/Popup';
+
+
+
+
+interface RazorpayResponse {
+    razorpay_payment_id: string;
+    razorpay_order_id: string;
+    razorpay_signature: string;
+  }
 
 const ManageCredits = () => {
     const { theme } = useTheme();
-    const [credits] = useState(300);
-    const [buyAmount, setBuyAmount] = useState(0);
+    const [buyAmount, setBuyAmount] = useState(10);
+    const { user,updateCredits } = useUser();
+    const [credits, setCredits] = useState(0); // Initialize with 0
+    const { toastSuccess, toastError, popupState, hidePopup } = usePopup();
+    
+
+    // Synchronize credits with user?.credits whenever user changes
+    useEffect(() => {
+        if (user?.credits !== undefined) {
+            setCredits(user.credits);
+        }
+    }, [user]);
 
     const handleBuyAmountChange = (amount: number) => {
+        
+        
         setBuyAmount(Math.max(0, buyAmount + amount));
+        console.log(buyAmount);
+        
     };
 
-    const totalPrice = (buyAmount / 50) * 10;
+    const totalPrice = buyAmount * 5;
 
     const loadRazorpayScript = () => {
-        if (buyAmount < 10) {
-            alert("Minimum 10 credits required to purchase.");
-            return;
+        return new Promise(resolve => {
+          const script = document.createElement("script");
+          script.src = "https://checkout.razorpay.com/v1/checkout.js";
+          script.onload = () => resolve(true);
+          script.onerror = () => resolve(false);
+          document.body.appendChild(script);
+        });
+      };
+   
+    
+      const handlePayment = async () => {
+        const loaded = await loadRazorpayScript();
+        if (!loaded) {
+          alert("Razorpay SDK failed to load.");
+          return;
         }
+    
+        try {
+          // Send amount to backend to create Razorpay order
 
-        const existingForm = document.getElementById("razorpay-form");
-        if (existingForm) {
-            existingForm.remove(); // Remove any previous form/script
+          const username = user?.email 
+
+          console.log("Creating order for user:", username, "with total price:", totalPrice);
+          
+          const orderRes = await creditsApis.createOrder(username,totalPrice); 
+    
+          const { order_id, amount, currency } = orderRes.message;
+
+          console.log("Order created:", order_id, amount, currency);
+          
+    
+          const options = {
+            key: "rzp_test_vDdkzfTjLyxvam", // Replace with your Razorpay key_id
+            amount: amount.toString(),
+            currency: currency,
+            name: "Trainer Credits",
+            description: `${credits} Credits Purchase`,
+            order_id: order_id,
+            handler: async function (response: RazorpayResponse) {
+              toastSuccess(`Payment successful!`);
+              console.log("Payment ID:", response.razorpay_payment_id);
+              console.log("Order ID:", response.razorpay_order_id);
+              console.log("Signature:", response.razorpay_signature);
+
+                // Call your backend to verify payment and update user credits
+                try {
+                    const verifyRes = await creditsApis.verifyPaymentAndUpdateCredits(
+                        response.razorpay_payment_id,
+                        response.razorpay_order_id,
+                        response.razorpay_signature
+                    );
+
+                    if (verifyRes.message.status === 'success') {
+                        console.log("Payment verified and credits updated:", verifyRes.message.credits);
+                        updateCredits()
+                        toastSuccess(`Successfully purchased ${buyAmount} credits!`);
+                    } else {
+                        alert("Failed to update credits.");
+                        toastError(`Failed to update credits.`);
+                    }
+                }
+                catch (error) {
+                    toastError(`An error occurred while verifying payment.`);
+
+                }
+    
+              // TODO: Call your backend to verify payment and update user credits
+            },
+
+            theme: {
+              color: "#3399cc"
+            }
+          };
+    
+          const rzp = new window.Razorpay(options);
+          rzp.open();
+        } catch (err) {
+          console.error(err);
+          toastError(`Error creating Razorpay order.`);
         }
+      };
 
-        const script = document.createElement("script");
-        script.src = "https://checkout.razorpay.com/v1/payment-button.js";
-        script.setAttribute("data-payment_button_id", "pl_QgEvH9iSHqlibR");
-        script.async = true;
-
-        const form = document.createElement("form");
-        form.id = "razorpay-form";
-        form.appendChild(script);
-
-        document.body.appendChild(form);
-    };
+    
 
     return (
         <div className="bg-[#F0F4F8] min-h-screen font-sans">
+             <Popup
+                isOpen={popupState.isOpen}
+                type={popupState.type}
+                message={popupState.message}
+                title={popupState.title}
+                onClose={hidePopup}
+                onConfirm={popupState.onConfirm}
+                confirmText={popupState.confirmText}
+                cancelText={popupState.cancelText}
+            />
             <NavBar bgColor="bg-white" />
 
             <div className="bg-blue-100 py-4">
@@ -133,7 +232,7 @@ const ManageCredits = () => {
                                 {/* Razorpay Button */}
                                 <button
                                     className="w-full bg-[#4F80FF] hover:bg-[#3b65cc] text-white py-3 rounded-lg text-[16px] font-medium flex items-center justify-center transition-colors"
-                                    onClick={loadRazorpayScript}
+                                    onClick={handlePayment}
                                     disabled={buyAmount < 10}
                                 >
                                     <FaWallet className="mr-2" />

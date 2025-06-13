@@ -5,8 +5,6 @@ import { toast } from 'react-hot-toast';
 export const creditsApis = {
     // Get user credits
     getUserCredits: async () => {
-
-
         const user = getUserDetails();
         try {
             const response = await axios.get(`/api/resource/Credits?fields=["credits"]&filters=${encodeURIComponent(JSON.stringify({ "user": user.email }))}`, {
@@ -15,10 +13,7 @@ export const creditsApis = {
                 },
                 headers: getAuthHeaders()
             });
-
-
             return response.data;
-
         } catch (error) {
             console.error('Error fetching user credits:', error);
             throw error;
@@ -46,7 +41,6 @@ export const creditsApis = {
     // Deduct credits from user
     deductCredits: async (name: string) => {
         const user = getUserDetails();
-
         try {
             const response = await axios.post(`/api/method/trainer.api.deduct_credits`, {
                 user: user.email,
@@ -78,26 +72,49 @@ export const creditsApis = {
         }
     },
 
-
-
     // Unlock trainer profile
     unlockTrainer: async (trainerName: string) => {
         try {
             const response = await creditsApis.deductCredits(trainerName);
-
-
-
-
-
-
-
-            return response.message.success
-
-
+            return response.message.success;
         } catch (error) {
             console.error('Error unlocking trainer:', error);
             toast.error('An error occurred while trying to unlock the trainer');
             return false;
         }
+    },
+
+    // Create order for payment
+    createOrder: async (username:string,amount: number) => {
+        try {
+            const response = await axios.post('/api/method/trainer.api.create_order', {
+                username: username,
+                amount: amount
+            }, 
+            {
+                headers: getAuthHeaders(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error creating order:', error);
+            throw error;
+        }
+    },
+
+    // Verify payment and update credits
+    verifyPaymentAndUpdateCredits: async (paymentId: string, orderId: string, signature: string) => {
+        try {
+            const response = await axios.post('/api/method/trainer.api.verify_payment_and_update_credits', {
+                razorpay_payment_id: paymentId,
+                razorpay_order_id: orderId,
+                razorpay_signature: signature
+            } ,{
+                headers: getAuthHeaders(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error verifying payment and updating credits:', error);
+            throw error;
+        }
     }
-}; 
+};

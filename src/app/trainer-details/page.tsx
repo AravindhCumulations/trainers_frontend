@@ -40,13 +40,6 @@ interface WorkshopDetailsData {
     evaluation?: string;
 }
 
-interface OverlayProps {
-    isOpen: boolean;
-    type: 'details' | 'edit' | 'create' | null;
-    data?: WorkshopDetailsData;
-    setOverlayState: (state: { isOpen: boolean; type: 'details' | 'edit' | 'create' | null; data?: WorkshopDetailsData }) => void;
-}
-
 // Workshop Details Component
 const WorkshopDetailsOverlay = ({ setOverlayState, workshop }: { setOverlayState: (state: { isOpen: boolean; type: 'details' | 'edit' | 'create' | null; data?: WorkshopDetailsData }) => void; workshop?: WorkshopDetailsData }) => {
     const handleClose = () => {
@@ -60,35 +53,6 @@ const WorkshopDetailsOverlay = ({ setOverlayState, workshop }: { setOverlayState
     return <WorkshopDetails workshop={workshop} onClose={handleClose} />;
 };
 
-// Dynamic Overlay Component
-const WorkshopOverlay = ({ isOpen, type, setOverlayState, data }: OverlayProps) => {
-    const handleClose = () => {
-        setOverlayState({ isOpen: false, type: null });
-    };
-
-    return (
-        <Overlay isOpen={isOpen} onClose={handleClose}>
-            {type === 'details' && <WorkshopDetailsOverlay setOverlayState={setOverlayState} workshop={data} />}
-            {type === 'edit' && (
-                <div className="bg-white w-full rounded-2xl mt-4">
-                    <EditWorkshop
-                        onClose={handleClose}
-                        initialData={data}
-                        mode="edit"
-                    />
-                </div>
-            )}
-            {type === 'create' && (
-                <div className="bg-white w-full rounded-2xl mt-4">
-                    <EditWorkshop
-                        onClose={handleClose}
-                        mode="create"
-                    />
-                </div>
-            )}
-        </Overlay>
-    );
-};
 
 // Create a client component that uses useSearchParams
 const TrainerDetailsContent = () => {
@@ -121,7 +85,7 @@ const TrainerDetailsContent = () => {
 
     // looders
     const { showLoader, hideLoader } = useLoading();
-    const { popupState, showError, hidePopup, showConfirmation, toastSuccess, showSuccess, toastError, showInfo } = usePopup();
+    const { popupState, showError, hidePopup, showConfirmation, toastSuccess, showSuccess, toastError } = usePopup();
 
     const handleWishlistUpdate = (trainer: TrainerCardModel, isWishlisted: boolean) => {
         // Update the trainer in the trainers list

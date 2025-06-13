@@ -203,10 +203,10 @@ export default function Home() {
           <Navbar bgColor="transparent" />
           {/* Hero Content */}
           <div className="flex flex-col gap-3 items-center h-[40vh] w-full mt-6 px-4 hero-content">
-            <h1 className="text-[clamp(2.5rem,5vw+1rem,3rem)] font-extrabold mb-2 text-center leading-tight hero-title">
+            <h1 className="heading-2xl font-bold mb-2 text-center  hero-title" aria-label="Hero Title">
               Find & Hire Soft Skills Trainers
             </h1>
-            <p className="mb-5 text-center max-w-2xl text-[18px] font-normal font-medium hero-desc">
+            <p className="mb-5 text-center max-w-2xl text-[18px] font-normal font-medium hero-desc" aria-label="Hero Description">
               Instantly Connect with Verified Trainers Across the Country
             </p>
             <div className="w-[60%] max-w-2xl flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md mb-5 hero-search-bar">
@@ -217,11 +217,13 @@ export default function Home() {
                 onChange={(e) => setSearchText(e.target.value)}
                 onKeyPress={handleKeyPress}
                 className="flex-1 px-5 py-2 rounded-full outline-none text-white bg-transparent placeholder-white/80 text-[16px] font-normal hero-search-input"
+                aria-label="Search Input"
               />
               {searchText && (
                 <button
                   onClick={handleClearSearch}
                   className="text-white hover:text-gray-200 px-2"
+                  aria-label="Clear Search Button"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="currentColor">
                     <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
@@ -235,6 +237,7 @@ export default function Home() {
                   ? 'opacity-50 cursor-not-allowed'
                   : 'hover:bg-blue-50'
                   }`}
+                aria-label="Search Button"
               >
                 Search
               </button>
@@ -402,7 +405,9 @@ export default function Home() {
 
       {/* Browse Trainers by Location Section - 2 rows, 3 columns, fixed size */}
       <section className="w-full max-w-7xl mx-auto my-10">
-        <p className="text-[30px] font-bold mb-4">Browse Trainers by Locations</p>
+        <p className="text-[30px] font-bold mb-4" aria-label="Browse Trainers by Locations Title">
+          Browse Trainers by Locations
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {locations.map((city, index) => (
             <div
@@ -521,9 +526,10 @@ export default function Home() {
 
             <section className="w-full max-w-7xl mx-auto mt-6">
               <div className="flex items-center gap-5">
-                <p className="text-[18px] font-medium leading-[26px] text-blue-600">👥 Join the Network & Grow your training Business 👉 </p>
+                <p className="text-[18px] font-medium leading-[26px] text-blue-600" aria-label="Join Network Text">👥 Join the Network & Grow your training Business 👉 </p>
                 <button className="bg-[#3B82F6]  h-[40px] rounded-xl text-white px-3 py-2 flex items-center justify-center gap-[10px] hover:bg-blue-700 transition-colors hover:scale-105 transition-all"
                   onClick={() => handleNavigation('/signup')}
+                  aria-label="Sign Up as Trainer Button"
                 >
                   <span className="text-[16px] font-semibold leading-[24px] tracking-[0%] text-center text-white ">Sign Up as a Trainer</span>
                 </button>
@@ -538,7 +544,9 @@ export default function Home() {
         <div className="flex flex-row gap-20 items-start">
           {/* Left Column */}
           <div className="flex-1">
-            <h2 className="text-[32px] font-bold mb-8 leading-[48px] text-black">How it Works</h2>
+            <h2 className="text-[32px] font-bold mb-8 leading-[48px] text-black" aria-label="How it Works Title">
+              How it Works
+            </h2>
             <div className="flex max-w-7xl mx-auto gap-[55px]">
               <div className="relative h-[max-content] flex flex-col gap-[80px]">
                 {/* Vertical dashed line */}
@@ -604,13 +612,13 @@ export default function Home() {
         <h2 className="text-2xl font-bold mb-8">FAQ – Everything You Need to Know</h2>
         <div className="space-y-6 max-w-3xl">
           <div>
-            <h3 className="font-semibold text-lg mb-2">How do I hire a trainer?</h3>
-            <p className="text-gray-600">Simply search trainers, review their profile, and unlock contact details using credits.</p>
+            <h3 className="font-semibold text-lg mb-2" aria-label="FAQ Question 1">How do I hire a trainer?</h3>
+            <p className="text-gray-600" aria-label="FAQ Answer 1">Simply search trainers, review their profile, and unlock contact details using credits.</p>
           </div>
 
           <div>
-            <h3 className="font-semibold text-lg mb-2">Do I need a subscription?</h3>
-            <p className="text-gray-600">No! Just buy credits as needed—no recurring fees.</p>
+            <h3 className="font-semibold text-lg mb-2" aria-label="FAQ Question 2">Do I need a subscription?</h3>
+            <p className="text-gray-600" aria-label="FAQ Answer 2">No! Just buy credits as needed—no recurring fees.</p>
           </div>
 
           <div>
@@ -630,7 +638,7 @@ export default function Home() {
         </div>
       </section>
 
-      <p className="text-center font-semibold text-3xl underline text-blue-500">Get Started Today!</p>
+      <p className="text-center font-semibold text-3xl underline text-blue-500" aria-label="Get Started Today Text">Get Started Today!</p>
 
 
       {/* Footer - 3 columns, fixed height, exact spacing */}
