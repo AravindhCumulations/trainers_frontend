@@ -665,10 +665,13 @@ export default function TrainerDetailsPage() {
 
 
     return (
-        <div className="min-h-screen bg-theme">            <NavBar />
+
+        <div className="min-h-screen bg-theme">
+            <NavBar />
+
             <div className="container mx-auto my-8">
                 <div className="max-w-4xl mx-auto bg-white rounded-xl overflow-hidden">
-                    <div className="flex flex-col justify-center items-center text-white py-[16px]bg-theme-header"
+                    <div className="flex flex-col justify-center items-center text-white py-[16px] bg-theme-header"
                     >
                         <h1 className="tracking-normal text-center align-middle font-sans text-3xl font-bold text-[32px]">Complete Your Trainer Profile</h1>
                         <p>Share your expertise and credentials with potential clients</p>
