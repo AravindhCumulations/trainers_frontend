@@ -173,6 +173,10 @@ export default function TrainerDetailsPage() {
     // Add expertise search handler
     const handleExpertiseSearch = (searchValue: string) => {
         setSearchTerm(searchValue);
+        if (!searchValue.trim()) {
+            setFilteredExpertise(expertise_in);
+            return;
+        }
         const filtered = expertise_in.filter(exp =>
             exp.toLowerCase().includes(searchValue.toLowerCase())
         );
@@ -203,6 +207,11 @@ export default function TrainerDetailsPage() {
                 : exp;
             handleChanges('expertise_in', newValue);
         }
+
+        // Reset search and filter after selection
+        setSearchTerm('');
+        setFilteredExpertise(expertise_in);
+        setIsExpertiseDropdownOpen(false);
     };
 
     // Add filtered expertise state
@@ -221,6 +230,8 @@ export default function TrainerDetailsPage() {
                 if (trainerParam) {
                     setIsEdit(true);
                     const trainerData = JSON.parse(decodeURIComponent(trainerParam));
+                    console.log(trainerData);
+
 
                     // Set the existing image URL as preview if available
                     if (trainerData.image) {
@@ -229,7 +240,29 @@ export default function TrainerDetailsPage() {
 
                     // Initialize form data using the new method
                     initializeFormData(trainerData);
+                } else {
+
+                    console.log("Proceeding with API");
+
+
+                    // Get trainer data using API
+                    const trainerName = getCurrentUserName();
+                    if (trainerName) {
+                        const response = await trainerApis.company.getTrainerByName(trainerName, trainerName);
+                        console.log(response.message);
+
+                        if (response.message) {
+                            setIsEdit(true);
+                            // Set the existing image URL as preview if available
+                            if (response.message.image) {
+                                setProfileImagePreview(response.message.image);
+                            }
+                            // Initialize form data using the new method
+                            initializeFormData(response.message);
+                        }
+                    }
                 }
+
 
             } catch (error) {
                 console.error('Error fetching trainer data:', error);
@@ -555,6 +588,10 @@ export default function TrainerDetailsPage() {
 
     const handleLanguageSearch = (searchValue: string) => {
         setSearchTerm(searchValue);
+        if (!searchValue.trim()) {
+            setFilteredLanguages(languages);
+            return;
+        }
         const filtered = languages.filter(lang =>
             lang.toLowerCase().includes(searchValue.toLowerCase())
         );
@@ -563,6 +600,10 @@ export default function TrainerDetailsPage() {
 
     const handleCitySearch = (searchValue: string) => {
         setSearchTerm(searchValue);
+        if (!searchValue.trim()) {
+            setFilteredCities(indianCities);
+            return;
+        }
         const filtered = indianCities.filter(city =>
             city.toLowerCase().includes(searchValue.toLowerCase())
         );
@@ -614,6 +655,11 @@ export default function TrainerDetailsPage() {
                 : lang;
             handleChanges('language', newValue);
         }
+
+        // Reset search and filter after selection
+        setSearchTerm('');
+        setFilteredLanguages(languages);
+        setIsDropdownOpen(false);
     };
 
 
@@ -622,13 +668,10 @@ export default function TrainerDetailsPage() {
 
 
     return (
-        <div className="min-h-screen"
-            style={{ background: theme.gradients.primary }}>
-            <NavBar />
+        <div className="min-h-screen bg-theme">            <NavBar />
             <div className="container mx-auto my-8">
                 <div className="max-w-4xl mx-auto bg-white rounded-xl overflow-hidden">
-                    <div className="flex flex-col justify-center items-center text-white py-[16px]"
-                        style={{ background: theme.gradients.header }}
+                    <div className="flex flex-col justify-center items-center text-white py-[16px]bg-theme-header"
                     >
                         <h1 className="tracking-normal text-center align-middle font-sans text-3xl font-bold text-[32px]">Complete Your Trainer Profile</h1>
                         <p>Share your expertise and credentials with potential clients</p>
@@ -824,9 +867,9 @@ export default function TrainerDetailsPage() {
                                         id="dob"
                                         value={form.dob}
                                         onChange={(e) => handleChanges('dob', e.target.value)}
-                                        className="w-full px-4 py-2.5 h-[46px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        className="w-full px-4 py-2.5 h-[46px] bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                                     >
-                                        <option value="">Select Year</option>
+                                        <option value="" >Select Year</option>
                                         {Array.from({ length: new Date().getFullYear() - 1949 }, (_, i) => {
                                             const year = new Date().getFullYear() - i;
                                             return (
@@ -1011,7 +1054,7 @@ export default function TrainerDetailsPage() {
                                         Companies Worked With
                                     </label>
                                     <div className="flex flex-wrap gap-2 mb-2">
-                                        {form.client_worked.map((client, index) => (
+                                        {form.client_worked.filter(client => client.company.trim() !== '').map((client, index) => (
                                             <Chip
                                                 key={index}
                                                 label={client.company}
@@ -1099,28 +1142,35 @@ export default function TrainerDetailsPage() {
                                         </div>
 
                                         <div className="flex gap-4 mt-3">
-                                            <TextField
-                                                variant="outlined"
-                                                fullWidth
-                                                placeholder="Institution"
-                                                value={edu.institution}
-                                                onChange={(e) => handleEducationChange(index, "institution", e.target.value)}
-                                                size="small"
-                                            />
-                                            <TextField
-                                                variant="outlined"
-                                                placeholder="Year"
-                                                value={edu.year}
-                                                onChange={(e) => handleEducationChange(index, "year", e.target.value)}
-                                                size="small"
-                                                InputProps={{
-                                                    endAdornment: (
-                                                        <InputAdornment position="end">
-                                                            <CalendarToday fontSize="small" />
-                                                        </InputAdornment>
-                                                    ),
-                                                }}
-                                            />
+                                            <div className="w-[70%]">
+                                                <TextField
+                                                    variant="outlined"
+                                                    fullWidth
+                                                    placeholder="Institution"
+                                                    value={edu.institution}
+                                                    onChange={(e) => handleEducationChange(index, "institution", e.target.value)}
+                                                    size="small"
+                                                />
+                                            </div>
+                                            <div className="w-[30%]">
+                                                <select
+                                                    value={edu.year}
+                                                    onChange={(e) => handleEducationChange(index, "year", e.target.value)}
+                                                    className="w-full px-4 py-2.5 h-[42px] bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                                >
+                                                    <option value="">Select Year</option>
+                                                    {Array.from({ length: new Date().getFullYear() - 1949 }, (_, i) => {
+                                                        const year = new Date().getFullYear() - i;
+                                                        return (
+                                                            <option key={year} value={year}>
+                                                                {year}
+                                                            </option>
+                                                        );
+                                                    })}
+                                                </select>
+                                            </div>
+
+
                                         </div>
                                     </div>
                                 ))}
@@ -1162,28 +1212,35 @@ export default function TrainerDetailsPage() {
                                         </div>
 
                                         <div className="flex gap-4 mt-3">
-                                            <TextField
-                                                variant="outlined"
-                                                fullWidth
-                                                placeholder="Issuing Organization"
-                                                value={cert.issued_by}
-                                                onChange={(e) => handleCertificationChange(index, "issued_by", e.target.value)}
-                                                size="small"
-                                            />
-                                            <TextField
-                                                variant="outlined"
-                                                placeholder="Year"
-                                                value={cert.issued_date}
-                                                onChange={(e) => handleCertificationChange(index, "issued_date", e.target.value)}
-                                                size="small"
-                                                InputProps={{
-                                                    endAdornment: (
-                                                        <InputAdornment position="end">
-                                                            <CalendarToday fontSize="small" />
-                                                        </InputAdornment>
-                                                    ),
-                                                }}
-                                            />
+                                            <div className="w-[70%]">
+                                                <TextField
+                                                    variant="outlined"
+                                                    fullWidth
+                                                    placeholder="Issuing Organization"
+                                                    value={cert.issued_by}
+                                                    onChange={(e) => handleCertificationChange(index, "issued_by", e.target.value)}
+                                                    size="small"
+                                                />
+                                            </div>
+                                            <div className="w-[30%]">
+                                                <select
+                                                    value={cert.issued_date}
+                                                    onChange={(e) => handleCertificationChange(index, "issued_date", e.target.value)}
+                                                    className="w-full px-4 py-2.5 h-[42px] bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                                >
+                                                    <option value="">Select Year</option>
+                                                    {Array.from({ length: new Date().getFullYear() - 1949 }, (_, i) => {
+                                                        const year = new Date().getFullYear() - i;
+                                                        return (
+                                                            <option key={year} value={year}>
+                                                                {year}
+                                                            </option>
+                                                        );
+                                                    })}
+                                                </select>
+                                            </div>
+
+
                                         </div>
                                     </div>
                                 ))}

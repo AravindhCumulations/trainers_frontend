@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, use } from "react";
 import { Star } from "lucide-react";
 import NavBar from "../../components/Navbar";
 import EditWorkshop from '@/components/EditWorkshop';
@@ -38,23 +38,10 @@ interface WorkshopDetailsData {
     handouts?: string;
     programFlow?: string;
     evaluation?: string;
+    tag: 'Workshop' | 'Case Study';
 }
 
-// Workshop Details Component
-const WorkshopDetailsOverlay = ({ setOverlayState, workshop }: { setOverlayState: (state: { isOpen: boolean; type: 'details' | 'edit' | 'create' | null; data?: WorkshopDetailsData }) => void; workshop?: WorkshopDetailsData }) => {
-    const handleClose = () => {
-        setOverlayState({ isOpen: false, type: null });
-    };
-
-
-
-    if (!workshop) return null;
-
-    return <WorkshopDetails workshop={workshop} onClose={handleClose} />;
-};
-
-
-// Create a client component that uses useSearchParams
+// Main Content
 const TrainerDetailsContent = () => {
     const { user, setProfilePic, updateCredits } = useUser();
     const searchParams = useSearchParams();
@@ -201,36 +188,51 @@ const TrainerDetailsContent = () => {
                 return;
             }
 
-            showConfirmation(
-                "10 Credits will be deducted to unlock this Trainer",
-                async () => {
-                    showLoader();
-                    try {
-                        const res = await creditsApis.unlockTrainer(trainerData.name);
-                        if (res) {
-                            setTrainerLocked(false);
-                            updateCredits();
-                            const userName = getCurrentUserName();
-                            const updatedTrainerData = await trainerApis.company.getTrainerByName(trainerData.name, userName);
-                            if (updatedTrainerData && updatedTrainerData.message) {
-                                setTrainerData(updatedTrainerData.message);
-                            }
-                            showSuccess('Trainer unlocked successfully!');
-                        } else {
-                            toastError("Some error occurred while unlocking trainer");
-                        }
-                    } catch (error) {
-                        console.error('Error unlocking trainer:', error);
-                        toastError('An error occurred while trying to unlock the trainer');
-                    } finally {
-                        hideLoader();
+            if (!user.credits) {
+                showConfirmation(
+                    "You’re out of credits! Would you like to purchase more to continue?",
+                    () => handleNavigation('/manage-credits'),
+                    {
+                        confirmText: 'Buy',
+                        cancelText: 'Cancel'
                     }
-                },
-                {
-                    confirmText: 'Proceed',
-                    cancelText: 'Cancel'
-                }
-            );
+
+                );
+            }
+            else {
+                showConfirmation(
+                    "Unlocking this trainer will deduct 10 credits from your balance.",
+                    async () => {
+                        showLoader();
+                        try {
+                            const res = await creditsApis.unlockTrainer(trainerData.name);
+                            if (res) {
+                                setTrainerLocked(false);
+                                updateCredits();
+                                const userName = getCurrentUserName();
+                                const updatedTrainerData = await trainerApis.company.getTrainerByName(trainerData.name, userName);
+                                if (updatedTrainerData && updatedTrainerData.message) {
+                                    setTrainerData(updatedTrainerData.message);
+                                }
+                                showSuccess('Trainer unlocked successfully!');
+                            } else {
+                                toastError("Some error occurred while unlocking trainer");
+                            }
+                        } catch (error) {
+                            console.error('Error unlocking trainer:', error);
+                            toastError('An error occurred while trying to unlock the trainer');
+                        } finally {
+                            hideLoader();
+                        }
+                    },
+                    {
+                        confirmText: 'Proceed',
+                        cancelText: 'Cancel'
+                    }
+                );
+            }
+
+
         } else {
             showConfirmation(
                 'You need to be logged in to access this feature. Would you like to proceed to the login page?',
@@ -258,7 +260,7 @@ const TrainerDetailsContent = () => {
         type: null
     });
 
-    const handleWorkshopClick = (type: 'details' | 'edit' | 'create', item: any) => {
+    const handleWorkshopClick = (type: 'details' | 'edit' | 'create', item: any, tag: 'Workshop' | 'Case Study') => {
         // Map the item to the expected WorkshopDetailsData interface
         const workshopData: WorkshopDetailsData = {
             idx: item.idx.toString(),
@@ -266,12 +268,13 @@ const TrainerDetailsContent = () => {
             price: item.price || 0,
             targetAudience: item.target_audience || "",
             format: 'In-Person',
-            image: item.workshop_image || "/assets/w1.jpg",
+            image: item.image || "/assets/w1.jpg",
             objectives: item.objectives || "",
             outcomes: item.outcomes || "",
             handouts: item.handouts || "",
             programFlow: item.program_flow || "",
-            evaluation: item.evaluation || ""
+            evaluation: item.evaluation || "",
+            tag: tag// Default to Workshop if tag is not provided
         };
         setOverlayState({ isOpen: true, type, data: workshopData });
     };
@@ -336,15 +339,12 @@ const TrainerDetailsContent = () => {
                 ) : (
                     <>
                         <Overlay isOpen={overlayState.isOpen} onClose={() => setOverlayState({ isOpen: false, type: null })}>
-                            {overlayState.type === 'details' && <WorkshopDetailsOverlay setOverlayState={setOverlayState} workshop={overlayState.data} />}
-                            {overlayState.type === 'edit' && (
-                                <div className="bg-white w-full rounded-2xl mt-4">
-                                    <EditWorkshop
-                                        onClose={() => setOverlayState({ isOpen: false, type: null })}
-                                        initialData={overlayState.data}
-                                        mode="edit"
-                                    />
-                                </div>
+                            {overlayState.type === 'details' && overlayState.data && (
+                                <WorkshopDetails
+                                    type={overlayState.data.tag === 'Case Study' ? 'Case Study' : 'Workshop'}
+                                    workshop={overlayState.data}
+                                    onClose={() => setOverlayState({ isOpen: false, type: null })}
+                                />
                             )}
                         </Overlay>
 
@@ -450,22 +450,27 @@ const TrainerDetailsContent = () => {
                                                     <div className="flex gap-4 items-start p-2 justify-between items-center">
                                                         {trainerData?.facebook && (
                                                             <a href={trainerData.facebook} target="_blank" rel="noopener noreferrer">
-                                                                <img src="assets/fb24.png" alt="Facebook" />
+                                                                <img src="assets/social/Facebook.svg" alt="Facebook" />
                                                             </a>
                                                         )}
                                                         {trainerData?.twitter && (
                                                             <a href={trainerData.twitter} target="_blank" rel="noopener noreferrer">
-                                                                <img src="assets/twtr24.png" alt="Twitter" />
+                                                                <img src="assets/social/Twitter.svg" alt="Twitter" />
                                                             </a>
                                                         )}
                                                         {trainerData?.linkedin && (
                                                             <a href={trainerData.linkedin} target="_blank" rel="noopener noreferrer">
-                                                                <img src="assets/lin24.png" alt="LinkedIn" />
+                                                                <img src="assets/social/LinkedIn.svg" alt="LinkedIn" />
+                                                            </a>
+                                                        )}
+                                                        {trainerData?.instagram && (
+                                                            <a href={trainerData.instagram} target="_blank" rel="noopener noreferrer">
+                                                                <img src="assets/social/Instagram.svg" alt="Instagram" />
                                                             </a>
                                                         )}
                                                         {trainerData?.personal_website && (
                                                             <a href={trainerData.personal_website} target="_blank" rel="noopener noreferrer">
-                                                                <img src="assets/internet.png" alt="Website" />
+                                                                <img src="assets/social/Website.svg" alt="Website" />
                                                             </a>
                                                         )}
 
@@ -508,7 +513,7 @@ const TrainerDetailsContent = () => {
                                 {/* Workshops - Full Width */}
                                 <div className="mb-6 rounded-xl bg-white p-6 text-lg font-semibold">
                                     <div className="flex justify-between items-center w-full">
-                                        <p className={`border-b-2 border-blue-500 text-xl font-semibold pb-3 ${isLoggedInUser ? '' : 'w-full'} `}>Workshops & CaseStudies</p>
+                                        <p className={`border-b-2 border-blue-500 text-xl font-semibold pb-3 ${isLoggedInUser ? '' : 'w-full'} `}>Workshops & Case Studies</p>
                                         <div className="flex items-center gap-2 cursor-pointer">
                                             {isLoggedInUser && (
                                                 <button
@@ -544,7 +549,7 @@ const TrainerDetailsContent = () => {
                                                         programFlow: casestudy.program_flow,
                                                         evaluation: casestudy.evaluation
                                                     }}
-                                                    onClick={() => handleWorkshopClick('details', casestudy)}
+                                                    onClick={() => handleWorkshopClick('details', casestudy, 'Case Study')}
                                                     tag="CaseStudy"
                                                 />
                                             ))}
@@ -564,7 +569,7 @@ const TrainerDetailsContent = () => {
                                                         programFlow: workshop.program_flow,
                                                         evaluation: workshop.evaluation
                                                     }}
-                                                    onClick={() => handleWorkshopClick('details', workshop)}
+                                                    onClick={() => handleWorkshopClick('details', workshop, 'Workshop')}
                                                     tag="Workshop"
                                                 />
                                             ))}

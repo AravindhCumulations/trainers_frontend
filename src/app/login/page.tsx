@@ -143,210 +143,113 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="flex justify-center items-center h-screen  transition-colors duration-300"
-            style={{ background: theme.gradients.primary }}
-        >
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg p-8 rounded-2xl shadow-2xl max-w-md w-full transition-colors duration-300"
-            >
-                {!showForgotPassword ? (
-                    <>
-                        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-6 transition-colors duration-300">Welcome Back</h2>
+        <div className="flex flex-col  h-screen  transition-colors duration-300 bg-theme">
 
-                        {error && (
-                            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                                {error}
-                            </div>
-                        )}
+            <div className="flex flex-1 flex-col justify-center items-center relative">
+                <motion.div className="top-5 left-5 bg-blue-600 rounded-lg px-2.5 py-3 mb-2  hover:cursor-pointer hover:scale-105"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}>
 
-                        {/* Form */}
-                        <form className="space-y-5" onSubmit={handleLogin}>
-                            <div>
-                                <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1 transition-colors duration-300">Email</label>
-                                <input
-                                    type="text"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter your email"
-                                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1 transition-colors duration-300">Password</label>
-                                <div className="flex relative">
-                                    <input
-                                        type={show ? "text" : "password"}
-                                        name="password"
-                                        value={formData.password}
-                                        onChange={handleInputChange}
-                                        placeholder="Enter your password"
-                                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                    />
-                                    {
-                                        show ?
-                                            <div className="absolute right-4 top-6">
-                                                <EyeOff
-                                                    size={24}
-                                                    className="transform -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-400 transition-colors duration-300"
-                                                    onClick={() => setShow(!show)}
-                                                />
-                                            </div> :
-                                            <div className="absolute right-4 top-6">
-                                                <Eye
-                                                    size={24}
-                                                    className="transform -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-400 transition-colors duration-300"
-                                                    onClick={() => setShow(!show)}
-                                                />
-                                            </div>
-                                    }
-                                </div>
-                            </div>
-                            <motion.button
-                                type="submit"
-                                whileHover={{ scale: formData.email && formData.password ? 1.05 : 1 }}
-                                whileTap={{ scale: formData.email && formData.password ? 0.95 : 1 }}
-                                className={`w-full px-4 py-3 rounded-lg font-semibold transition-colors duration-300 relative ${formData.email && formData.password
-                                    ? 'bg-primary hover:bg-primary-hover text-white'
-                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                    }`}
-                                disabled={!formData.email || !formData.password}
-                            >
-                                login
-                            </motion.button>
-                        </form>
+                    <p className="text-white font-extrabold hover:scale-105" onClick={() => handleNavigation('/')}>Trainer&apos;s Mart</p>
+                </motion.div>
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg p-8 rounded-2xl shadow-2xl max-w-md w-full transition-colors duration-300"
+                >
+                    {!showForgotPassword ? (
+                        <>
+                            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-6 transition-colors duration-300">Welcome Back</h2>
 
-                        <p
-                            className='forgot-password text-blue-600 dark:text-blue-400 cursor-pointer hover:underline text-center mt-4'
-                            onClick={() => {
-                                setShowForgotPassword(true);
-                                setError(null);
-                            }}
-                        >
-                            Forgot Password?
-                        </p>
-
-                        <p className="text-center text-gray-600 dark:text-gray-400 mt-4 transition-colors duration-300">
-                            Don&apos;t have an account?
-                            <a className="text-blue-600 dark:text-blue-400 font-semibold hover:underline ml-1 transition-colors duration-300 cursor-pointer"
-                                onClick={() => {
-                                    handleNavigation('/signup');
-                                    setError(null);
-                                }}
-                            >Sign up</a>
-                        </p>
-                    </>
-                ) : (
-                    <>
-                        <div className="flex items-center mb-6 gap-3">
-                            <button
-                                onClick={() => {
-                                    setShowForgotPassword(false);
-                                    setForgotPasswordStep('email');
-                                    setForgotPasswordData({
-                                        email: '',
-                                        otp: '',
-                                        newPassword: '',
-                                        confirmPassword: ''
-                                    });
-                                    setError(null);
-                                }}
-                                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-300"
-                            >
-                                ⟵  &nbsp; back to login
-                            </button>
-                        </div>
-                        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-6 transition-colors duration-300">
-                            {forgotPasswordStep === 'email' ? 'Reset Password' :
-                                forgotPasswordStep === 'otp' ? 'Enter OTP' :
-                                    'Set New Password'}
-                        </h2>
-
-
-                        {error && (
-                            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                                {error}
-                            </div>
-                        )}
-
-                        <form className="space-y-5" onSubmit={handleForgotPassword}>
-                            {forgotPasswordStep === 'email' && (
-                                <div>
-                                    <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1">Email</label>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={forgotPasswordData.email}
-                                        onChange={handleForgotPasswordInputChange}
-                                        placeholder="Enter your email"
-                                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        required
-                                    />
+                            {error && (
+                                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                                    {error}
                                 </div>
                             )}
 
-                            {forgotPasswordStep === 'otp' && (
+                            {/* Form */}
+                            <form className="space-y-5" onSubmit={handleLogin}>
                                 <div>
-                                    <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1">OTP</label>
+                                    <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1 transition-colors duration-300">Email</label>
                                     <input
                                         type="text"
-                                        name="otp"
-                                        value={forgotPasswordData.otp}
-                                        onChange={handleForgotPasswordInputChange}
-                                        placeholder="Enter OTP"
-                                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        required
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter your email"
+                                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                                     />
                                 </div>
-                            )}
-
-                            {forgotPasswordStep === 'reset' && (
-                                <>
-                                    <div>
-                                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1">New Password</label>
+                                <div>
+                                    <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1 transition-colors duration-300">Password</label>
+                                    <div className="flex relative">
                                         <input
-                                            type="password"
-                                            name="newPassword"
-                                            value={forgotPasswordData.newPassword}
-                                            onChange={handleForgotPasswordInputChange}
-                                            placeholder="Enter new password"
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            required
+                                            type={show ? "text" : "password"}
+                                            name="password"
+                                            value={formData.password}
+                                            onChange={handleInputChange}
+                                            placeholder="Enter your password"
+                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                                         />
+                                        {
+                                            show ?
+                                                <div className="absolute right-4 top-6">
+                                                    <EyeOff
+                                                        size={24}
+                                                        className="transform -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-400 transition-colors duration-300"
+                                                        onClick={() => setShow(!show)}
+                                                    />
+                                                </div> :
+                                                <div className="absolute right-4 top-6">
+                                                    <Eye
+                                                        size={24}
+                                                        className="transform -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-400 transition-colors duration-300"
+                                                        onClick={() => setShow(!show)}
+                                                    />
+                                                </div>
+                                        }
                                     </div>
-                                    <div>
-                                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1">Confirm Password</label>
-                                        <input
-                                            type="password"
-                                            name="confirmPassword"
-                                            value={forgotPasswordData.confirmPassword}
-                                            onChange={handleForgotPasswordInputChange}
-                                            placeholder="Confirm new password"
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            required
-                                        />
-                                    </div>
-                                </>
-                            )}
-
-                            <div className="flex gap-4">
+                                </div>
                                 <motion.button
                                     type="submit"
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="flex-1 bg-primary hover:bg-primary-hover text-white px-4 py-3 rounded-lg font-semibold"
+                                    whileHover={{ scale: formData.email && formData.password ? 1.05 : 1 }}
+                                    whileTap={{ scale: formData.email && formData.password ? 0.95 : 1 }}
+                                    className={`w-full px-4 py-3 rounded-lg font-semibold transition-colors duration-300 relative ${formData.email && formData.password
+                                        ? 'bg-primary hover:bg-primary-hover text-white'
+                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                        }`}
+                                    disabled={!formData.email || !formData.password}
                                 >
-                                    {forgotPasswordStep === 'email' ? 'Send OTP' :
-                                        forgotPasswordStep === 'otp' ? 'Verify OTP' :
-                                            'Reset Password'}
+                                    login
                                 </motion.button>
-                                <motion.button
-                                    type="button"
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
+                            </form>
+
+                            <p
+                                className='forgot-password text-blue-600 dark:text-blue-400 cursor-pointer hover:underline text-center mt-4'
+                                onClick={() => {
+                                    setShowForgotPassword(true);
+                                    setError(null);
+                                }}
+                            >
+                                Forgot Password?
+                            </p>
+
+                            <p className="text-center text-gray-600 dark:text-gray-400 mt-4 transition-colors duration-300">
+                                Don&apos;t have an account?&nbsp;
+                                <a className="text-blue-600 dark:text-blue-400 font-semibold hover:underline ml-1 transition-colors duration-300 cursor-pointer"
+                                    onClick={() => {
+                                        handleNavigation('/signup');
+                                        setError(null);
+                                    }}
+                                >Sign up</a>
+                            </p>
+                        </>
+                    ) : (
+                        <>
+                            <div className="flex items-center mb-6 gap-3">
+                                <button
                                     onClick={() => {
                                         setShowForgotPassword(false);
                                         setForgotPasswordStep('email');
@@ -356,16 +259,125 @@ export default function LoginPage() {
                                             newPassword: '',
                                             confirmPassword: ''
                                         });
+                                        setError(null);
                                     }}
-                                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-3 rounded-lg font-semibold"
+                                    className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-300"
                                 >
-                                    Cancel
-                                </motion.button>
+                                    ⟵  &nbsp; back to login
+                                </button>
                             </div>
-                        </form>
-                    </>
-                )}
-            </motion.div>
+                            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-6 transition-colors duration-300">
+                                {forgotPasswordStep === 'email' ? 'Reset Password' :
+                                    forgotPasswordStep === 'otp' ? 'Enter OTP' :
+                                        'Set New Password'}
+                            </h2>
+
+
+                            {error && (
+                                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                                    {error}
+                                </div>
+                            )}
+
+                            <form className="space-y-5" onSubmit={handleForgotPassword}>
+                                {forgotPasswordStep === 'email' && (
+                                    <div>
+                                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1">Email</label>
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            value={forgotPasswordData.email}
+                                            onChange={handleForgotPasswordInputChange}
+                                            placeholder="Enter your email"
+                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                )}
+
+                                {forgotPasswordStep === 'otp' && (
+                                    <div>
+                                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1">OTP</label>
+                                        <input
+                                            type="text"
+                                            name="otp"
+                                            value={forgotPasswordData.otp}
+                                            onChange={handleForgotPasswordInputChange}
+                                            placeholder="Enter OTP"
+                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                )}
+
+                                {forgotPasswordStep === 'reset' && (
+                                    <>
+                                        <div>
+                                            <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1">New Password</label>
+                                            <input
+                                                type="password"
+                                                name="newPassword"
+                                                value={forgotPasswordData.newPassword}
+                                                onChange={handleForgotPasswordInputChange}
+                                                placeholder="Enter new password"
+                                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1">Confirm Password</label>
+                                            <input
+                                                type="password"
+                                                name="confirmPassword"
+                                                value={forgotPasswordData.confirmPassword}
+                                                onChange={handleForgotPasswordInputChange}
+                                                placeholder="Confirm new password"
+                                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                required
+                                            />
+                                        </div>
+                                    </>
+                                )}
+
+                                <div className="flex gap-4">
+                                    <motion.button
+                                        type="submit"
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="flex-1 bg-primary hover:bg-primary-hover text-white px-4 py-3 rounded-lg font-semibold"
+                                    >
+                                        {forgotPasswordStep === 'email' ? 'Send OTP' :
+                                            forgotPasswordStep === 'otp' ? 'Verify OTP' :
+                                                'Reset Password'}
+                                    </motion.button>
+                                    <motion.button
+                                        type="button"
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={() => {
+                                            setShowForgotPassword(false);
+                                            setForgotPasswordStep('email');
+                                            setForgotPasswordData({
+                                                email: '',
+                                                otp: '',
+                                                newPassword: '',
+                                                confirmPassword: ''
+                                            });
+                                        }}
+                                        className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-3 rounded-lg font-semibold"
+                                    >
+                                        Cancel
+                                    </motion.button>
+                                </div>
+                            </form>
+                        </>
+                    )}
+                </motion.div>
+                <a className="text-blue-600 font-semibold cursor-pointer mt-3 underline"
+                    onClick={() => handleNavigation('/')}
+                >skip</a>
+            </div>
+
         </div>
     );
 } 

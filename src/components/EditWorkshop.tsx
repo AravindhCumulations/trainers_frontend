@@ -264,7 +264,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
             <div className="form max-w-4xl mx-auto">
                 <div className="bg-white rounded-2xl p-12 flex flex-col gap-[24px] text-blue-700 font-semibold">
                     <div className="flex justify-between items-center">
-                        <p className="text-3xl font-bold text-black">🎓 Create / Edit Workshop</p>
+                        <p className="text-3xl font-bold text-black">🎓 Create / Edit Workshop or Case Study</p>
                         <button
                             className="text-gray-500 hover:text-gray-800 text-xl font-bold"
                             onClick={onClose}
@@ -513,23 +513,25 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                             <div className="flex gap-4 text-base text-gray-700">
                                 <div className="flex items-center gap-2">
                                     <input
-                                        type="checkbox"
+                                        type="radio"
                                         id="workshop"
+                                        name="type"
                                         checked={!formData.isCaseStudy}
                                         onChange={() => handleChange('isCaseStudy', false)}
                                         disabled={isEditMode}
-                                        className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${isEditMode ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 ${isEditMode ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     />
                                     <label htmlFor="workshop" className={`text-base font-normal ${isEditMode ? 'text-gray-500' : ''}`}>Workshop</label>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <input
-                                        type="checkbox"
+                                        type="radio"
                                         id="case-study"
+                                        name="type"
                                         checked={formData.isCaseStudy}
                                         onChange={() => handleChange('isCaseStudy', true)}
                                         disabled={isEditMode}
-                                        className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${isEditMode ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 ${isEditMode ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     />
                                     <label htmlFor="case-study" className={`text-base font-normal ${isEditMode ? 'text-gray-500' : ''}`}>Case Study</label>
                                 </div>

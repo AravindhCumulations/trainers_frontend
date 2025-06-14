@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { useUser } from '@/context/UserContext';
 import { TrainerCardModel } from '@/models/trainerCard.model';
 import { useTypingEffect } from '@/hooks/useTypingEffect';
+import { expertise_in } from './content/ExpertiseIN';
 
 
 export default function Home() {
@@ -185,6 +186,7 @@ export default function Home() {
   };
 
   const typingText = useTypingEffect([
+    ...expertise_in,
     'trainer name',
     'skill',
     'city',
@@ -292,18 +294,28 @@ export default function Home() {
       {isCompany ? (
         <div className="flex flex-col max-w-7xl mx-auto mt-[40px]  items-center">
           <div className="tabs mb-[20px]">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`pb-2 text-lg font-medium w-[200px] ${activeTab === tab
-                  ? 'border-b-2 border-blue-500 text-blue-600'
-                  : 'text-gray-500'
-                  }`}
-              >
-                {tab}
-              </button>
-            ))}
+            {tabs.map((tab) => {
+              const isDisabled =
+                (tab === 'Featured' && (!trainers || trainers.length === 0)) ||
+                (tab === 'Wish listed' && (!wishlistedTrainers || wishlistedTrainers.length === 0)) ||
+                (tab === 'Unlocked' && (!unlockedTrainers || unlockedTrainers.length === 0));
+
+              return (
+                <button
+                  key={tab}
+                  onClick={() => !isDisabled && setActiveTab(tab)}
+                  disabled={isDisabled}
+                  className={`pb-2 text-lg font-medium w-[200px] ${isDisabled
+                    ? 'text-gray-300 cursor-not-allowed'
+                    : activeTab === tab
+                      ? 'border-b-2 border-blue-500 text-blue-600'
+                      : 'text-gray-500 hover:text-blue-600'
+                    }`}
+                >
+                  {tab}
+                </button>
+              );
+            })}
           </div>
           <div className="trainer-list min-h-[350px] flex flex-col items-center justify-between">
             {activeTab === 'Featured' && <TrainerGrid

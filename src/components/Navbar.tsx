@@ -195,14 +195,24 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
 
                                     {/* Dropdown Menu */}
                                     {showDropdown && (
-                                        <div className="absolute top-11 right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-1 border-gray-200">
-                                            {/* <button
-                                                onClick={handleProfile}
+                                        <div className="absolute top-11 right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50 border border-1 border-gray-200">
+                                            <div className="px-4 py-2 border-b border-gray-200">
+                                                <p className="text-sm text-gray-600 line-clamp-1">{user.email}</p>
+                                            </div>
+                                            {isTrainer && (<button
+                                                onClick={() => {
+                                                    handleNavigation(`/trainer-form`);
+                                                    setShowDropdown(false);
+                                                }}
                                                 className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                                             >
-                                                <UserIcon className="w-4 h-4" />
-                                                Profile
-                                            </button> */}
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                    <circle cx="12" cy="7" r="4"></circle>
+                                                </svg>
+                                                My Profile
+                                            </button>)}
+
                                             <button
                                                 onClick={handleLogout}
                                                 className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"

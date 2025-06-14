@@ -376,8 +376,8 @@ export default function WorkshopsPage() {
                 cancelText={popupState.cancelText}
             />
             <NavBar />
-            <div className="container mx-auto my-4 w-full flex-grow">
-                <div className="flex justify-between items-center mb-8">
+            <div className="container mx-auto my-10 w-full flex-grow">
+                <div className="flex justify-between items-center mb-8 ">
                     <h1 className="text-4xl font-bold text-gray-800">Workshops & Case Studies</h1>
                     <button
                         onClick={() => {
@@ -410,6 +410,7 @@ export default function WorkshopsPage() {
                 >
                     {overlayState.type === 'details' && overlayState.data && (
                         <WorkshopDetails
+                            type={overlayState.data.isCaseStudy ? 'Case Study' : 'Workshop'}
                             workshop={overlayState.data}
                             onClose={() => setOverlayState({ isOpen: false, type: null })}
                         />

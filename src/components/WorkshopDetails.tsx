@@ -2,7 +2,10 @@ import React from 'react';
 import Image from 'next/image';
 import parse from 'html-react-parser';
 
+type ContentType = 'Workshop' | 'Case Study';
+
 interface WorkshopDetailsProps {
+    type: ContentType;
     workshop: {
         idx: string;
         title: string;
@@ -19,7 +22,11 @@ interface WorkshopDetailsProps {
     onClose: () => void;
 }
 
-const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose }) => {
+const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ type, workshop, onClose }) => {
+
+    console.log(type);
+
+
     return (
         <div className="w-full max-w-4xl min-w-[900px] bg-white rounded-3xl shadow-2xl z-50 relative pb-10 px-6 pt-8 my-8">
             {/* Close Button */}
@@ -60,6 +67,10 @@ const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose }) 
                 <span className="bg-yellow-100 text-yellow-800 px-4 py-1 text-sm rounded-full">
                     💰 ₹{workshop.price}
                 </span>
+                <span className="bg-orange-100 text-yellow-800 px-4 py-1 text-sm rounded-full">
+                    {type === "Workshop" ? "🛠 Workshop" : "📘 Case Study"}
+                </span>
+
             </div>
 
             {/* Content */}
@@ -86,7 +97,7 @@ const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose }) 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <p className="font-semibold text-gray-800 text-base mb-1">🧠 Program Flow</p>
-                        <div className="template-container">
+                        <div className="template-container program-flow-list">
                             {parse(workshop.programFlow || '')}
                         </div>
                     </div>

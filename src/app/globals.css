@@ -142,7 +142,13 @@
   --font-mono: var(--font-geist-mono);
 }
 
+.bg-theme {
+  background: linear-gradient(112.87deg, #DBEAFE 0%, #EFF6FF 100%);
+}
 
+.bg-theme-header {
+  background: linear-gradient(90deg, #7196FF 0%, #2563EB 100%);
+}
 
 /* Theme transition */
 * {
@@ -255,5 +261,13 @@ h2 {
 .heading-2xl {
   font-size: var(--text-5xl);
   font-weight: 700;
-  line-height: var(--leading-none); 
+  line-height: var(--leading-none);
+}
+
+.program-flow-list ul {
+  list-style-type: disc !important;
+  padding-left: 1.5rem;
+  /* ensures bullets are visible */
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }

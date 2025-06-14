@@ -38,10 +38,10 @@ const WorkshopCard = ({ workshop, onClick, tag = "workshop" }: WorkshopCardProps
                 {" "}
                 {/* Reduced padding */}
 
-                <h2 className={titleClasses}>{workshop.title}</h2>
+                <h2 className={titleClasses} title={workshop.title}>{workshop.title}</h2>
                 <div className="flex flex-row flex-grow overflow-hidden">
                     <div className="h-[4.5rem] overflow-hidden">
-                        <p className={descriptionClasses}>{workshop.objectives}</p>
+                        <p className={descriptionClasses} title={workshop.objectives}>{workshop.objectives}</p>
                     </div>
                 </div>
                 <div className="flex justify-between items-center mt-auto">

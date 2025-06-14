@@ -4,7 +4,7 @@ import React, { useEffect, useState, Suspense } from 'react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import TrainerGrid from '../../components/TrainerGrid';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { trainerApis } from '../../lib/apis/trainer.apis';
 import { categories } from '@/app/content/categories'
 import { getCurrentUserName } from '@/lib/utils/auth.utils'
@@ -14,6 +14,7 @@ import { indianCities } from '@/app/content/IndianCities';
 
 function TrainersPageContent() {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const [citySearch, setCitySearch] = useState('');
     const [searchText, setSearchText] = useState('');
     const [searchResults, setSearchResults] = useState<TrainerCardModel[]>([]);
@@ -24,9 +25,28 @@ function TrainersPageContent() {
     const [isLoading, setIsLoading] = useState(true);
     const { showLoader, hideLoader } = useLoading();
 
+    const updateUrlParams = (search: string, city: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (search) {
+            params.set('search_text', search);
+        } else {
+            params.delete('search_text');
+        }
+
+        if (city) {
+            params.set('city', city);
+        } else {
+            params.delete('city');
+        }
+
+        router.push(`?${params.toString()}`);
+    };
+
     const handleSearch = async (searchValue = searchText, cityValue = citySearch, page = currentPage, pageSize = itemsPerPage) => {
         try {
             setIsLoading(true);
+            updateUrlParams(searchValue, cityValue);
             const response = await trainerApis.searchTrainers(
                 getCurrentUserName(),
                 searchValue,
@@ -42,7 +62,7 @@ function TrainersPageContent() {
             setTotalItems(total);
 
             if (searchValue || cityValue) {
-                setSearchTitle(`Search Results for${searchValue ? ` "${searchValue}"` : ''}${cityValue ? ` in "${cityValue}"` : ''}`);
+                setSearchTitle(`Search Results ${searchValue ? `for  "${searchValue}"` : ''}${cityValue ? ` in "${cityValue}"` : ''}`);
             } else {
                 setSearchTitle('All Trainers');
             }
@@ -72,6 +92,7 @@ function TrainersPageContent() {
         setSearchText('');
         setCurrentPage(1);
         setSearchResults([]);
+        updateUrlParams('', citySearch);
         handleSearch('', citySearch, 1, itemsPerPage);
     };
 
@@ -79,6 +100,7 @@ function TrainersPageContent() {
         setCitySearch('');
         setCurrentPage(1);
         setSearchResults([]);
+        updateUrlParams(searchText, '');
         handleSearch(searchText, '', 1, itemsPerPage);
     };
 
@@ -163,6 +185,7 @@ function TrainersPageContent() {
                                         if (e.target.value === '') {
                                             setCurrentPage(1);
                                             setSearchResults([]);
+                                            updateUrlParams('', citySearch);
                                             handleSearch('', citySearch, 1, itemsPerPage);
                                         }
                                     }}
@@ -194,6 +217,7 @@ function TrainersPageContent() {
                                         setCitySearch(e.target.value);
                                         setCurrentPage(1);
                                         setSearchResults([]);
+                                        updateUrlParams(searchText, e.target.value);
                                         handleSearch(searchText, e.target.value, 1, itemsPerPage);
                                     }}
                                     className="flex-1 px-5 py-2 rounded-full outline-none text-white bg-transparent placeholder-white/80 text-[16px] font-normal hero-search-input appearance-none cursor-pointer hover:bg-white/10 transition-colors duration-200"

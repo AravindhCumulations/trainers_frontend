@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface OverlayProps {
     isOpen: boolean;
@@ -10,6 +10,31 @@ interface OverlayProps {
 }
 
 const Overlay: React.FC<OverlayProps> = ({ isOpen, onClose, children, className = '' }) => {
+    useEffect(() => {
+        if (isOpen) {
+            // Save the current scroll position
+            const scrollY = window.scrollY;
+            // Add styles to prevent scrolling
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.width = '100%';
+        } else {
+            // Restore scroll position and remove fixed positioning
+            const scrollY = document.body.style.top;
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+            window.scrollTo(0, parseInt(scrollY || '0') * -1);
+        }
+
+        // Cleanup function
+        return () => {
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+        };
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     return (
