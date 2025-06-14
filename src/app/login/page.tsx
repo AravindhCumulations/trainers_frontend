@@ -5,7 +5,6 @@ import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { LoginModel, LoginFormData } from '@/models/auth.models';
 import { motion } from 'framer-motion';
-import { useTheme } from '@/styles/ThemeProvider';
 import { authApis } from '@/lib/apis/auth.apis';
 import { setUserDetailsToLocalStore } from '@/lib/utils/auth.utils';
 import { useLoading } from '@/context/LoadingContext';
@@ -14,7 +13,6 @@ import { useUser } from '@/context/UserContext';
 
 export default function LoginPage() {
     const router = useRouter();
-    const { theme } = useTheme();
     const { setUser } = useUser();
     const [formData, setFormData] = useState<LoginFormData>({
         email: '',

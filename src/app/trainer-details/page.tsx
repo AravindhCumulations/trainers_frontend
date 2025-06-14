@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect, Suspense, use } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Star } from "lucide-react";
 import NavBar from "../../components/Navbar";
-import EditWorkshop from '@/components/EditWorkshop';
 import Footer from "@/components/Footer";
 import WorkshopDetails from '@/components/WorkshopDetails';
 import TrainerGrid from "@/components/TrainerGrid";

@@ -4,7 +4,6 @@ import Footer from '@/components/Footer';
 import NavBar from '@/components/Navbar';
 import React, { useEffect, useState } from 'react';
 import { FaWallet, FaPlus, FaMinus, FaHistory, FaCoins } from 'react-icons/fa';
-import { useTheme } from '@/styles/ThemeProvider';
 import { useUser } from '@/context/UserContext';
 import { creditsApis } from '@/lib/apis/credits.apis';
 import { usePopup } from '@/lib/hooks/usePopup';
@@ -17,7 +16,6 @@ interface RazorpayResponse {
 }
 
 const ManageCredits = () => {
-    const { theme } = useTheme();
     const [buyAmount, setBuyAmount] = useState(10);
     const { user, updateCredits } = useUser();
     const [credits, setCredits] = useState(0);

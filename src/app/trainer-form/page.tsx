@@ -5,7 +5,6 @@ import isEqual from 'lodash/isEqual';
 
 import NavBar from '../../components/Navbar';
 import { Education, Certification, Testimonial, TrainerFormValidator } from '@/models/trainerDetails.model';
-import { useTheme } from '@/styles/ThemeProvider';
 import Footer from '@/components/Footer';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
@@ -14,11 +13,10 @@ import LanguageIcon from '@mui/icons-material/Language';
 import XIcon from '@mui/icons-material/X';
 import {
     TextField,
-    InputAdornment,
     IconButton,
     Chip,
 } from '@mui/material';
-import { Add, Delete, CalendarToday } from "@mui/icons-material";
+import { Add, Delete } from "@mui/icons-material";
 import { indianCities } from "@/app/content/IndianCities";
 import { languages } from "@/app/content/Languages";
 import { trainerApis } from "@/lib/apis/trainer.apis";
@@ -35,7 +33,6 @@ type ModifiedTrainerFields = Partial<TrainerFormDto>;
 export default function TrainerDetailsPage() {
 
 
-    const { theme } = useTheme();
     const { setName } = useUser();
     const errorContainerRef = useRef<HTMLDivElement>(null);
 
