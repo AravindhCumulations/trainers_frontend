@@ -40,14 +40,14 @@ const TrainerCard = memo(({ trainer, onClick, viewMode, onWishlistUpdate }: Trai
 
     return (
         <div
-            className="bg-white rounded-2xl border border-[#D1D3D466] shadow-[0px_2px_2px_0px_#0000000F] px-6 py-4 flex flex-col items-center w-[300px] h-[385px] mx-auto trainer-card cursor-pointer hover:shadow-md transition-shadow"
+            className="trainer-card-cont"
             onClick={() => onClick(trainer)}
             role="button"
             tabIndex={0}
             onKeyPress={(e) => e.key === 'Enter' && onClick(trainer)}
         >
             {/* Trainer image */}
-            <div className="rounded-2xl overflow-hidden mb-3 flex items-center justify-center bg-gray-100 relative h-[192px] w-[260px] trainer-card-avatar">
+            <div className="trainer-card-image">
                 <div className="w-full h-full overflow-hidden relative">
                     <Image
                         src={trainer.image || '/default_trainer.png'}

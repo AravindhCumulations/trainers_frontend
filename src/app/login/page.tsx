@@ -76,12 +76,79 @@ export default function LoginPage() {
                 }
             }
         } catch (err: any) {
-            const errorMessage = err?.response?.data?.message || 'Login failed. Please try again.';
+            const errorMessage = err?.response?.data?.message ?? 'Login failed. Please try again.';
             setError(errorMessage);
         } finally {
             hideLoader()
         }
     }, [formData, handleNavigation, hideLoader, router, setUser, showLoader]);
+
+
+    // const handleLogin = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    //     e.preventDefault();
+    //     setError(null);
+    //     showLoader();
+
+    //     const validationError = validateLoginForm(formData);
+    //     if (validationError) {
+    //         setError(validationError);
+    //         hideLoader();
+    //         return;
+    //     }
+
+    //     try {
+    //         const data = await authApis.login(formData.email, formData.password);
+    //         const isStored = handleLoginSuccess(data);
+    //         if (isStored) {
+    //             navigateAfterLogin(data.user_details);
+    //         }
+    //     } catch (err: any) {
+    //         handleLoginError(err);
+    //     } finally {
+    //         hideLoader();
+    //     }
+    // }, [formData, handleNavigation, hideLoader, router, setUser, showLoader]);
+
+    // // --- Helper Functions ---
+    // const validateLoginForm = (formData: any): string | null => {
+    //     const loginModel = new LoginModel(formData);
+    //     return loginModel.validate();
+    // };
+
+    // const handleLoginSuccess = (data: any): boolean => {
+    //     if (data.user_details && data.key_details) {
+    //         setUserDetailsToLocalStore(data);
+    //         setUser({
+    //             name: data.user_details.name,
+    //             email: data.user_details.email,
+    //             role: data.user_details.role_user === "Trainer" ? "Trainer" : "user_role",
+    //             profilePic: '',
+    //             isLoggedIn: true,
+    //             credits: 0
+    //         });
+    //         return true;
+    //     }
+    //     return false;
+    // };
+
+    // const navigateAfterLogin = (userDetails: any) => {
+    //     if (userDetails.role_user === "Trainer") {
+    //         if (userDetails.is_first_login) {
+    //             handleNavigation('/trainer-form');
+    //         } else {
+    //             handleNavigation('/trainer-details', { 'trainer': userDetails.name });
+    //         }
+    //     } else {
+    //         handleNavigation('/');
+    //     }
+    // };
+
+    // const handleLoginError = (err: any) => {
+    //     console.error('Login error:', err);
+    //     const errorMessage = err?.response?.data?.message ?? 'Login failed. Please try again.';
+    //     setError(errorMessage);
+    // };
+
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -90,6 +157,7 @@ export default function LoginPage() {
             [name]: value
         }));
     };
+
 
     const handleForgotPassword = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -131,6 +199,70 @@ export default function LoginPage() {
             hideLoader();
         }
     };
+
+    // forgot password
+
+    // const handleForgotPassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    //     e.preventDefault();
+    //     setError(null);
+    //     showLoader();
+
+    //     try {
+    //         switch (forgotPasswordStep) {
+    //             case 'email':
+    //                 await authApis.otp.generateOTP(forgotPasswordData.email);
+    //                 setForgotPasswordStep('otp');
+    //                 break;
+
+    //             case 'otp':
+    //                 const response = await authApis.otp.verifyOTP(forgotPasswordData.email, forgotPasswordData.otp);
+    //                 if (response.message.status === 'success') {
+    //                     setForgotPasswordStep('reset');
+    //                 } else {
+    //                     setError(response.message.message);
+    //                 }
+    //                 break;
+
+    //             case 'reset':
+    //                 if (forgotPasswordData.newPassword !== forgotPasswordData.confirmPassword) {
+    //                     setError('Passwords do not match');
+    //                     return;
+    //                 }
+    //                 await authApis.Password.resetPassword(forgotPasswordData.email, forgotPasswordData.newPassword);
+    //                 resetForgotPasswordState();
+    //                 break;
+    //         }
+    //     } catch (err: unknown) {
+    //         console.error('Forgot password error:', err);
+    //         if (isErrorWithMessage(err)) {
+    //             setError(err.message);
+    //         } else {
+    //             setError('Operation failed. Please try again.');
+    //         }
+    //     } finally {
+    //         hideLoader();
+    //     }
+    // };
+
+    // // --- Helper Functions ---
+    // const resetForgotPasswordState = () => {
+    //     setShowForgotPassword(false);
+    //     setForgotPasswordStep('email');
+    //     setForgotPasswordData({
+    //         email: '',
+    //         otp: '',
+    //         newPassword: '',
+    //         confirmPassword: ''
+    //     });
+    //     setError(null);
+    // };
+
+    // const isErrorWithMessage = (err: unknown): err is { message: string } => {
+    //     return typeof err === 'object' && err !== null && 'message' in err;
+    // };
+
+    // forgot password
+
 
     const handleForgotPasswordInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;

@@ -18,7 +18,7 @@ module.exports = {
             },
             maxWidth: {
                 '8xl': '64rem', // 1408px
-                '9xl': '96rem', // 1536px
+                '9xl': '100rem', // 1536px
             },
             fontSize: {
                 'text-xxl': ['148px', { lineHeight: '56px', fontWeight: '700' }],

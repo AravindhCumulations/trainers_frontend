@@ -67,7 +67,7 @@ export default function TrainerGrid({
 
     return (
         <section className="w-full max-w-[1352px] mx-auto flex flex-col trainer-list-section">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-7 lg:gap 3 trainer-list-grid">
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-5 md:gap-7 lg:gap-4 trainer-list-grid">
                 {isLoading ? (
                     // Show skeleton loaders based on pageSize
                     Array.from({ length: pageSize }).map((_, index) => (

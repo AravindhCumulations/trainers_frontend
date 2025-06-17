@@ -220,9 +220,10 @@ export default function TrainerDetailsPage() {
             try {
                 showLoader();
                 const searchParams = new URLSearchParams(window.location.search);
-                const trainerParam = searchParams.get('trainer');
+                const trainerParam = searchParams.get('trainerData');
+                const trainerName = searchParams.get('trainer')
 
-
+                // case routing from trainer-details
 
                 if (trainerParam) {
                     setIsEdit(true);
@@ -237,13 +238,8 @@ export default function TrainerDetailsPage() {
 
                     // Initialize form data using the new method
                     initializeFormData(trainerData);
-                } else {
-
-                    console.log("Proceeding with API");
-
-
+                } else if (trainerName) {
                     // Get trainer data using API
-                    const trainerName = getCurrentUserName();
                     if (trainerName) {
                         const response = await trainerApis.company.getTrainerByName(trainerName, trainerName);
                         console.log(response.message);
@@ -671,10 +667,10 @@ export default function TrainerDetailsPage() {
 
             <div className="container mx-auto my-8">
                 <div className="max-w-4xl mx-auto bg-white rounded-xl overflow-hidden">
-                    <div className="flex flex-col justify-center items-center text-white py-[16px] bg-theme-header"
+                    <div className="flex flex-col justify-center items-center text-center text-white py-[16px] bg-theme-header"
                     >
-                        <h1 className="tracking-normal text-center align-middle font-sans text-3xl font-bold text-[32px]">Complete Your Trainer Profile</h1>
-                        <p>Share your expertise and credentials with potential clients</p>
+                        <h1 className="tracking-normal text-center align-middle font-sans text-3xl font-bold text-[clamp(20px,5vw,32px)]">Complete Your Trainer Profile</h1>
+                        <p className='px-4'>Share your expertise and credentials with potential clients</p>
                     </div>
 
                     {errors.length > 0 && (

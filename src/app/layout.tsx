@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { UserProvider } from '@/context/UserContext';
 import { ThemeProvider } from "@/styles/ThemeProvider";
-// import { ThemeToggle } from "@/components/ThemeToggle";
 import { LoadingProvider } from '@/context/LoadingContext';
 import { Toaster } from 'react-hot-toast';
 
@@ -27,7 +26,6 @@ export default function RootLayout({
       <body className={`${inter.variable} antialiased`}>
         <UserProvider>
           <ThemeProvider>
-            {/* <ThemeToggle /> */}
             <LoadingProvider>
               {children}
             </LoadingProvider>

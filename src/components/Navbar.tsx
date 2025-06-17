@@ -7,9 +7,10 @@ import { useNavigation } from "@/lib/hooks/useNavigation";
 import Image from 'next/image';
 import { creditsApis } from "@/lib/apis/credits.apis";
 
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, Menu } from "lucide-react";
 import { authApis } from "@/lib/apis/auth.apis";
 import { useUser } from '@/context/UserContext';
+import { getCurrentUserName } from "@/lib/utils/auth.utils";
 
 
 interface NavBarProps {
@@ -20,6 +21,7 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
 
     const [credit, setCredit] = useState(0);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const { handleNavigation } = useNavigation();
     const { resetUser, user } = useUser();
     const [isLoading, setIsLoading] = useState(true);
@@ -65,21 +67,35 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
         fetchCredits();
     }, [isLoggedIn, isTrainer]);
 
+    // Add effect to handle body scroll
+    useEffect(() => {
+        if (isDrawerOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        // Cleanup function to ensure scroll is re-enabled when component unmounts
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isDrawerOpen]);
+
     // Determine text and border color based on background color
     const textColor = bgColor === "bg-white" ? "text-blue-600" : "text-white";
     const borderColor = bgColor === "bg-white" ? "border-blue-600" : "border-white";
     const hoverColor = bgColor === "bg-white" ? "bg-blue-100" : "bg-white/20";
 
 
-    const handleLogin = () => {
+    const handleLogin = (): void => {
         handleNavigation("/login");
     };
 
-    const handleSignup = () => {
+    const handleSignup = (): void => {
         handleNavigation("/signup");
     };
 
-    const handleLogout = async () => {
+    const handleLogout = async (): Promise<void> => {
         try {
             // First call the logout API
             await authApis.logout();
@@ -108,18 +124,34 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
         }
     };
 
-    const handleCredits = () => {
+    const handleCredits = (): void => {
         handleNavigation("/manage-credits");
     }
 
+    const handleDrawerClose = (): void => {
+        setIsDrawerOpen(false);
+    };
+
+    const handleDrawerItemClick = (path: string): void => {
+        handleNavigation(path);
+        setIsDrawerOpen(false);
+    };
 
     return (
         <>
             {/* Navbar */}
             <header
-                className={`w-full mx-auto px-4 sm:px-6 lg:px-20 flex flex-col items-center relative z-10 ${bgColor} ${textColor} transition-colors duration-200`}
+                className={`w-full mx-auto  flex flex-col items-center relative z-50 px-0 lg:px-4 ${bgColor} ${textColor} transition-colors duration-200`}
             >
-                <nav className="w-full mx-auto flex items-center justify-between py-4">
+                <nav className="w-full max-w-9xl mx-auto flex items-center justify-start md:justify-between py-4 px-4 lg:px-0">
+                    {/* Mobile Menu Button */}
+                    <button
+                        className="md:hidden p-2"
+                        onClick={() => setIsDrawerOpen(true)}
+                    >
+                        <Menu className={`w-6 h-6 ${textColor}`} />
+                    </button>
+
                     <Link href="/" className={`text-2xl font-extrabold tracking-tight ${textColor} transition-colors duration-200`}>
                         Trainer&apos;s Mart
                     </Link>
@@ -201,7 +233,7 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                                             </div>
                                             {isTrainer && (<button
                                                 onClick={() => {
-                                                    handleNavigation(`/trainer-form`);
+                                                    handleNavigation(`/trainer-form?trainer=${getCurrentUserName}`);
                                                     setShowDropdown(false);
                                                 }}
                                                 className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
@@ -246,6 +278,95 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                     </div>
                 </nav>
             </header>
+
+            {/* Mobile Side Drawer */}
+            <div
+                className={`fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300 md:hidden ${isDrawerOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                    }`}
+                onClick={handleDrawerClose}
+            >
+                <div
+                    className={`fixed left-0 z-50 top-0 h-full w-64 bg-white transform transition-transform duration-300 ease-in-out ${isDrawerOpen ? 'translate-x-0' : '-translate-x-full'
+                        }`}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="p-4 border-b">
+                        <h2 className="text-xl font-bold text-gray-800">Menu</h2>
+                    </div>
+
+                    <div className="p-4">
+                        {!isLoading && (
+                            isLoggedIn ? (
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3 p-2">
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-900">{user.email}</p>
+                                            {!isTrainer && (
+                                                <p className="text-sm text-gray-500">{user.credits || credit} Credits</p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {!isTrainer && (
+                                        <button
+                                            onClick={() => handleDrawerItemClick("/manage-credits")}
+                                            className="w-full px-2 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                        >
+                                            <svg
+                                                width="16"
+                                                height="16"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="fill-current text-gray-600"
+                                            >
+                                                <path d="M12 21.7116L3.25 16.8558V7.14433L12 2.28857L20.75 7.14433V16.8558L12 21.7116Z" />
+                                            </svg>
+                                            Manage Credits
+                                        </button>
+                                    )}
+
+                                    {isTrainer && (
+                                        <button
+                                            onClick={() => handleDrawerItemClick("/trainer-form")}
+                                            className="w-full px-2 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                <circle cx="12" cy="7" r="4"></circle>
+                                            </svg>
+                                            My Profile
+                                        </button>
+                                    )}
+
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full px-2 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                    >
+                                        <LogOutIcon className="w-4 h-4" />
+                                        Logout
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    <button
+                                        onClick={() => handleDrawerItemClick("/login")}
+                                        className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                                    >
+                                        Login
+                                    </button>
+                                    <button
+                                        onClick={() => handleDrawerItemClick("/signup")}
+                                        className="w-full px-4 py-2 text-left bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                    >
+                                        Sign Up
+                                    </button>
+                                </div>
+                            )
+                        )}
+                    </div>
+                </div>
+            </div>
         </>
     );
 }

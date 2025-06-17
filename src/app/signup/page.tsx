@@ -67,6 +67,7 @@ export default function SignupPage() {
 
 
     const handleSignup = async () => {
+
         setError(null);
 
         if (!isFormValid()) {
@@ -136,6 +137,62 @@ export default function SignupPage() {
         }
     };
 
+    // const handleSignup = async () => {
+    //     setError(null);
+    //     if (!isFormValid() || !formData) return;
+
+    //     const signupData = getCleanedSignupData(formData);
+    //     const validationError = validateSignupData(signupData);
+    //     if (validationError) {
+    //         setError(validationError);
+    //         return;
+    //     }
+
+    //     try {
+    //         const newUser = SignupModel.createUser(signupData);
+    //         const data = await authApis.singUp(newUser);
+
+    //         await handleSignupResponse(data);
+    //     } catch (err) {
+    //         setError('Failed to create account. Please try again.');
+    //     }
+    // };
+
+    // // --- Helper Functions ---
+    // const getCleanedSignupData = (formData: User): User => ({
+    //     ...formData,
+    //     email: formData.email.trim(),
+    //     password: formData.password.trim(),
+    //     first_name: formData.first_name.trim(),
+    //     last_name: formData.last_name.trim(),
+    //     roles: formData.roles,
+    // });
+
+    // const validateSignupData = (data: User): string | null => {
+    //     const model = new SignupModel(data);
+    //     return model.validate();
+    // };
+
+    // const handleSignupResponse = async (data: any) => {
+    //     if (data.status !== "success") {
+    //         if (data.message?.status === "error" && data.message.message) {
+    //             setError(data.message.message);
+    //         }
+    //         return;
+    //     }
+
+    //     if (!data.user_details || !data.key_details) return;
+
+    //     const success = setUserDetailsToLocalStore(data);
+    //     if (!success) return;
+
+    //     if (data.user_details.role_user === "Trainer") {
+    //         await handleNavigation('/trainer-form');
+    //     } else {
+    //         await handleNavigation('/');
+    //     }
+    // };
+
     useEffect(() => {
         setError("")
 
@@ -146,7 +203,7 @@ export default function SignupPage() {
 
 
         <div className="flex flex-col h-screen bg-blue-100">
-            <div className="flex flex-1 flex-col justify-center items-center">
+            <div className="flex flex-1 flex-col justify-center items-center ">
                 <motion.div className="top-5 left-5 bg-blue-600 rounded-lg px-2.5 py-3 mb-2  hover:cursor-pointer hover:scale-105"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -160,7 +217,7 @@ export default function SignupPage() {
                     transition={{ duration: 0.5 }}
                     className="bg-white/80 backdrop-blur-lg p-8 rounded-xl shadow-lg max-w-md w-full"
                 >
-                    <h2 className="text-3xl font-bold text-center text-gray-900">Sign Up</h2>
+                    <h2 className="text-[clamp(20px,5vw,30px)] font-bold text-center text-gray-900">Sign Up</h2>
 
                     {error && (
                         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">

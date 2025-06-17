@@ -11,6 +11,8 @@ import { getCurrentUserName } from '@/lib/utils/auth.utils'
 import { useLoading } from '@/context/LoadingContext';
 import { TrainerCardModel } from '@/models/trainerCard.model';
 import { indianCities } from '@/app/content/IndianCities';
+import { getCategories } from "@/app/content/categories";
+
 
 function TrainersPageContent() {
     const searchParams = useSearchParams();
@@ -132,50 +134,50 @@ function TrainersPageContent() {
         }
     };
 
-    useEffect(() => {
-        const initializeSearch = async () => {
-            try {
-                showLoader();
+    // useEffect(() => {
+    //     const initializeSearch = async () => {
+    //         try {
+    //             showLoader();
 
-                const city = searchParams.get('city') || undefined;
-                const searchText = searchParams.get('search_text') || undefined;
+    //             const city = searchParams.get('city') || undefined;
+    //             const searchText = searchParams.get('search_text') || undefined;
 
-                if (city || searchText) {
-                    if (city) setCitySearch(city);
-                    if (searchText) setSearchText(searchText);
-                    if (searchText || city) {
-                        setSearchTitle(`Search Results for${searchText ? ` "${searchText}"` : ''}${city ? ` in "${city}"` : ''}`);
-                    }
-                }
-                await handleSearch(searchText, city, 1, itemsPerPage);
-            } catch (error) {
-                console.error('Error in initial search:', error);
-                setSearchResults([]);
-                setSearchTitle('All Trainers');
-                setTotalItems(0);
-                setCitySearch('');
-                setSearchText('');
-            }
-            finally {
-                hideLoader()
-            }
-        };
+    //             if (city || searchText) {
+    //                 if (city) setCitySearch(city);
+    //                 if (searchText) setSearchText(searchText);
+    //                 if (searchText || city) {
+    //                     setSearchTitle(`Search Results for${searchText ? ` "${searchText}"` : ''}${city ? ` in "${city}"` : ''}`);
+    //                 }
+    //             }
+    //             await handleSearch(searchText, city, 1, itemsPerPage);
+    //         } catch (error) {
+    //             console.error('Error in initial search:', error);
+    //             setSearchResults([]);
+    //             setSearchTitle('All Trainers');
+    //             setTotalItems(0);
+    //             setCitySearch('');
+    //             setSearchText('');
+    //         }
+    //         finally {
+    //             hideLoader()
+    //         }
+    //     };
 
-        initializeSearch();
-    }, [searchParams]);
+    //     initializeSearch();
+    // }, [searchParams]);
 
-    useEffect(() => {
+    // useEffect(() => {
 
-    }, [searchResults]);
+    // }, [searchResults]);
 
     return (
         <div className="bg-white min-h-screen flex flex-col">
             <section className="relative w-full mx-auto flex flex-col items-center header-hero-section bg-white">
                 <div className="w-full bg-gradient-to-b  from-blue-400 to-blue-600 text-white pb-10 px-0 flex flex-col items-center rounded-b-[40px] relative z-10 header-hero-bg">
                     <Navbar bgColor='transparent' />
-                    <div className="flex w-full items-center py-6 px-[80px]">
-                        <div className="flex w-full gap-3 items-center justify-center">
-                            <div className=" w-[60%]  flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md mb-5 hero-search-bar">
+                    <div className="flex w-full justify-center items-center py-6 px-[80px]">
+                        <div className="flex flex-col md:flex-row  w-full max-w-7xl gap-3 items-center justify-center">
+                            <div className="w-[350px] md:w-[60%] flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md mb-5 hero-search-bar">
                                 <input
                                     type="text"
                                     placeholder="Search by trainer name, skill, or city..."
@@ -210,7 +212,7 @@ function TrainersPageContent() {
                                     </svg>
                                 </div>
                             </div>
-                            <div className=" w-[40%] flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md mb-5 hero-search-city-bar relative">
+                            <div className="w-[250px] md:w-[40%] flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md mb-5 hero-search-city-bar relative">
                                 <select
                                     value={citySearch}
                                     onChange={(e) => {
@@ -277,7 +279,7 @@ function TrainersPageContent() {
             <div className="w-full max-w-[1352px] mx-auto px-4 py-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Similar Categories</h2>
                 <div className="flex flex-wrap gap-3">
-                    {categories.map((category, index) => (
+                    {getCategories("#3B82F6").map((category, index) => (
                         <button
                             onClick={() => {
                                 setSearchText(category.name);
