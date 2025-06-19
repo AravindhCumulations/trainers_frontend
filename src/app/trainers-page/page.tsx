@@ -12,6 +12,7 @@ import { useLoading } from '@/context/LoadingContext';
 import { TrainerCardModel } from '@/models/trainerCard.model';
 import { indianCities } from '@/app/content/IndianCities';
 import { getCategories } from "@/app/content/categories";
+import { usePopup } from '@/lib/hooks/usePopup';
 
 
 function TrainersPageContent() {
@@ -26,6 +27,21 @@ function TrainersPageContent() {
     const [totalItems, setTotalItems] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const { showLoader, hideLoader } = useLoading();
+    const { showConfirmation } = usePopup();
+
+    const callLogin = () => {
+        showConfirmation(
+            'Please login to continue',
+            () => {
+                router.push('/login');
+            },
+            {
+                title: 'Login Required',
+                confirmText: 'Login',
+                cancelText: 'Stay'
+            }
+        );
+    };
 
     const updateUrlParams = (search: string, city: string) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -173,11 +189,11 @@ function TrainersPageContent() {
     return (
         <div className="bg-white min-h-screen flex flex-col">
             <section className="relative w-full mx-auto flex flex-col items-center header-hero-section bg-white">
-                <div className="w-full bg-gradient-to-b  from-blue-400 to-blue-600 text-white pb-10 px-0 flex flex-col items-center rounded-b-[40px] relative z-10 header-hero-bg">
+                <div className="w-full bg-gradient-to-b from-blue-400 to-blue-600 text-white pb-6 sm:pb-8 lg:pb-10 px-4 sm:px-6 lg:px-8 flex flex-col items-center rounded-b-[20px] sm:rounded-b-[30px] lg:rounded-b-[40px] relative z-10 header-hero-bg">
                     <Navbar bgColor='transparent' />
-                    <div className="flex w-full justify-center items-center py-6 px-[80px]">
-                        <div className="flex flex-col md:flex-row  w-full max-w-7xl gap-3 items-center justify-center">
-                            <div className="w-[350px] md:w-[60%] flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md mb-5 hero-search-bar">
+                    <div className="flex w-full justify-center items-center py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
+                        <div className="flex flex-col lg:flex-row w-full max-w-7xl gap-3 sm:gap-4 items-center justify-center">
+                            <div className="w-full lg:w-[60%] flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md mb-3 sm:mb-4 lg:mb-5 hero-search-bar">
                                 <input
                                     type="text"
                                     placeholder="Search by trainer name, skill, or city..."
@@ -192,17 +208,17 @@ function TrainersPageContent() {
                                         }
                                     }}
                                     onKeyPress={handleKeyPress}
-                                    className="flex-1 px-5 py-2 rounded-full outline-none text-white bg-transparent placeholder-white/80 text-[16px] font-normal hero-search-input"
+                                    className="flex-1 px-3 sm:px-5 py-2 rounded-full outline-none text-white bg-transparent placeholder-white/80 text-sm sm:text-base font-normal hero-search-input"
                                 />
                                 {searchText && (
                                     <div className="pr-2 cursor-pointer" onClick={handleClearSearch}>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="sm:w-5 sm:h-5">
                                             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="white" />
                                         </svg>
                                     </div>
                                 )}
                                 <div className="pr-2 cursor-pointer" onClick={handleSearchClick}>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="sm:w-6 sm:h-6">
                                         <mask id="mask0_201_1588" style={{ maskType: "alpha" }} maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
                                             <rect width="24" height="24" fill="#D9D9D9" />
                                         </mask>
@@ -212,7 +228,7 @@ function TrainersPageContent() {
                                     </svg>
                                 </div>
                             </div>
-                            <div className="w-[250px] md:w-[40%] flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md mb-5 hero-search-city-bar relative">
+                            <div className="w-full lg:w-[40%] flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md mb-3 sm:mb-4 lg:mb-5 hero-search-city-bar relative">
                                 <select
                                     value={citySearch}
                                     onChange={(e) => {
@@ -222,7 +238,7 @@ function TrainersPageContent() {
                                         updateUrlParams(searchText, e.target.value);
                                         handleSearch(searchText, e.target.value, 1, itemsPerPage);
                                     }}
-                                    className="flex-1 px-5 py-2 rounded-full outline-none text-white bg-transparent placeholder-white/80 text-[16px] font-normal hero-search-input appearance-none cursor-pointer hover:bg-white/10 transition-colors duration-200"
+                                    className="flex-1 px-3 sm:px-5 py-2 rounded-full outline-none text-white bg-transparent placeholder-white/80 text-sm sm:text-base font-normal hero-search-input appearance-none cursor-pointer hover:bg-white/10 transition-colors duration-200"
                                 >
                                     <option value="" className="text-gray-900 bg-white">Choose City</option>
                                     {indianCities.map((city) => (
@@ -231,14 +247,14 @@ function TrainersPageContent() {
                                         </option>
                                     ))}
                                 </select>
-                                <div className="absolute right-12 pointer-events-none">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <div className="absolute right-10 sm:right-12 pointer-events-none">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="sm:w-5 sm:h-5">
                                         <path d="M7 10l5 5 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
                                 </div>
                                 {citySearch && (
                                     <div className="pr-2 cursor-pointer hover:bg-white/10 rounded-full p-1 transition-colors duration-200" onClick={handleClearCity}>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="sm:w-5 sm:h-5">
                                             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="white" />
                                         </svg>
                                     </div>
@@ -250,12 +266,12 @@ function TrainersPageContent() {
             </section>
 
             <main className="flex-grow">
-                <div className="w-full max-w-[1352px] mx-auto px-4 py-4">
-                    <h2 className="text-2xl font-bold text-gray-900">
+                <div className="w-full max-w-[1352px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
                         {searchTitle}
                     </h2>
                     {totalItems > 0 && (
-                        <p className="text-gray-600 mt-2">
+                        <p className="text-sm sm:text-base text-gray-600 mt-2 sm:mt-3">
                             Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} results
                         </p>
                     )}
@@ -271,14 +287,15 @@ function TrainersPageContent() {
                     }}
                     onPageChange={handlePageChange}
                     onWishlistUpdate={handleWishlistUpdate}
+                    callLogin={callLogin}
                     isLoading={isLoading}
                 />
 
             </main>
 
-            <div className="w-full max-w-[1352px] mx-auto px-4 py-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Similar Categories</h2>
-                <div className="flex flex-wrap gap-3">
+            <div className="w-full max-w-[1352px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 sm:mb-4 lg:mb-6">Similar Categories</h2>
+                <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-4">
                     {getCategories("#3B82F6").map((category, index) => (
                         <button
                             onClick={() => {
@@ -286,7 +303,7 @@ function TrainersPageContent() {
                                 handleSearch(category.name, '', 1, itemsPerPage);
                             }}
                             key={index}
-                            className="py-1.5 px-4 text-[#3B82F6] bg-blue-100 text-sm font-medium rounded-md items-center flex flex-col"
+                            className="py-1.5 sm:py-2 px-3 sm:px-4 text-[#3B82F6] bg-blue-100 text-xs sm:text-sm font-medium rounded-md items-center flex flex-col hover:bg-blue-200 transition-colors duration-200"
                         >
                             {category.icon}
                             {category.name}

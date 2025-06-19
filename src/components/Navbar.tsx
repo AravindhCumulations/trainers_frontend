@@ -152,9 +152,16 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                         <Menu className={`w-6 h-6 ${textColor}`} />
                     </button>
 
-                    <Link href="/" className={`text-2xl font-extrabold tracking-tight ${textColor} transition-colors duration-200`}>
+                    {/* <Link href="/" className={`text-2xl font-extrabold tracking-tight ${textColor} transition-colors duration-200`}>
                         Trainer&apos;s Mart
-                    </Link>
+                    </Link> */}
+                    <button
+                        className={`text-2xl font-extrabold tracking-tight ${textColor} transition-colors duration-200 hover:scale-105 bg-transparent border-none p-0 m-0 cursor-pointer`}
+                        onClick={() => handleNavigation('/')}
+                    >
+                        Trainer&apos;s Mart
+                    </button>
+
 
                     <div className="hidden md:block">
                         {!isLoading && (
@@ -179,7 +186,7 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                                                             fill="currentColor" />
                                                     </g>
                                                 </svg>
-                                                <div className="font-bold text-base flex p-2">{user.credits || credit} Credits</div>
+                                                <div className="font-bold text-base flex p-2">{user.credits ?? credit} Credits</div>
                                             </div>
                                         )}
 
@@ -291,7 +298,7 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="p-4 border-b">
-                        <h2 className="text-xl font-bold text-gray-800">Menu</h2>
+                        <h2 className="text-xl font-bold text-gray-800">Trainer&apos;s Mart</h2>
                     </div>
 
                     <div className="p-4">

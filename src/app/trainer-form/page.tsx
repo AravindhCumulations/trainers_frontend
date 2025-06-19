@@ -103,27 +103,27 @@ export default function TrainerDetailsPage() {
     // Add initializeFormData method
     const initializeFormData = (trainerData: any) => {
         const formData = {
-            bio_line: trainerData.bio_line || '',
-            trainers_approach: trainerData.trainers_approach || '',
-            experience: trainerData.experience || 1,
-            city: trainerData.city || '',
-            dob: trainerData.dob || '',
-            expertise_in: trainerData.expertise_in || '',
-            language: trainerData.language || '',
-            charge: trainerData.charge || 0,
-            phone: trainerData.phone?.trim() || '',
-            email: trainerData.email || '',
-            trainer: trainerData.email || '',
-            image: trainerData.image || '', // Keep the existing image URL
-            education: trainerData.education || [{ course: '', institution: '', year: '' }],
-            certificates: trainerData.certificates || [{ certificate_name: '', issued_by: '', issued_date: '', certificate_url: '' }],
-            testimonilas: trainerData.testimonilas || [{ client_name: '', company: '', testimonials: '' }],
-            facebook: trainerData.facebook || '',
-            instagram: trainerData.instagram || '',
-            linkedin: trainerData.linkedin || '',
-            twitter: trainerData.twitter || '',
-            personal_website: trainerData.personal_website || '',
-            client_worked: trainerData.client_worked || [],
+            bio_line: trainerData.bio_line ?? '',
+            trainers_approach: trainerData.trainers_approach ?? '',
+            experience: trainerData.experience ?? 1,
+            city: trainerData.city ?? '',
+            dob: trainerData.dob ?? '',
+            expertise_in: trainerData.expertise_in ?? '',
+            language: trainerData.language ?? '',
+            charge: trainerData.charge ?? 0,
+            phone: trainerData.phone?.trim() ?? '',
+            email: trainerData.email ?? '',
+            trainer: trainerData.email ?? '',
+            image: trainerData.image ?? '', // Keep the existing image URL
+            education: trainerData.education ?? [{ course: '', institution: '', year: '' }],
+            certificates: trainerData.certificates ?? [{ certificate_name: '', issued_by: '', issued_date: '', certificate_url: '' }],
+            testimonilas: trainerData.testimonilas ?? [{ client_name: '', company: '', testimonials: '' }],
+            facebook: trainerData.facebook ?? '',
+            instagram: trainerData.instagram ?? '',
+            linkedin: trainerData.linkedin ?? '',
+            twitter: trainerData.twitter ?? '',
+            personal_website: trainerData.personal_website ?? '',
+            client_worked: trainerData.client_worked ?? [],
         };
 
         // Set both form and initial form state
@@ -564,7 +564,7 @@ export default function TrainerDetailsPage() {
                     setErrors([parsedMessage.message]);
                 } catch (parseError) {
                     // If parsing fails, use the exception message
-                    setErrors([error.response.data.exception || "An error occurred during submission"]);
+                    setErrors([error.response.data.exception ?? "An error occurred during submission"]);
                 }
             } else {
                 setErrors(["An error occurred during submission"]);
@@ -665,21 +665,21 @@ export default function TrainerDetailsPage() {
         <div className="min-h-screen bg-theme">
             <NavBar />
 
-            <div className="container mx-auto my-8">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 my-4 sm:my-6 lg:my-8">
                 <div className="max-w-4xl mx-auto bg-white rounded-xl overflow-hidden">
-                    <div className="flex flex-col justify-center items-center text-center text-white py-[16px] bg-theme-header"
+                    <div className="flex flex-col justify-center items-center text-center text-white py-3 sm:py-4 lg:py-[16px] bg-theme-header"
                     >
-                        <h1 className="tracking-normal text-center align-middle font-sans text-3xl font-bold text-[clamp(20px,5vw,32px)]">Complete Your Trainer Profile</h1>
-                        <p className='px-4'>Share your expertise and credentials with potential clients</p>
+                        <h1 className="tracking-normal text-center align-middle font-sans text-xl sm:text-2xl lg:text-3xl font-bold text-[clamp(18px,4vw,32px)]">Complete Your Trainer Profile</h1>
+                        <p className='px-3 sm:px-4 text-sm sm:text-base'>Share your expertise and credentials with potential clients</p>
                     </div>
 
                     {errors.length > 0 && (
                         <div
                             ref={errorContainerRef}
                             tabIndex={-1}
-                            className="p-4 bg-red-50 border border-red-200 rounded-lg m-4 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            className="p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg m-3 sm:m-4 focus:outline-none focus:ring-2 focus:ring-red-500"
                         >
-                            <ul className="list-disc list-inside text-red-600">
+                            <ul className="list-disc list-inside text-red-600 text-sm sm:text-base">
                                 {errors.map((error, index) => (
                                     <li key={index}>{error}</li>
                                 ))}
@@ -687,13 +687,13 @@ export default function TrainerDetailsPage() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-8">
+                    <form onSubmit={handleSubmit} className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
 
                         {/* Profile Picture Upload */}
-                        <div className="rounded-xl p-6 shadow-sm bg-white">
-                            <h3 className="text-xl font-semibold text-gray-800 mb-6">Profile Picture</h3>
-                            <div className="flex flex-col items-center space-y-4">
-                                <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-gray-200">
+                        <div className="rounded-xl p-4 sm:p-6 shadow-sm bg-white">
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Profile Picture</h3>
+                            <div className="flex flex-col items-center space-y-3 sm:space-y-4">
+                                <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-2 border-gray-200">
                                     {profileImagePreview ? (
                                         <img
                                             src={profileImagePreview}
@@ -702,7 +702,7 @@ export default function TrainerDetailsPage() {
                                         />
                                     ) : (
                                         <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                                            <span className="text-gray-400">No image</span>
+                                            <span className="text-gray-400 text-xs sm:text-sm">No image</span>
                                         </div>
                                     )}
                                 </div>
@@ -716,19 +716,19 @@ export default function TrainerDetailsPage() {
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                    className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
                                 >
                                     {profileImage ? 'Change Picture' : 'Upload Picture'}
                                 </button>
                             </div>
                         </div>
 
-                        <div className="rounded-xl p-6 shadow-sm bg-white">
+                        <div className="rounded-xl p-4 sm:p-6 shadow-sm bg-white">
                             {/* Section Title */}
-                            <h3 className="text-xl font-semibold text-gray-800 mb-6">Personal Details</h3>
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Personal Details</h3>
 
                             {/* Bio */}
-                            <div className="mb-6">
+                            <div className="mb-4 sm:mb-6">
                                 <label
                                     htmlFor="bio"
                                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -745,16 +745,16 @@ export default function TrainerDetailsPage() {
                                             }
                                         }}
                                         placeholder="Share your training philosophy and what makes you unique..."
-                                        rows={6}
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        rows={4}
+                                        className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
                                     />
-                                    <div className="absolute bottom-2 right-2 text-sm text-gray-500">
+                                    <div className="absolute bottom-2 right-2 text-xs sm:text-sm text-gray-500">
                                         {form.bio_line.length}/500
                                     </div>
                                 </div>
                             </div>
                             {/* TrainerApproch */}
-                            <div className="mb-6">
+                            <div className="mb-4 sm:mb-6">
                                 <label
                                     htmlFor="trainerApproch"
                                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -771,17 +771,17 @@ export default function TrainerDetailsPage() {
                                             }
                                         }}
                                         placeholder="Share your approch strategy"
-                                        rows={4}
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        rows={3}
+                                        className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
                                     />
-                                    <div className="absolute bottom-2 right-2 text-sm text-gray-500">
+                                    <div className="absolute bottom-2 right-2 text-xs sm:text-sm text-gray-500">
                                         {form.trainers_approach.length}/500
                                     </div>
                                 </div>
                             </div>
 
                             {/* Grid Row for Experience, City, DOB */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                                 {/* Years of Experience */}
                                 <div>
                                     <label
@@ -798,7 +798,7 @@ export default function TrainerDetailsPage() {
                                             handleChanges('experience', Number(e.target.value))
                                         }
                                         placeholder="Your years of experience"
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
                                     />
                                 </div>
 
@@ -816,7 +816,7 @@ export default function TrainerDetailsPage() {
                                             value={form.city}
                                             readOnly
                                             placeholder="Select your city"
-                                            className="w-full px-4 py-2.5 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
                                             onClick={() => setIsCityDropdownOpen(true)}
                                         />
                                         {isCityDropdownOpen && (
@@ -824,7 +824,7 @@ export default function TrainerDetailsPage() {
                                                 <input
                                                     type="text"
                                                     placeholder="Search cities..."
-                                                    className="w-full px-4 py-2 border-b border-gray-300 focus:outline-none"
+                                                    className="w-full px-3 sm:px-4 py-2 border-b border-gray-300 focus:outline-none text-sm sm:text-base"
                                                     value={searchTerm}
                                                     onChange={(e) => handleCitySearch(e.target.value)}
                                                     autoFocus
@@ -833,7 +833,7 @@ export default function TrainerDetailsPage() {
                                                     {filteredCities.map(city => (
                                                         <div
                                                             key={city}
-                                                            className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${form.city === city ? 'bg-blue-50' : ''
+                                                            className={`px-3 sm:px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm sm:text-base ${form.city === city ? 'bg-blue-50' : ''
                                                                 }`}
                                                             onClick={() => {
                                                                 handleChanges('city', city);
@@ -863,7 +863,7 @@ export default function TrainerDetailsPage() {
                                         id="dob"
                                         value={form.dob}
                                         onChange={(e) => handleChanges('dob', e.target.value)}
-                                        className="w-full px-4 py-2.5 h-[46px] bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        className="w-full px-3 sm:px-4 py-2 sm:py-2.5 h-[42px] sm:h-[46px] bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
                                     >
                                         <option value="" >Select Year</option>
                                         {Array.from({ length: new Date().getFullYear() - 1949 }, (_, i) => {
@@ -880,15 +880,15 @@ export default function TrainerDetailsPage() {
                         </div>
 
                         {/* Professrional Information */}
-                        <div className="rounded-xl p-6 shadow-sm bg-white">
-                            <h3 className="text-xl font-semibold text-gray-800 mb-6">Professional Details</h3>
+                        <div className="rounded-xl p-4 sm:p-6 shadow-sm bg-white">
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Professional Details</h3>
 
-                            <div className="space-y-5">
+                            <div className="space-y-4 sm:space-y-5">
                                 {/* Expertise */}
                                 <div className="relative" ref={expertiseDropdownRef}>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         Expertise / tags
-                                        <span className="text-sm text-gray-500 ml-2">
+                                        <span className="text-xs sm:text-sm text-gray-500 ml-1 sm:ml-2">
                                             (Select up to 3)
                                         </span>
                                     </label>
@@ -897,7 +897,7 @@ export default function TrainerDetailsPage() {
                                         value={form.expertise_in}
                                         readOnly
                                         placeholder="Select expertise from dropdown"
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
                                         onFocus={() => setIsExpertiseDropdownOpen(true)}
                                     />
                                     {isExpertiseDropdownOpen && (
@@ -905,7 +905,7 @@ export default function TrainerDetailsPage() {
                                             <input
                                                 type="text"
                                                 placeholder="Search expertise..."
-                                                className="w-full px-4 py-2 border-b border-gray-300 focus:outline-none"
+                                                className="w-full px-3 sm:px-4 py-2 border-b border-gray-300 focus:outline-none text-sm sm:text-base"
                                                 value={searchTerm}
                                                 onChange={(e) => handleExpertiseSearch(e.target.value)}
                                                 autoFocus
@@ -918,7 +918,7 @@ export default function TrainerDetailsPage() {
                                                     return (
                                                         <div
                                                             key={exp}
-                                                            className={`px-4 py-2 cursor-pointer flex items-center justify-between 
+                                                            className={`px-3 sm:px-4 py-2 cursor-pointer flex items-center justify-between text-sm sm:text-base
                                                                 ${isExpertiseSelected(exp)
                                                                     ? 'bg-blue-50 hover:bg-blue-100'
                                                                     : isDisabled
@@ -952,7 +952,7 @@ export default function TrainerDetailsPage() {
                                         value={form.language}
                                         readOnly
                                         placeholder="Select languages from dropdown"
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
                                         onFocus={() => setIsDropdownOpen(true)}
                                     />
                                     {isDropdownOpen && (
@@ -960,7 +960,7 @@ export default function TrainerDetailsPage() {
                                             <input
                                                 type="text"
                                                 placeholder="Search languages..."
-                                                className="w-full px-4 py-2 border-b border-gray-300 focus:outline-none"
+                                                className="w-full px-3 sm:px-4 py-2 border-b border-gray-300 focus:outline-none text-sm sm:text-base"
                                                 value={searchTerm}
                                                 onChange={(e) => handleLanguageSearch(e.target.value)}
                                                 autoFocus
@@ -969,7 +969,7 @@ export default function TrainerDetailsPage() {
                                                 {filteredLanguages.map(lang => (
                                                     <div
                                                         key={lang}
-                                                        className={`px-4 py-2 cursor-pointer flex items-center justify-between ${isLanguageSelected(lang)
+                                                        className={`px-3 sm:px-4 py-2 cursor-pointer flex items-center justify-between text-sm sm:text-base ${isLanguageSelected(lang)
                                                             ? 'bg-blue-50 hover:bg-blue-100'
                                                             : 'hover:bg-gray-100'
                                                             }`}
@@ -992,18 +992,18 @@ export default function TrainerDetailsPage() {
                                 </div>
 
                                 {/* Horizontal Fields */}
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                                     {/* Hourly Rate */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Hourly Rate</label>
                                         <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500">
-                                            <span className="text-gray-500">₹</span>
+                                            <span className="text-gray-500 text-sm sm:text-base">₹</span>
                                             <input
                                                 type="number"
                                                 value={form.charge}
                                                 onChange={(e) => handleChanges('charge', e.target.value)}
                                                 placeholder="Enter hourly rate"
-                                                className="w-full ml-2 outline-none"
+                                                className="w-full ml-2 outline-none text-sm sm:text-base"
                                             />
                                         </div>
                                     </div>
@@ -1012,7 +1012,7 @@ export default function TrainerDetailsPage() {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                                         <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500">
-                                            <span className="text-gray-500">+91</span>
+                                            <span className="text-gray-500 text-sm sm:text-base">+91</span>
                                             <input
                                                 type="tel"
                                                 value={form.phone.replace(/^\+91-/, '')}
@@ -1022,7 +1022,7 @@ export default function TrainerDetailsPage() {
                                                     handleChanges('phone', cleanNumber);
                                                 }}
                                                 placeholder="Enter phone number"
-                                                className="w-full ml-2 outline-none"
+                                                className="w-full ml-2 outline-none text-sm sm:text-base"
                                             />
                                         </div>
                                     </div>
@@ -1045,7 +1045,7 @@ export default function TrainerDetailsPage() {
                                 </div>
 
                                 {/* Clients Worked */}
-                                <div className="mb-6">
+                                <div className="mb-4 sm:mb-6">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         Companies Worked With
                                     </label>
@@ -1067,7 +1067,7 @@ export default function TrainerDetailsPage() {
                                                         }));
                                                     }
                                                 }}
-                                                className="bg-blue-100 text-blue-800"
+                                                className="bg-blue-100 text-blue-800 text-xs sm:text-sm"
                                             />
                                         ))}
                                     </div>
@@ -1108,15 +1108,15 @@ export default function TrainerDetailsPage() {
                         </div>
 
                         {/* Education & Certifications  */}
-                        <div className="bg-white p-6 rounded-xl shadow-sm">
-                            <h3 className="text-xl font-semibold text-gray-800 mb-6">Education & Certificates</h3>
+                        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Education & Certificates</h3>
 
                             {/* Education Section */}
-                            <div className="mb-6">
+                            <div className="mb-4 sm:mb-6">
                                 <label className="block font-medium text-gray-700 mb-2">Education</label>
 
                                 {form.education.map((edu, index) => (
-                                    <div key={index} className="mb-6">
+                                    <div key={index} className="mb-4 sm:mb-6">
                                         <div className="relative flex gap-2">
                                             <TextField
                                                 variant="outlined"
@@ -1137,8 +1137,8 @@ export default function TrainerDetailsPage() {
                                             )}
                                         </div>
 
-                                        <div className="flex gap-4 mt-3">
-                                            <div className="w-[70%]">
+                                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-3">
+                                            <div className="w-full sm:w-[70%]">
                                                 <TextField
                                                     variant="outlined"
                                                     fullWidth
@@ -1148,11 +1148,11 @@ export default function TrainerDetailsPage() {
                                                     size="small"
                                                 />
                                             </div>
-                                            <div className="w-[30%]">
+                                            <div className="w-full sm:w-[30%]">
                                                 <select
                                                     value={edu.year}
                                                     onChange={(e) => handleEducationChange(index, "year", e.target.value)}
-                                                    className="w-full px-4 py-2.5 h-[42px] bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                                    className="w-full px-3 sm:px-4 py-2 sm:py-2.5 h-[42px] bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
                                                 >
                                                     <option value="">Select Year</option>
                                                     {Array.from({ length: new Date().getFullYear() - 1949 }, (_, i) => {
@@ -1175,7 +1175,7 @@ export default function TrainerDetailsPage() {
                                     type="button"
                                     onClick={addEducation}
                                     disabled={form.education.length >= 3}
-                                    className={`flex items-center font-medium mt-2 ${form.education.length >= 3 ? 'text-gray-400 cursor-not-allowed' : 'text-green-600'}`}
+                                    className={`flex items-center font-medium mt-2 text-sm sm:text-base ${form.education.length >= 3 ? 'text-gray-400 cursor-not-allowed' : 'text-green-600'}`}
                                 >
                                     <Add fontSize="small" className="mr-1" /> Add another Education
                                 </button>
@@ -1186,7 +1186,7 @@ export default function TrainerDetailsPage() {
                                 <label className="block font-medium text-gray-700 mb-2">Certificates</label>
 
                                 {form.certificates.map((cert, index) => (
-                                    <div key={index} className="mb-6">
+                                    <div key={index} className="mb-4 sm:mb-6">
                                         <div className="relative flex gap-2">
                                             <TextField
                                                 variant="outlined"
@@ -1207,8 +1207,8 @@ export default function TrainerDetailsPage() {
                                             )}
                                         </div>
 
-                                        <div className="flex gap-4 mt-3">
-                                            <div className="w-[70%]">
+                                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-3">
+                                            <div className="w-full sm:w-[70%]">
                                                 <TextField
                                                     variant="outlined"
                                                     fullWidth
@@ -1218,11 +1218,11 @@ export default function TrainerDetailsPage() {
                                                     size="small"
                                                 />
                                             </div>
-                                            <div className="w-[30%]">
+                                            <div className="w-full sm:w-[30%]">
                                                 <select
                                                     value={cert.issued_date}
                                                     onChange={(e) => handleCertificationChange(index, "issued_date", e.target.value)}
-                                                    className="w-full px-4 py-2.5 h-[42px] bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                                    className="w-full px-3 sm:px-4 py-2 sm:py-2.5 h-[42px] bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
                                                 >
                                                     <option value="">Select Year</option>
                                                     {Array.from({ length: new Date().getFullYear() - 1949 }, (_, i) => {
@@ -1245,7 +1245,7 @@ export default function TrainerDetailsPage() {
                                     type="button"
                                     onClick={addCertification}
                                     disabled={form.certificates.length >= 3}
-                                    className={`flex items-center font-medium mt-2 ${form.certificates.length >= 3 ? 'text-gray-400 cursor-not-allowed' : 'text-green-600'}`}
+                                    className={`flex items-center font-medium mt-2 text-sm sm:text-base ${form.certificates.length >= 3 ? 'text-gray-400 cursor-not-allowed' : 'text-green-600'}`}
                                 >
                                     <Add fontSize="small" className="mr-1" /> Add another Certificate
                                 </button>
@@ -1253,19 +1253,19 @@ export default function TrainerDetailsPage() {
                         </div>
 
                         {/* Client Testimonials */}
-                        <div className="max-w-4xl mx-auto space-y-10">
+                        <div className="max-w-4xl mx-auto space-y-8 sm:space-y-10">
                             {/* ... other sections like PersonalInfo, Education, etc. */}
 
                             {/* Client Testimonials Section */}
-                            <div className="bg-white p-6 rounded-xl shadow-sm">
-                                <h3 className="text-xl font-semibold text-gray-800 mb-1">Client Testimonials</h3>
-                                <p className="text-sm text-gray-500 mb-4">
+                            <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
+                                <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-1">Client Testimonials</h3>
+                                <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
                                     Share testimonials from your clients to build trust with potential new clients.
                                 </p>
 
                                 {form.testimonilas.map((testimonial, index) => (
-                                    <div key={index} className="mb-6">
-                                        <div className="flex gap-4 mb-3">
+                                    <div key={index} className="mb-4 sm:mb-6">
+                                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-3">
                                             <TextField
                                                 fullWidth
                                                 size="small"
@@ -1311,7 +1311,7 @@ export default function TrainerDetailsPage() {
                                     type="button"
                                     onClick={addTestimonial}
                                     disabled={form.testimonilas.length >= 3}
-                                    className={`flex items-center font-medium mt-2 ${form.testimonilas.length >= 3 ? 'text-gray-400 cursor-not-allowed' : 'text-green-600'}`}
+                                    className={`flex items-center font-medium mt-2 text-sm sm:text-base ${form.testimonilas.length >= 3 ? 'text-gray-400 cursor-not-allowed' : 'text-green-600'}`}
                                 >
                                     <Add fontSize="small" className="mr-1" /> Add another Testimonial
                                 </button>
@@ -1319,10 +1319,10 @@ export default function TrainerDetailsPage() {
                         </div>
 
                         {/* Social Media Section */}
-                        <div className="bg-white p-6 rounded-xl shadow-sm">
-                            <h3 className="text-xl font-semibold text-gray-800 mb-6">Online Presence</h3>
+                        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Online Presence</h3>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 {/* Facebook */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
@@ -1388,7 +1388,7 @@ export default function TrainerDetailsPage() {
                                 </div>
 
                                 {/* Website (Single full-width row) */}
-                                <div className="md:col-span-2">
+                                <div className="sm:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                                         <LanguageIcon className="text-gray-600 mr-2" fontSize="small" />
                                         Personal Website
@@ -1405,12 +1405,12 @@ export default function TrainerDetailsPage() {
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-3 sm:gap-4">
                             {isEdit && (
                                 <button
                                     type="button"
                                     onClick={() => handleNavigation('/trainer-details', { 'trainer': getCurrentUserName() })}
-                                    className="w-full px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                                    className="w-full px-4 sm:px-6 py-2.5 sm:py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm sm:text-base"
                                 >
                                     Cancel
                                 </button>
@@ -1418,7 +1418,7 @@ export default function TrainerDetailsPage() {
                             <button
                                 type="submit"
                                 disabled={!hasFormChanges}
-                                className={`w-full px-6 py-3 text-white rounded-lg ${hasFormChanges
+                                className={`w-full px-4 sm:px-6 py-2.5 sm:py-3 text-white rounded-lg text-sm sm:text-base ${hasFormChanges
                                     ? 'bg-blue-600 hover:bg-blue-700'
                                     : 'bg-gray-400 cursor-not-allowed'
                                     } transition-colors`}

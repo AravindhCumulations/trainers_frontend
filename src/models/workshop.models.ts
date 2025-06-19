@@ -3,7 +3,7 @@ export interface Workshop {
     title: string;
     price: number;
     targetAudience: string;
-    format: 'virtual' | 'In-Person';
+    format: string;
     image: string;
     objectives: string;
     outcomes: string;

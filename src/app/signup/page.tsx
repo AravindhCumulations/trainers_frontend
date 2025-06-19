@@ -66,132 +66,63 @@ export default function SignupPage() {
     };
 
 
+
+
     const handleSignup = async () => {
-
         setError(null);
+        if (!isFormValid() || !formData) return;
 
-        if (!isFormValid()) {
+        const signupData = getCleanedSignupData(formData);
+        const validationError = validateSignupData(signupData);
+        if (validationError) {
+            setError(validationError);
             return;
         }
 
         try {
-            if (formData) {
+            const newUser = SignupModel.createUser(signupData);
+            const data = await authApis.singUp(newUser);
 
-                // Ensure the data is properly formatted
-                const signupData: User = {
-                    ...formData,
-                    email: formData.email.trim(),
-                    password: formData.password.trim(),
-                    first_name: formData.first_name.trim(),
-                    last_name: formData.last_name.trim(),
-                    roles: formData.roles
-                };
-
-
-
-
-                const signupModel = new SignupModel(signupData);
-                const validationError = signupModel.validate();
-
-                if (validationError) {
-
-                    setError(validationError);
-                    return;
-                }
-
-                const newUser = SignupModel.createUser(signupData);
-
-
-                const data = await authApis.singUp(newUser);
-
-
-
-
-                if (data.status === "success") {
-                    if (data.user_details && data.key_details) {
-                        const success: boolean = setUserDetailsToLocalStore(data);
-                        if (success) {
-                            if (data.user_details.role_user === "Trainer") {
-
-                                if (data) {
-                                    // router.push(`/trainer-form`);
-                                    await handleNavigation('/trainer-form')
-                                } else {
-                                    setError('Trainer profile not found');
-                                }
-                            } else {
-                                await handleNavigation('/')
-                            }
-                        }
-
-                    }
-                }
-                else {
-                    if (data.message.status === "error" && data.message.message)
-                        setError(data.message.message);
-                }
-
-            }
+            await handleSignupResponse(data);
         } catch (err) {
             setError('Failed to create account. Please try again.');
         }
     };
 
-    // const handleSignup = async () => {
-    //     setError(null);
-    //     if (!isFormValid() || !formData) return;
+    // --- Helper Functions ---
+    const getCleanedSignupData = (formData: User): User => ({
+        ...formData,
+        email: formData.email.trim(),
+        password: formData.password.trim(),
+        first_name: formData.first_name.trim(),
+        last_name: formData.last_name.trim(),
+        roles: formData.roles,
+    });
 
-    //     const signupData = getCleanedSignupData(formData);
-    //     const validationError = validateSignupData(signupData);
-    //     if (validationError) {
-    //         setError(validationError);
-    //         return;
-    //     }
+    const validateSignupData = (data: User): string | null => {
+        const model = new SignupModel(data);
+        return model.validate();
+    };
 
-    //     try {
-    //         const newUser = SignupModel.createUser(signupData);
-    //         const data = await authApis.singUp(newUser);
+    const handleSignupResponse = async (data: any) => {
+        if (data.status !== "success") {
+            if (data.message?.status === "error" && data.message.message) {
+                setError(data.message.message);
+            }
+            return;
+        }
 
-    //         await handleSignupResponse(data);
-    //     } catch (err) {
-    //         setError('Failed to create account. Please try again.');
-    //     }
-    // };
+        if (!data.user_details || !data.key_details) return;
 
-    // // --- Helper Functions ---
-    // const getCleanedSignupData = (formData: User): User => ({
-    //     ...formData,
-    //     email: formData.email.trim(),
-    //     password: formData.password.trim(),
-    //     first_name: formData.first_name.trim(),
-    //     last_name: formData.last_name.trim(),
-    //     roles: formData.roles,
-    // });
+        const success = setUserDetailsToLocalStore(data);
+        if (!success) return;
 
-    // const validateSignupData = (data: User): string | null => {
-    //     const model = new SignupModel(data);
-    //     return model.validate();
-    // };
-
-    // const handleSignupResponse = async (data: any) => {
-    //     if (data.status !== "success") {
-    //         if (data.message?.status === "error" && data.message.message) {
-    //             setError(data.message.message);
-    //         }
-    //         return;
-    //     }
-
-    //     if (!data.user_details || !data.key_details) return;
-
-    //     const success = setUserDetailsToLocalStore(data);
-    //     if (!success) return;
-
-    //     if (data.user_details.role_user === "Trainer") {
-    //         await handleNavigation('/trainer-form');
-    //     } else {
-    //         await handleNavigation('/');
-    //     }
-    // };
+        if (data.user_details.role_user === "Trainer") {
+            await handleNavigation('/trainer-form');
+        } else {
+            await handleNavigation('/');
+        }
+    };
 
     useEffect(() => {
         setError("")

@@ -38,44 +38,44 @@ const SearchCategoriesRow: React.FC<SearchCategoriesRowProps> = ({ onCategoryCli
     };
 
     return (
-        <div className="max-w-[1050px] mx-4 md:mx-0 w-[370px] md:w-[70%] lg:w-[60%] lg:flex max-w-6xl h-[60px] flex items-center gap-2 mt-0 justify-center bg-white/20 rounded-full py-4 px-3 shadow-md backdrop-blur-md hero-categories">
+        <div className="w-full max-w-xs sm:max-w-sm md:max-w-[70%] lg:max-w-[65.6rem] flex items-center gap-1 sm:gap-2 mt-0 justify-center bg-white/20 rounded-full py-2 sm:py-3 md:py-2 px-2 sm:px-3 md:px-2 shadow-md backdrop-blur-md hero-categories">
             <button
                 onClick={() => handleScroll('left')}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-xl font-bold hover:bg-white/50 transition hero-categories-left"
+                className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full bg-white text-xl font-bold hover:bg-white/50 transition hero-categories-left flex-shrink-0"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000">
+                <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="#000" className="sm:w-6 sm:h-6">
                     <path d="M560-267.69 347.69-480 560-692.31 588.31-664l-184 184 184 184L560-267.69Z" />
                 </svg>
             </button>
             <div
                 ref={scrollContainerRef}
-                className="flex gap-10 overflow-x-auto hero-categories-list flex-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                className="flex gap-4 sm:gap-6 md:gap-10 overflow-x-auto hero-categories-list flex-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                 style={{ scrollBehavior: 'smooth' }}
             >
                 {getCategories("#ffffff").map((category, index) => (
                     <button
                         key={index}
-                        className="flex flex-col items-center justify-center gap-1 min-w-[70px] max-w-[70px] hero-category cursor-pointer text-white hover:opacity-80 transition-opacity"
+                        className="flex flex-col items-center justify-center gap-0.5 sm:gap-1 min-w-[48px] max-w-[48px] sm:min-w-[60px] sm:max-w-[60px] md:min-w-[70px] md:max-w-[70px] hero-category cursor-pointer text-white hover:opacity-80 transition-opacity"
                         onClick={() => handleCategoryClick(category.name)}
                     >
                         {loadingCategory === category.name ? (
-                            <div className="w-6 h-6 flex items-center justify-center">
+                            <div className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">
                                 <Loader isLoading={true} size="sm" />
                             </div>
                         ) : (
-                            <div className="w-6 h-6 flex items-center justify-center">
+                            <div className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">
                                 {category.icon}
                             </div>
                         )}
-                        <span className="text-xs font-medium text-center whitespace-nowrap overflow-hidden text-ellipsis w-full">{category.name}</span>
+                        <span className="text-[10px] sm:text-xs font-medium text-center whitespace-nowrap overflow-hidden text-ellipsis w-full">{category.name}</span>
                     </button>
                 ))}
             </div>
             <button
                 onClick={() => handleScroll('right')}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-xl font-bold hover:bg-white/50 transition hero-categories-right"
+                className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full bg-white text-xl font-bold hover:bg-white/50 transition hero-categories-right flex-shrink-0"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000">
+                <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="#000" className="sm:w-6 sm:h-6">
                     <path d="m531.69-480-184-184L376-692.31 588.31-480 376-267.69 347.69-296l184-184Z" />
                 </svg>
             </button>
