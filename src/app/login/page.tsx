@@ -159,7 +159,7 @@ export default function LoginPage() {
                 >
                     {!showForgotPassword ? (
                         <>
-                            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-6 transition-colors duration-300">Welcome Back</h2>
+                            <h2 className="text-3xl font-bold text-center text-gray-900  mb-6 transition-colors duration-300">Welcome Back</h2>
 
                             {error && (
                                 <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -170,18 +170,18 @@ export default function LoginPage() {
                             {/* Form */}
                             <form className="space-y-5" onSubmit={handleLogin}>
                                 <div>
-                                    <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1 transition-colors duration-300">Email</label>
+                                    <label className="block text-gray-700  font-semibold mb-1 transition-colors duration-300">Email</label>
                                     <input
                                         type="text"
                                         name="email"
                                         value={formData.email}
                                         onChange={handleInputChange}
                                         placeholder="Enter your email"
-                                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                        className="w-full px-4 py-3 border border-gray-300  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300 bg-white  text-gray-900"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1 transition-colors duration-300">Password</label>
+                                    <label className="block text-gray-700  font-semibold mb-1 transition-colors duration-300">Password</label>
                                     <div className="flex relative">
                                         <input
                                             type={show ? "text" : "password"}
@@ -189,21 +189,21 @@ export default function LoginPage() {
                                             value={formData.password}
                                             onChange={handleInputChange}
                                             placeholder="Enter your password"
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                            className="w-full px-4 py-3 border border-gray-300  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300 bg-whitetext-gray-900 "
                                         />
                                         {
                                             show ?
                                                 <div className="absolute right-4 top-6">
                                                     <EyeOff
                                                         size={24}
-                                                        className="transform -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-400 transition-colors duration-300"
+                                                        className="transform -translate-y-1/2 cursor-pointer text-gray-500  transition-colors duration-300"
                                                         onClick={() => setShow(!show)}
                                                     />
                                                 </div> :
                                                 <div className="absolute right-4 top-6">
                                                     <Eye
                                                         size={24}
-                                                        className="transform -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-400 transition-colors duration-300"
+                                                        className="transform -translate-y-1/2 cursor-pointer text-gray-500  transition-colors duration-300"
                                                         onClick={() => setShow(!show)}
                                                     />
                                                 </div>
@@ -225,7 +225,7 @@ export default function LoginPage() {
                             </form>
 
                             <p
-                                className='forgot-password text-blue-600 dark:text-blue-400 cursor-pointer hover:underline text-center mt-4'
+                                className='forgot-password text-blue-600  cursor-pointer hover:underline text-center mt-4'
                                 onClick={() => {
                                     setShowForgotPassword(true);
                                     setError(null);
@@ -234,9 +234,9 @@ export default function LoginPage() {
                                 Forgot Password?
                             </p>
 
-                            <p className="text-center text-gray-600 dark:text-gray-400 mt-4 transition-colors duration-300">
+                            <p className="text-center text-gray-600  mt-4 transition-colors duration-300">
                                 Don&apos;t have an account?&nbsp;
-                                <a className="text-blue-600 dark:text-blue-400 font-semibold hover:underline ml-1 transition-colors duration-300 cursor-pointer"
+                                <a className="text-blue-600  font-semibold hover:underline ml-1 transition-colors duration-300 cursor-pointer"
                                     onClick={() => {
                                         handleNavigation('/signup');
                                         setError(null);
@@ -259,12 +259,12 @@ export default function LoginPage() {
                                         });
                                         setError(null);
                                     }}
-                                    className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-300"
+                                    className="text-gray-600  hover:text-gray-900  transition-colors duration-300"
                                 >
                                     ⟵  &nbsp; back to login
                                 </button>
                             </div>
-                            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-6 transition-colors duration-300">
+                            <h2 className="text-3xl font-bold text-center text-gray-900  mb-6 transition-colors duration-300">
                                 {forgotPasswordStep === 'email' ? 'Reset Password' :
                                     forgotPasswordStep === 'otp' ? 'Enter OTP' :
                                         'Set New Password'}
@@ -280,14 +280,14 @@ export default function LoginPage() {
                             <form className="space-y-5" onSubmit={handleForgotPassword}>
                                 {forgotPasswordStep === 'email' && (
                                     <div>
-                                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1">Email</label>
+                                        <label className="block text-gray-700  font-semibold mb-1">Email</label>
                                         <input
                                             type="email"
                                             name="email"
                                             value={forgotPasswordData.email}
                                             onChange={handleForgotPasswordInputChange}
                                             placeholder="Enter your email"
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="w-full px-4 py-3 border border-gray-300  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             required
                                         />
                                     </div>
@@ -295,14 +295,14 @@ export default function LoginPage() {
 
                                 {forgotPasswordStep === 'otp' && (
                                     <div>
-                                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1">OTP</label>
+                                        <label className="block text-gray-700  font-semibold mb-1">OTP</label>
                                         <input
                                             type="text"
                                             name="otp"
                                             value={forgotPasswordData.otp}
                                             onChange={handleForgotPasswordInputChange}
                                             placeholder="Enter OTP"
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="w-full px-4 py-3 border border-gray-300  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             required
                                         />
                                     </div>
@@ -311,26 +311,26 @@ export default function LoginPage() {
                                 {forgotPasswordStep === 'reset' && (
                                     <>
                                         <div>
-                                            <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1">New Password</label>
+                                            <label className="block text-gray-700  font-semibold mb-1">New Password</label>
                                             <input
                                                 type="password"
                                                 name="newPassword"
                                                 value={forgotPasswordData.newPassword}
                                                 onChange={handleForgotPasswordInputChange}
                                                 placeholder="Enter new password"
-                                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full px-4 py-3 border border-gray-300  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 required
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-1">Confirm Password</label>
+                                            <label className="block text-gray-700  font-semibold mb-1">Confirm Password</label>
                                             <input
                                                 type="password"
                                                 name="confirmPassword"
                                                 value={forgotPasswordData.confirmPassword}
                                                 onChange={handleForgotPasswordInputChange}
                                                 placeholder="Confirm new password"
-                                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full px-4 py-3 border border-gray-300  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 required
                                             />
                                         </div>
