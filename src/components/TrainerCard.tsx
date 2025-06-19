@@ -4,13 +4,13 @@ import { trainerApis } from '../lib/apis/trainer.apis';
 import Image from 'next/image';
 import { usePopup } from '@/lib/hooks/usePopup';
 import { useUser } from '@/context/UserContext';
-import { useNavigation } from '@/lib/hooks/useNavigation';
+// import { useNavigation } from '@/lib/hooks/useNavigation';
 
 const TrainerCard = memo(({ trainer, onClick, viewMode, onWishlistUpdate, callLogin }: TrainerCardProps) => {
     const [isWishlisted, setIsWishlisted] = useState(trainer.is_wishlisted === 1 || viewMode === "wishlisted");
     const { toastSuccess, toastError } = usePopup();
     const { user } = useUser();
-    const { handleNavigation } = useNavigation();
+    // const { handleNavigation } = useNavigation();
 
     const handleWishlist = async (name: string, is_wishlisted: number) => {
         if (!user.isLoggedIn || user.role === 'guest') {

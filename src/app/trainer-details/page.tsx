@@ -19,7 +19,7 @@ import { useUser } from '@/context/UserContext';
 import Overlay from '@/components/Overlay';
 import { TrainerCardModel } from '@/models/trainerCard.model';
 import TrainerDetailsSkeleton from '@/components/TrainerDetailsSkeleton';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { usePopup } from '@/lib/hooks/usePopup';
 import Popup from '@/components/Popup';
 import { dummyTrainerDetails } from "../content/InitialWorkshops";
@@ -45,7 +45,7 @@ interface WorkshopDetailsData {
 const TrainerDetailsContent = () => {
     const { user, updateCredits } = useUser();
     const searchParams = useSearchParams();
-    const router = useRouter();
+    // const router = useRouter();
 
     // globally
     const [isCompany, setIsCompany] = useState(false);
@@ -114,75 +114,75 @@ const TrainerDetailsContent = () => {
         setTrainerData(dummyTrainerDetails)
     });
 
-    // useEffect(() => {
-    //     const checkOverflow = () => {
-    //         const container = document.querySelector('.workshops-container');
-    //         if (container) {
-    //             setHasOverflow(container.scrollWidth > container.clientWidth);
-    //         }
-    //     };
+    useEffect(() => {
+        const checkOverflow = () => {
+            const container = document.querySelector('.workshops-container');
+            if (container) {
+                setHasOverflow(container.scrollWidth > container.clientWidth);
+            }
+        };
 
-    //     checkOverflow();
-    //     window.addEventListener('resize', checkOverflow);
-    //     return () => window.removeEventListener('resize', checkOverflow);
-    // }, [trainerData]);
+        checkOverflow();
+        window.addEventListener('resize', checkOverflow);
+        return () => window.removeEventListener('resize', checkOverflow);
+    }, [trainerData]);
 
-    // useEffect(() => {
-    //     const fetchTrainerData = async () => {
-    //         try {
-    //             const trainerName = searchParams.get('trainer');
-    //             const userName = getCurrentUserName() || 'guest';
-    //             const userRole = getCurrentUserRole() || 'guest';
+    useEffect(() => {
+        const fetchTrainerData = async () => {
+            try {
+                const trainerName = searchParams.get('trainer');
+                const userName = getCurrentUserName() || 'guest';
+                const userRole = getCurrentUserRole() || 'guest';
 
-    //             if (!trainerName) {
-    //                 showError('Trainer not found');
-    //                 return;
-    //             }
+                if (!trainerName) {
+                    showError('Trainer not found');
+                    return;
+                }
 
-    //             if (userRole === 'Trainer' && userName === trainerName) {
-    //                 setIsLoggedInUser(true);
+                if (userRole === 'Trainer' && userName === trainerName) {
+                    setIsLoggedInUser(true);
 
-    //                 const response = await trainerApis.getTrainerByName(trainerName);
+                    const response = await trainerApis.getTrainerByName(trainerName);
 
-    //                 setTrainerData(response.data);
+                    setTrainerData(response.data);
 
-    //                 if (!response.data) {
-    //                     showError('Failed to fetch trainer details');
-    //                     return;
-    //                 }
-    //             }
-    //             else {
-    //                 const res = await trainerApis.company.getTrainerByName(trainerName, userName);
+                    if (!response.data) {
+                        showError('Failed to fetch trainer details');
+                        return;
+                    }
+                }
+                else {
+                    const res = await trainerApis.company.getTrainerByName(trainerName, userName);
 
-    //                 if (!res || !res.message) {
-    //                     showError('Failed to fetch trainer details');
-    //                     return;
-    //                 }
+                    if (!res || !res.message) {
+                        showError('Failed to fetch trainer details');
+                        return;
+                    }
 
-    //                 setTrainerData(res.message);
+                    setTrainerData(res.message);
 
-    //                 if (res.message.is_unlocked) {
-    //                     setTrainerLocked(false);
+                    if (res.message.is_unlocked) {
+                        setTrainerLocked(false);
 
-    //                 }
-    //                 else {
-    //                     setTrainerLocked(true);
-    //                 }
+                    }
+                    else {
+                        setTrainerLocked(true);
+                    }
 
-    //                 await fetchAllTrainers(userName);
+                    await fetchAllTrainers(userName);
 
-    //             }
+                }
 
-    //         } catch (error) {
-    //             console.error('Error fetching trainer data:', error);
-    //             showError('Trainer Details not found');
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
+            } catch (error) {
+                console.error('Error fetching trainer data:', error);
+                showError('Trainer Details not found');
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    //     fetchTrainerData();
-    // }, [showError, searchParams]);
+        fetchTrainerData();
+    }, [showError, searchParams]);
 
 
 

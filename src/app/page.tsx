@@ -56,31 +56,31 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Update isLoggedIn and isCompany when user context changes
-  // useEffect(() => {
-  //   setIsLoggedIn(user.isLoggedIn);
-  //   setIsCompany(user.role === 'user_role');
-  //   const initializeData = async () => {
-  //     try {
-  //       const userName = user.name;
-  //       showLoader();
-  //       setIsLoading(true);
-  //       await fetchAllTrainers(userName);
+  useEffect(() => {
+    setIsLoggedIn(user.isLoggedIn);
+    setIsCompany(user.role === 'user_role');
+    const initializeData = async () => {
+      try {
+        const userName = user.name;
+        showLoader();
+        setIsLoading(true);
+        await fetchAllTrainers(userName);
 
 
 
-  //       if (user.role === 'user_role') {
-  //         await fetchCompanyTrainers(userName);
-  //       }
-  //     } catch (error) {
-  //       console.error("Failed to initialize data:", error);
-  //     } finally {
-  //       hideLoader();
-  //       setIsLoading(false);
-  //     }
-  //   };
+        if (user.role === 'user_role') {
+          await fetchCompanyTrainers(userName);
+        }
+      } catch (error) {
+        console.error("Failed to initialize data:", error);
+      } finally {
+        hideLoader();
+        setIsLoading(false);
+      }
+    };
 
-  //   initializeData();
-  // }, [user, user.isLoggedIn]);
+    initializeData();
+  }, [user, user.isLoggedIn]);
 
 
   const [searchText, setSearchText] = useState(''); // global search

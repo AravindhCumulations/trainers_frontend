@@ -6,7 +6,6 @@ import Footer from '../../components/Footer';
 import TrainerGrid from '../../components/TrainerGrid';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { trainerApis } from '../../lib/apis/trainer.apis';
-import { categories } from '@/app/content/categories'
 import { getCurrentUserName } from '@/lib/utils/auth.utils'
 import { useLoading } from '@/context/LoadingContext';
 import { TrainerCardModel } from '@/models/trainerCard.model';
@@ -150,41 +149,41 @@ function TrainersPageContent() {
         }
     };
 
-    // useEffect(() => {
-    //     const initializeSearch = async () => {
-    //         try {
-    //             showLoader();
+    useEffect(() => {
+        const initializeSearch = async () => {
+            try {
+                showLoader();
 
-    //             const city = searchParams.get('city') || undefined;
-    //             const searchText = searchParams.get('search_text') || undefined;
+                const city = searchParams.get('city') || undefined;
+                const searchText = searchParams.get('search_text') || undefined;
 
-    //             if (city || searchText) {
-    //                 if (city) setCitySearch(city);
-    //                 if (searchText) setSearchText(searchText);
-    //                 if (searchText || city) {
-    //                     setSearchTitle(`Search Results for${searchText ? ` "${searchText}"` : ''}${city ? ` in "${city}"` : ''}`);
-    //                 }
-    //             }
-    //             await handleSearch(searchText, city, 1, itemsPerPage);
-    //         } catch (error) {
-    //             console.error('Error in initial search:', error);
-    //             setSearchResults([]);
-    //             setSearchTitle('All Trainers');
-    //             setTotalItems(0);
-    //             setCitySearch('');
-    //             setSearchText('');
-    //         }
-    //         finally {
-    //             hideLoader()
-    //         }
-    //     };
+                if (city || searchText) {
+                    if (city) setCitySearch(city);
+                    if (searchText) setSearchText(searchText);
+                    if (searchText || city) {
+                        setSearchTitle(`Search Results for${searchText ? ` "${searchText}"` : ''}${city ? ` in "${city}"` : ''}`);
+                    }
+                }
+                await handleSearch(searchText, city, 1, itemsPerPage);
+            } catch (error) {
+                console.error('Error in initial search:', error);
+                setSearchResults([]);
+                setSearchTitle('All Trainers');
+                setTotalItems(0);
+                setCitySearch('');
+                setSearchText('');
+            }
+            finally {
+                hideLoader()
+            }
+        };
 
-    //     initializeSearch();
-    // }, [searchParams]);
+        initializeSearch();
+    }, [searchParams]);
 
-    // useEffect(() => {
+    useEffect(() => {
 
-    // }, [searchResults]);
+    }, [searchResults]);
 
     return (
         <div className="bg-white min-h-screen flex flex-col">
