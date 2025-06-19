@@ -14,7 +14,6 @@ import { useUser } from '@/context/UserContext';
 import { TrainerCardModel } from '@/models/trainerCard.model';
 import { useTypingEffect } from '@/hooks/useTypingEffect';
 import { expertise_in } from './content/ExpertiseIN';
-import { dummyTrainers } from './content/DummyTrainers';
 import { usePopup } from '@/lib/hooks/usePopup';
 import { useRouter } from 'next/navigation';
 import Popup from '@/components/Popup';
@@ -384,8 +383,7 @@ export default function Home() {
           <section className="section-cont md:px-8 lg:px-4 px-4  trainer-list-section">
             <h2 className="section-title">Discover Our Popular Trainers</h2>
             <TrainerGrid
-              // trainers={trainers}
-              trainers={dummyTrainers}
+              trainers={trainers}
               paginationMode="client"
               paginationConfig={{ page: 1, pageSize: 12 }}
               pageLocked={true}

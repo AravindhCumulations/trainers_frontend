@@ -4,9 +4,9 @@ const nextConfig = {
     images: {
         remotePatterns: [
             {
-                protocol: 'http',
-                hostname: '3.94.205.118',
-                port: '8000',
+                protocol: 'https',
+                hostname: 'trainers.m.frappe.cloud',
+                port: '',
                 pathname: '**/files/**',
             },
         ],
@@ -19,11 +19,11 @@ const nextConfig = {
         return [
             {
                 source: '/api/:path*',
-                destination: 'http://3.94.205.118:8000/api/:path*'
+                destination: 'https://trainers.m.frappe.cloud/api/:path*'
             },
             {
                 source: '/files/:path*',
-                destination: 'http://3.94.205.118:8000/files/:path*'
+                destination: 'https://trainers.m.frappe.cloud/files/:path*'
             }
         ]
     },

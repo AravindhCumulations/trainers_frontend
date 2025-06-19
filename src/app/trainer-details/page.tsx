@@ -22,7 +22,6 @@ import TrainerDetailsSkeleton from '@/components/TrainerDetailsSkeleton';
 import { useSearchParams } from 'next/navigation';
 import { usePopup } from '@/lib/hooks/usePopup';
 import Popup from '@/components/Popup';
-import { dummyTrainerDetails } from "../content/InitialWorkshops";
 
 
 
@@ -57,8 +56,7 @@ const TrainerDetailsContent = () => {
     const [hasOverflow, setHasOverflow] = useState(false);
 
     // page specific
-    // const [isLoggedInUser, setIsLoggedInUser] = useState(false);
-    const [isLoggedInUser, setIsLoggedInUser] = useState(true);
+    const [isLoggedInUser, setIsLoggedInUser] = useState(false);
     const [trainerLocked, setTrainerLocked] = useState(true);
     useEffect(() => {
 
@@ -69,8 +67,7 @@ const TrainerDetailsContent = () => {
     const [trainers, setTrainers] = useState<TrainerCardModel[]>([]);
 
     //utilities
-    // const [loading, setLoading] = useState(true);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const { handleNavigation } = useNavigation();
 
@@ -108,11 +105,6 @@ const TrainerDetailsContent = () => {
         }
     };
 
-    useEffect(() => {
-        console.log("am here at trainer dummy");
-
-        setTrainerData(dummyTrainerDetails)
-    });
 
     useEffect(() => {
         const checkOverflow = () => {
