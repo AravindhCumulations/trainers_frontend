@@ -22,6 +22,7 @@ import TrainerDetailsSkeleton from '@/components/TrainerDetailsSkeleton';
 import { useSearchParams } from 'next/navigation';
 import { usePopup } from '@/lib/hooks/usePopup';
 import Popup from '@/components/Popup';
+import { Workshop } from "@/models/workshop.models";
 
 
 
@@ -29,15 +30,15 @@ interface WorkshopDetailsData {
     idx: string;
     title: string;
     price: number;
-    targetAudience: string;
+    target_audience: string;
     format: string;
     image: string;
     objectives: string;
     outcomes?: string;
     handouts?: string;
-    programFlow?: string;
+    program_flow?: string;
     evaluation?: string;
-    tag: 'Workshop' | 'Case Study';
+    type: 'workshop' | 'Case Study';
 }
 
 // Main Content
@@ -262,31 +263,31 @@ const TrainerDetailsContent = () => {
     const [overlayState, setOverlayState] = useState<{
         isOpen: boolean;
         type: 'details' | 'edit' | 'create' | null;
-        data?: WorkshopDetailsData;
+        data?: Workshop;
     }>({
         isOpen: false,
         type: null
     });
 
-    const handleWorkshopClick = (type: 'details' | 'edit' | 'create', item: any, tag: 'Workshop' | 'Case Study') => {
+    const handleWorkshopClick = (type: 'details' | 'edit' | 'create', item: Workshop, tag: 'Workshop' | 'Case Study') => {
 
         if (!item) {
             showError("Failed to load Data")
         }
         // Map the item to the expected WorkshopDetailsData interface
-        const workshopData: WorkshopDetailsData = {
+        const workshopData: Workshop = {
             idx: item.idx.toString(),
             title: item.title,
             price: item.price,
-            targetAudience: item.target_audience,
+            target_audience: item.target_audience,
             format: item.format,
             image: item.image,
             objectives: item.objectives,
             outcomes: item.outcomes,
             handouts: item.handouts,
-            programFlow: item.program_flow,
+            program_flow: item.program_flow,
             evaluation: item.evaluation,
-            tag: tag// Default to Workshop if tag is not provided
+            type: item.type
         };
         setOverlayState({ isOpen: true, type, data: workshopData });
     };
@@ -353,7 +354,6 @@ const TrainerDetailsContent = () => {
                         <Overlay isOpen={overlayState.isOpen} onClose={() => setOverlayState({ isOpen: false, type: null })}>
                             {overlayState.type === 'details' && overlayState.data && (
                                 <WorkshopDetails
-                                    type={overlayState.data.tag === 'Case Study' ? 'Case Study' : 'Workshop'}
                                     workshop={overlayState.data}
                                     onClose={() => setOverlayState({ isOpen: false, type: null })}
                                 />
@@ -562,7 +562,7 @@ const TrainerDetailsContent = () => {
                                             {isLoggedInUser && (
                                                 <button
                                                     onClick={() => {
-                                                        if (trainerData.workshop.length === 0 && trainerData.casestudy.length === 0) {
+                                                        if (trainerData.workshop.length === 0) {
                                                             handleNavigation(`/workshop?trainer=${user.name}&action=create`);
                                                         } else {
                                                             handleNavigation(`/workshop?trainer=${user.name}`);
@@ -570,7 +570,7 @@ const TrainerDetailsContent = () => {
                                                     }}
                                                     className="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 text-sm sm:text-base"
                                                 >
-                                                    {trainerData.workshop.length === 0 && trainerData.casestudy.length === 0 ? 'Add' : 'View all'}
+                                                    {trainerData.workshop.length === 0 ? 'Add' : 'View all'}
                                                 </button>
                                             )}
                                         </div>
@@ -588,26 +588,7 @@ const TrainerDetailsContent = () => {
                                                 </div>
                                             ) : (
                                                 <>
-                                                    {(trainerData.casestudy || []).map((casestudy) => (
-                                                        <WorkshopCard
-                                                            key={casestudy.idx.toString()}
-                                                            workshop={{
-                                                                idx: casestudy.idx.toString(),
-                                                                title: casestudy.title ?? '',
-                                                                objectives: casestudy.objectives ?? '',
-                                                                price: casestudy.price ?? '',
-                                                                targetAudience: casestudy.target_audience ?? '',
-                                                                format: casestudy.format ?? '',
-                                                                image: casestudy.image ?? '',
-                                                                outcomes: casestudy.outcomes ?? '',
-                                                                handouts: casestudy.handouts ?? '',
-                                                                programFlow: casestudy.program_flow ?? '',
-                                                                evaluation: casestudy.evaluation ?? ''
-                                                            }}
-                                                            onClick={() => handleWorkshopClick('details', casestudy, 'Case Study')}
-                                                            tag="CaseStudy"
-                                                        />
-                                                    ))}
+
                                                     {(trainerData.workshop || []).map((workshop) => (
                                                         <WorkshopCard
                                                             key={workshop.idx.toString()}
@@ -616,13 +597,14 @@ const TrainerDetailsContent = () => {
                                                                 title: workshop.title ?? '',
                                                                 objectives: workshop.objectives ?? '',
                                                                 price: workshop.price ?? '',
-                                                                targetAudience: workshop.target_audience ?? '',
+                                                                target_audience: workshop.target_audience ?? '',
                                                                 format: workshop.format ?? '',
                                                                 image: workshop.image ?? '',
                                                                 outcomes: workshop.outcomes ?? '',
                                                                 handouts: workshop.handouts ?? '',
-                                                                programFlow: workshop.program_flow ?? '',
-                                                                evaluation: workshop.evaluation ?? ''
+                                                                program_flow: workshop.program_flow ?? '',
+                                                                evaluation: workshop.evaluation ?? '',
+                                                                type: workshop.type
                                                             }}
                                                             onClick={() => handleWorkshopClick('details', workshop, 'Workshop')}
                                                             tag="Workshop"

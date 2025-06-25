@@ -1,3 +1,5 @@
+import { Workshop } from "./workshop.models";
+
 export interface Education {
     course: string;
     institution: string;
@@ -26,21 +28,7 @@ export interface Review {
 
 }
 
-export interface Workshop {
 
-    idx: number,
-    title: string,
-    objectives: string,
-    price: number,
-    target_audience: string,
-    format: string,
-    image: string,
-    outcomes: string;
-    handouts: string;
-    program_flow: string;
-    evaluation: string;
-
-}
 
 export interface CaseStudy {
 

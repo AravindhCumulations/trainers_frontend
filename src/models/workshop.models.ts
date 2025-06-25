@@ -1,16 +1,16 @@
 export interface Workshop {
     idx: string;
     title: string;
+    objectives: string,
     price: number;
-    targetAudience: string;
+    target_audience: string;
     format: string;
     image: string;
-    objectives: string;
     outcomes: string;
     handouts: string;
-    programFlow: string;
+    program_flow: string;
     evaluation: string;
-    isCaseStudy?: boolean;
+    type: 'Workshop' | 'CaseStudy';
 }
 
 export class WorkshopModel {
@@ -30,13 +30,13 @@ export class WorkshopModel {
         if (!this.data.price) {
             return 'Price is required';
         }
-        if (!this.data.targetAudience) {
+        if (!this.data.target_audience) {
             return 'Target audience is required';
         }
         if (!this.data.format) {
             return 'Format is required';
         }
-        if (!this.data.isCaseStudy) {
+        if (!this.data.type) {
             return 'Type is required';
         }
         if (!this.data.outcomes) {
@@ -45,8 +45,8 @@ export class WorkshopModel {
         if (!this.data.handouts) {
             return 'Handouts is required';
         }
-        if (!this.data.programFlow) {
-            return 'ProgramFlow is required';
+        if (!this.data.program_flow) {
+            return 'program_flow is required';
         }
         if (!this.data.evaluation) {
             return 'Evaluation is required';
@@ -63,15 +63,15 @@ export class WorkshopModel {
             idx: this.data.idx || Date.now().toString(),
             title: this.data.title,
             price: this.data.price,
-            targetAudience: this.data.targetAudience,
+            target_audience: this.data.target_audience,
             format: this.data.format as 'virtual' | 'In-Person',
             image: this.data.image,
             objectives: this.data.objectives,
             outcomes: this.data.outcomes || '',
             handouts: this.data.handouts || '',
-            programFlow: this.data.programFlow || '',
+            program_flow: this.data.program_flow || '',
             evaluation: this.data.evaluation || '',
-            isCaseStudy: false
+            type: this.data.type
         };
     }
 } 

@@ -22,7 +22,6 @@ import { initialWorkshops } from '../content/InitialWorkshops';
 
 export default function WorkshopsPage() {
     const [workshops, setWorkshops] = useState<Workshop[]>([]);
-    const [caseStudies, setCaseStudies] = useState<Workshop[]>([]);
     const { toastSuccess, toastError, showConfirmation, popupState, hidePopup } = usePopup();
     const { user } = useUser();
 
@@ -48,39 +47,24 @@ export default function WorkshopsPage() {
 
             const trainerData: TrainerDetailsModel = response.data;
 
-            // Separate workshops and case studies
-            const workshopList: Workshop[] = trainerData.workshop.map(w => ({
-                idx: w.idx.toString(),
-                title: w.title,
-                objectives: w.objectives || '',
-                price: w.price,
-                targetAudience: w.target_audience,
-                format: w.format as 'virtual' | 'In-Person',
-                image: w.image,
-                outcomes: w.outcomes || '',
-                handouts: w.handouts || '',
-                programFlow: w.program_flow || '',
-                evaluation: w.evaluation || '',
-                isCaseStudy: false
-            }));
+            // Map API fields to Workshop model fields and ensure 'type' is set
+            const allWorkshops: Workshop[] = trainerData.workshop.map(w => (
+                {
+                    idx: w.idx.toString(),
+                    title: w.title,
+                    objectives: w.objectives || '',
+                    price: w.price,
+                    target_audience: w.target_audience,
+                    format: w.format as 'virtual' | 'In-Person',
+                    image: w.image,
+                    outcomes: w.outcomes || '',
+                    handouts: w.handouts || '',
+                    program_flow: w.program_flow || '',
+                    evaluation: w.evaluation || '',
+                    type: (w as any).type || 'Workshop',
+                }));
 
-            const caseStudyList: Workshop[] = trainerData.casestudy.map(c => ({
-                idx: `case_${c.idx}`,
-                title: c.title,
-                objectives: c.objectives || '',
-                price: c.price,
-                targetAudience: c.target_audience,
-                format: c.format as 'virtual' | 'In-Person',
-                image: c.image,
-                outcomes: c.outcomes || '',
-                handouts: c.handouts || '',
-                programFlow: c.program_flow || '',
-                evaluation: c.evaluation || '',
-                isCaseStudy: true
-            }));
-
-            setWorkshops(workshopList);
-            setCaseStudies(caseStudyList);
+            setWorkshops(allWorkshops);
         } catch (error) {
             console.error('Error fetching workshops:', error);
             toastError('Failed to fetch workshops and case studies');
@@ -99,16 +83,9 @@ export default function WorkshopsPage() {
         }
     }, []);
 
-    // handles
-    useEffect(() => {
-        setWorkshops(initialWorkshops)
-        setCaseStudies(initialWorkshops)
-    })
-
-
-    const handleDeleteWorkshop = async (idx: string, isCaseStudy: boolean = false) => {
+    const handleDeleteWorkshop = async (idx: string) => {
         try {
-            console.log('Starting delete operation:', { idx, isCaseStudy });
+            console.log('Starting delete operation:', { idx });
 
             const searchParams = new URLSearchParams(window.location.search);
             const trainerName = searchParams.get('trainer');
@@ -120,49 +97,45 @@ export default function WorkshopsPage() {
             const trainerId = trainerResponse.data.name;
             console.log('Retrieved trainer ID:', trainerId);
 
-            const { workshops: updatedWorkshops, caseStudies: updatedCaseStudies } =
-                deleteWorkshop(workshops, caseStudies, idx, isCaseStudy);
-            console.log('Updated state after deletion:', { updatedWorkshops, updatedCaseStudies });
+            const updatedWorkshops = deleteWorkshop(workshops, idx);
+            console.log('Updated state after deletion:', { updatedWorkshops });
 
-            const payload = constructWorkshopPayload(updatedWorkshops, updatedCaseStudies, trainerId, isCaseStudy);
+            const payload = constructWorkshopPayload(updatedWorkshops, trainerId);
             console.log('Sending delete payload to API:', payload);
 
             // Make API call to update trainer with the modified list
             await trainerApis.trainerForm.editFormData(payload);
             console.log('Delete API call successful');
 
-            // Update local state
-            if (isCaseStudy) {
-                setCaseStudies(updatedCaseStudies);
-            } else {
-                setWorkshops(updatedWorkshops);
-            }
+            // // Update local state
+            setWorkshops(updatedWorkshops);
             console.log('Local state updated after deletion');
 
-            toastSuccess(`${isCaseStudy ? 'Case study' : 'Workshop'} deleted successfully`);
+            toastSuccess(`${workshops.find(w => w.idx === idx)?.type === 'Workshop' ? 'Workshop' : 'Casestudy'} deleted successfully`);
         } catch (error) {
-            console.error(`Error deleting ${isCaseStudy ? 'case study' : 'workshop'}:`, error);
-            toastError(`Failed to delete ${isCaseStudy ? 'case study' : 'workshop'}`);
+            console.error(`Error deleting workshop:`, error);
+            toastError(`Failed to delete workshop/case study`);
         }
     };
 
-    const handleEditClick = (item: Workshop, e: React.MouseEvent, isCaseStudy: boolean = false) => {
+    const handleEditClick = (item: any, e: React.MouseEvent) => {
         e.stopPropagation(); // Prevent card click event
+
+        console.log("Check your item here", item);
+
         setOverlayState({
             isOpen: true,
             type: 'edit',
-            data: {
-                ...item,
-                isCaseStudy
-            }
+            data: item
         });
     };
 
-    const handleDeleteClick = (idx: string, e: React.MouseEvent, isCaseStudy: boolean = false) => {
+    const handleDeleteClick = (idx: string, e: React.MouseEvent) => {
         e.stopPropagation(); // Prevent card click event
+        const item = workshops.find(w => w.idx === idx);
         showConfirmation(
-            `Are you sure you want to delete this ${isCaseStudy ? 'case study' : 'workshop'}?`,
-            () => handleDeleteWorkshop(idx, isCaseStudy),
+            `Are you sure you want to delete this ${item?.type === 'Workshop' ? 'Workshop' : 'Casestudy'}?`,
+            () => handleDeleteWorkshop(idx),
             {
                 confirmText: 'Delete',
                 cancelText: 'Cancel'
@@ -170,9 +143,9 @@ export default function WorkshopsPage() {
         );
     };
 
-    const handleWorkshopUpdate = async (workshopData: Workshop, isCreate: boolean, isCaseStudy: boolean) => {
+    const handleWorkshopUpdate = async (workshopData: Workshop, isCreate: boolean) => {
         try {
-            console.log('Starting workshop update operation:', { workshopData, isCreate, isCaseStudy });
+            console.log('Starting workshop update operation:', { workshopData, isCreate });
 
             const searchParams = new URLSearchParams(window.location.search);
             const trainerName = searchParams.get('trainer');
@@ -180,30 +153,21 @@ export default function WorkshopsPage() {
                 throw new Error('Trainer name not found in URL');
             }
 
-            // const trainerResponse = await trainerApis.getTrainerByName(trainerName);
-            // const trainerId = trainerResponse.data.name;
-            // console.log('Retrieved trainer ID:', trainerId);
-
             const trainerId = user.name;
 
-
-            let updatedWorkshops, updatedCaseStudies;
+            let updatedWorkshops;
 
             if (isCreate) {
                 console.log('Creating new item');
-                const result = addWorkshop(workshops, caseStudies, workshopData, isCaseStudy);
-                updatedWorkshops = result.workshops;
-                updatedCaseStudies = result.caseStudies;
+                updatedWorkshops = addWorkshop(workshops, workshopData);
             } else {
                 console.log('Updating existing item');
-                const result = updateWorkshop(workshops, caseStudies, workshopData, isCaseStudy);
-                updatedWorkshops = result.workshops;
-                updatedCaseStudies = result.caseStudies;
+                updatedWorkshops = updateWorkshop(workshops, workshopData);
             }
 
-            console.log('Updated state:', { updatedWorkshops, updatedCaseStudies });
+            console.log('Updated state:', { updatedWorkshops });
 
-            const payload = constructWorkshopPayload(updatedWorkshops, updatedCaseStudies, trainerId, isCaseStudy);
+            const payload = constructWorkshopPayload(updatedWorkshops, trainerId);
             console.log('Sending payload to API:', payload);
 
             // Make API call to update trainer with the modified list
@@ -216,23 +180,25 @@ export default function WorkshopsPage() {
 
             // Show appropriate success message
             const action = isCreate ? 'created' : 'updated';
-            const type = isCaseStudy ? 'Case study' : 'Workshop';
+            const type = workshopData.type === 'Workshop' ? 'Workshop' : 'Casestudy';
             toastSuccess(`${type} ${action} successfully`);
 
             setOverlayState({ isOpen: false, type: null });
         } catch (error) {
-            console.error(`Error ${isCreate ? 'creating' : 'updating'} ${isCaseStudy ? 'case study' : 'workshop'}:`, error);
-            toastError(`Failed to ${isCreate ? 'create' : 'update'} ${isCaseStudy ? 'case study' : 'workshop'}. Please try again.`);
+            console.error(`Error ${isCreate ? 'creating' : 'updating'} workshop:`, error);
+            toastError(`Failed to ${isCreate ? 'create' : 'update'} workshop/case study. Please try again.`);
         }
     };
 
-    const renderCard = (item: Workshop, isCaseStudy: boolean = false) => {
+    const renderCard = (item: Workshop) => {
+
+        console.log("i->", item);
+
         // Safely check if item and idx exist
         if (!item || !item.idx) {
             console.error('Invalid item data:', item);
             return null;
         }
-
         return (
             <motion.div
                 key={item.idx}
@@ -250,13 +216,13 @@ export default function WorkshopsPage() {
                     />
                     <div className="absolute top-2 right-2 flex gap-1 sm:gap-2">
                         <button
-                            onClick={(e) => handleEditClick(item, e, isCaseStudy)}
+                            onClick={(e) => handleEditClick(item, e)}
                             className="bg-blue-500 text-white p-1.5 sm:p-2 rounded-full hover:bg-blue-600 transition"
                         >
                             <Edit size={14} className="sm:w-4 sm:h-4" />
                         </button>
                         <button
-                            onClick={(e) => handleDeleteClick(item.idx, e, isCaseStudy)}
+                            onClick={(e) => handleDeleteClick(item.idx, e)}
                             className="bg-red-500 text-white p-1.5 sm:p-2 rounded-full hover:bg-red-600 transition"
                         >
                             <Trash2 size={14} className="sm:w-4 sm:h-4" />
@@ -270,13 +236,12 @@ export default function WorkshopsPage() {
                     </span>
                     <div className="flex justify-between items-start mb-2">
                         <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold line-clamp-2">{item.title}</h2>
-
                     </div>
                     <p className="text-gray-600 mb-3 sm:mb-4 flex-grow line-clamp-3 text-sm sm:text-base">{item.objectives}</p>
                     <div className="flex flex-col justify-end items-start gap-2 mt-auto">
                         <div className="flex flex-wrap gap-1 sm:gap-2">
                             <span className="text-xs sm:text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded-md">
-                                {isCaseStudy ? 'Case Study' : 'Workshop'}
+                                {item.type ? 'Workshop' : 'Casestudy'}
                             </span>
                         </div>
                         <span className="text-green-600 font-bold text-sm sm:text-base">₹ {item.price}/hour</span>
@@ -337,14 +302,11 @@ export default function WorkshopsPage() {
                     {/* Combined Workshops and Case Studies Section */}
                     <div className="mb-8 sm:mb-12">
                         <div className="workshop-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                            {[...workshops, ...caseStudies].map((item) => {
-                                const isCaseStudy = item?.idx?.startsWith('case_') || false;
-                                return renderCard(item, isCaseStudy);
-                            })}
+                            {workshops.map((item) => renderCard(item))}
                         </div>
                     </div>
 
-                    {workshops.length === 0 && caseStudies.length === 0 && (
+                    {workshops.length === 0 && (
                         <div className="text-center py-8 sm:py-12">
                             <p className="text-gray-500 text-sm sm:text-base">Add workshop or case study to display</p>
                         </div>
@@ -357,7 +319,6 @@ export default function WorkshopsPage() {
                     >
                         {overlayState.type === 'details' && overlayState.data && (
                             <WorkshopDetails
-                                type={overlayState.data.isCaseStudy ? 'Case Study' : 'Workshop'}
                                 workshop={overlayState.data}
                                 onClose={() => setOverlayState({ isOpen: false, type: null })}
                             />
@@ -368,7 +329,7 @@ export default function WorkshopsPage() {
                                     onClose={() => setOverlayState({ isOpen: false, type: null })}
                                     initialData={overlayState.data}
                                     mode="edit"
-                                    onUpdate={(workshopData) => handleWorkshopUpdate(workshopData, false, workshopData.isCaseStudy ?? false)}
+                                    onUpdate={(workshopData) => handleWorkshopUpdate(workshopData, false)}
                                 />
                             </div>
                         )}
@@ -377,7 +338,7 @@ export default function WorkshopsPage() {
                                 <EditWorkshop
                                     onClose={() => setOverlayState({ isOpen: false, type: null })}
                                     mode="create"
-                                    onUpdate={(workshopData) => handleWorkshopUpdate(workshopData, true, workshopData.isCaseStudy ?? false)}
+                                    onUpdate={(workshopData) => handleWorkshopUpdate(workshopData, true)}
                                 />
                             </div>
                         )}

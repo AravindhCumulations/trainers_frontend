@@ -5,41 +5,16 @@ import { useLoading } from '@/context/LoadingContext';
 import { usePopup } from '@/lib/hooks/usePopup';
 import { trainerApis } from '@/lib/apis/trainer.apis';
 import { TextField, Chip } from '@mui/material';
+import { Workshop, } from '@/models/workshop.models';
 
 interface EditWorkshopProps {
     onClose: () => void;
-    initialData?: {
-        idx: string;
-        title: string;
-        objectives: string;
-        price: number;
-        targetAudience: string;
-        format: string;
-        image: string;
-        outcomes?: string;
-        handouts?: string;
-        programFlow?: string;
-        evaluation?: string;
-        isCaseStudy?: boolean;
-    };
+    initialData?: Workshop
     mode: 'create' | 'edit';
     onUpdate?: (updatedWorkshop: any) => void;
 }
 
-interface WorkshopForm {
-    title: string,
-    objectives: string,
-    targetAudience: string,
-    format: string,
-    outcomes: string,
-    handouts: string,
-    programFlow: string,
-    evaluation: string,
-    price: number,
-    image: string,
-    isCaseStudy: boolean,
 
-}
 
 const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpdate }) => {
     const { showLoader, hideLoader } = useLoading();
@@ -47,18 +22,25 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
     const [errors, setErrors] = useState<string[]>([]);
     const errorContainerRef = useRef<HTMLDivElement>(null);
 
+
+    console.log("its here");
+
+    console.log(initialData);
+
+
     const initialFormData = {
+        idx: initialData?.idx ?? '',
         title: initialData?.title ?? '',
         objectives: initialData?.objectives ?? '',
-        targetAudience: initialData?.targetAudience ?? '',
+        target_audience: initialData?.target_audience ?? '',
         format: initialData?.format ?? 'In-Person',
         outcomes: initialData?.outcomes ?? '',
         handouts: initialData?.handouts ?? '',
-        programFlow: initialData?.programFlow ?? '',
+        program_flow: initialData?.program_flow ?? '',
         evaluation: initialData?.evaluation ?? '',
         price: initialData?.price ?? 0,
         image: initialData?.image ?? '',
-        isCaseStudy: initialData?.isCaseStudy ?? false
+        type: initialData?.type ?? 'Workshop'
     };
 
     const [formData, setFormData] = useState(initialFormData);
@@ -155,19 +137,24 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
     // Update form data when initialData changes
     useEffect(() => {
         if (initialData) {
+            const normalizedType: 'Workshop' | 'CaseStudy' =
+                initialData.type?.toLowerCase() === 'casestudy'
+                    ? 'CaseStudy'
+                    : 'Workshop';
             // Ensure HTML content is properly handled for QuillEditor fields
             const newInitialData = {
+                idx: initialData.idx,
                 title: initialData.title ?? '',
                 objectives: initialData.objectives ?? '',
-                targetAudience: initialData.targetAudience ?? '',
+                target_audience: initialData.target_audience ?? '',
                 format: initialData.format ?? 'In-Person',
                 outcomes: initialData.outcomes ?? '',
                 handouts: initialData.handouts ?? '',
-                programFlow: initialData.programFlow ?? '',
+                program_flow: initialData.program_flow ?? '',
                 evaluation: initialData.evaluation ?? '',
                 price: initialData.price ?? 0,
                 image: initialData.image ?? '',
-                isCaseStudy: initialData.isCaseStudy ?? false
+                type: normalizedType
             };
 
             // Set the form data
@@ -187,8 +174,8 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
         ...initialData,
         ...modifiedFields,
         image: imageUrl,
-        isCaseStudy: formData.isCaseStudy,
-        format: formData.format
+        format: formData.format,
+        type: formData.type
     });
 
     const getImageUrl = async (currentImage: string, selectedImage: File | null): Promise<string> => {
@@ -196,7 +183,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
         const uploadResponse = await trainerApis.fileUpload.uploadProfilePicture(selectedImage);
         return uploadResponse.message.file_url;
     };
-    const validateFormData = (formData: WorkshopForm, imagePreview: string | null, isEditMode: boolean): string[] => {
+    const validateFormData = (formData: Workshop, imagePreview: string | null, isEditMode: boolean): string[] => {
         const errors: string[] = [];
 
         const check = (condition: boolean, message: string) => {
@@ -207,13 +194,13 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
         check(!formData.objectives.trim(), 'Objectives is Required');
         check(formData.objectives.length > MAX_CHAR_LIMIT, 'Objectives should be less than 300 characters');
         check(formData.price <= 0, 'Price should be greater than 0');
-        check(!formData.targetAudience.trim(), 'Target Audience is Required');
+        check(!formData.target_audience.trim(), 'Target Audience is Required');
         check(!formData.outcomes.trim(), 'Outcomes is Required');
         check(formData.outcomes.length > MAX_CHAR_LIMIT, 'Outcomes should be less than 300 characters');
         check(!formData.handouts.trim(), 'Handouts is Required');
         check(formData.handouts.length > MAX_CHAR_LIMIT, 'Handouts should be less than 300 characters');
-        check(!formData.programFlow.trim(), 'Program Flow is Required');
-        check(getTextLength(formData.programFlow) > MAX_CHAR_LIMIT, 'Program Flow should be less than 300 characters');
+        check(!formData.program_flow.trim(), 'Program Flow is Required');
+        check(getTextLength(formData.program_flow) > MAX_CHAR_LIMIT, 'Program Flow should be less than 300 characters');
         check(!formData.evaluation.trim(), 'Evaluation is Required');
         check(formData.evaluation.length > MAX_CHAR_LIMIT, 'Evaluation should be less than 300 characters');
         check(!imagePreview && !isEditMode, 'Image is Required');
@@ -246,6 +233,10 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
             const imageUrl = await getImageUrl(formData.image, selectedImage);
 
             const updateData = prepareUpdateData(initialData, modifiedFields, formData, imageUrl);
+
+
+            console.log(updateData);
+
 
             if (onUpdate) onUpdate(updateData);
             onClose();
@@ -365,15 +356,15 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                         <div className="flex flex-col gap-2">
                             <p className="text-sm sm:text-base font-normal text-blue-700">Target Audience</p>
                             <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
-                                {formData.targetAudience.split(',').map((audience, index) => (
+                                {formData.target_audience.split(',').map((audience, index) => (
                                     audience.trim() && (
                                         <Chip
                                             key={index}
                                             label={audience.trim()}
                                             onDelete={() => {
-                                                const audiences = formData.targetAudience.split(',').map(a => a.trim());
+                                                const audiences = formData.target_audience.split(',').map(a => a.trim());
                                                 audiences.splice(index, 1);
-                                                handleChange('targetAudience', audiences.join(', '));
+                                                handleChange('target_audience', audiences.join(', '));
                                             }}
                                             className="bg-blue-100 text-blue-800 text-xs sm:text-sm"
                                         />
@@ -392,10 +383,10 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                                         const audience = input.value.trim();
 
                                         if (audience) {
-                                            const currentAudiences = formData.targetAudience ? formData.targetAudience.split(',').map(a => a.trim()) : [];
+                                            const currentAudiences = formData.target_audience ? formData.target_audience.split(',').map(a => a.trim()) : [];
                                             if (!currentAudiences.includes(audience)) {
                                                 const newAudiences = [...currentAudiences, audience];
-                                                handleChange('targetAudience', newAudiences.join(', '));
+                                                handleChange('target_audience', newAudiences.join(', '));
                                             }
                                             input.value = '';
                                         }
@@ -427,11 +418,11 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                             <p className="text-sm sm:text-base font-normal text-blue-700">Program Flow</p>
                             <div className="relative">
                                 <QuillEditor
-                                    value={formData.programFlow}
-                                    onChange={(val) => handleQuillChange('programFlow', val)}
+                                    value={formData.program_flow}
+                                    onChange={(val) => handleQuillChange('program_flow', val)}
                                 />
                                 <span className="absolute bottom-2 right-2 text-xs sm:text-sm text-gray-500">
-                                    {getTextLength(formData.programFlow)}/{MAX_CHAR_LIMIT}
+                                    {getTextLength(formData.program_flow)}/{MAX_CHAR_LIMIT}
                                 </span>
                             </div>
                         </div>
@@ -520,8 +511,8 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                                         type="radio"
                                         id="workshop"
                                         name="type"
-                                        checked={!formData.isCaseStudy}
-                                        onChange={() => handleChange('isCaseStudy', false)}
+                                        checked={formData.type === 'Workshop'}
+                                        onChange={() => handleChange('type', 'Workshop')}
                                         disabled={isEditMode}
                                         className={`w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 ${isEditMode ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     />
@@ -532,8 +523,8 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                                         type="radio"
                                         id="case-study"
                                         name="type"
-                                        checked={formData.isCaseStudy}
-                                        onChange={() => handleChange('isCaseStudy', true)}
+                                        checked={formData.type === 'CaseStudy'}
+                                        onChange={() => handleChange('type', 'CaseStudy')}
                                         disabled={isEditMode}
                                         className={`w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 ${isEditMode ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     />

@@ -1,30 +1,16 @@
 import React from 'react';
 import Image from 'next/image';
 import parse from 'html-react-parser';
+import { Workshop } from '@/models/workshop.models';
 
-type ContentType = 'Workshop' | 'Case Study';
 
 interface WorkshopDetailsProps {
-    type: ContentType;
-    workshop: {
-        idx: string;
-        title: string;
-        price: number;
-        targetAudience: string;
-        format: string;
-        image: string;
-        objectives: string;
-        outcomes?: string;
-        handouts?: string;
-        programFlow?: string;
-        evaluation?: string;
-    };
+    workshop: Workshop
     onClose: () => void;
 }
 
-const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ type, workshop, onClose }) => {
+const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose }) => {
 
-    console.log(type);
 
 
     return (
@@ -59,7 +45,7 @@ const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ type, workshop, onClo
             {/* Tags */}
             <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <span className="bg-blue-100 text-blue-800 px-2 sm:px-4 py-1 text-xs sm:text-sm rounded-full">
-                    👥 {workshop.targetAudience}
+                    👥 {workshop.target_audience}
                 </span>
                 <span className="bg-green-100 text-green-800 px-2 sm:px-4 py-1 text-xs sm:text-sm rounded-full">
                     💻 {workshop.format}
@@ -68,7 +54,7 @@ const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ type, workshop, onClo
                     💰 ₹{workshop.price}
                 </span>
                 <span className="bg-orange-100 text-yellow-800 px-2 sm:px-4 py-1 text-xs sm:text-sm rounded-full">
-                    {type === "Workshop" ? "🛠 Workshop" : "📘 Case Study"}
+                    {workshop.type === "Workshop" ? "🛠 Workshop" : "📘 Case Study"}
                 </span>
 
             </div>
@@ -98,7 +84,7 @@ const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ type, workshop, onClo
                     <div>
                         <p className="font-semibold text-gray-800 text-sm sm:text-base mb-1 sm:mb-2">🧠 Program Flow</p>
                         <div className="template-container program-flow-list text-xs sm:text-sm">
-                            {parse(workshop.programFlow || '')}
+                            {parse(workshop.program_flow || '')}
                         </div>
                     </div>
                     <div>

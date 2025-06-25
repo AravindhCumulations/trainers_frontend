@@ -6,7 +6,7 @@ export const initialWorkshops: Workshop[] = [
         idx: '1',
         title: 'Fitness Fundamentals',
         price: 99.99,
-        targetAudience: 'Beginners',
+        target_audience: 'Beginners',
         format: 'Virtual',
         image: '/assets/w1.jpg',
 
@@ -14,7 +14,7 @@ export const initialWorkshops: Workshop[] = [
         outcomes: 'Participants will gain a strong understanding of workout basics, improved posture, and a personalized beginner routine.',
         handouts: 'Beginner workout guide PDF, Nutrition basics cheat sheet, Weekly planner template.',
         evaluation: 'Pre- and post-session self-assessment, interactive quiz, and live Q&A participation.',
-        programFlow: `
+        program_flow: `
           1. Welcome and Introduction
           2. Understanding Fitness & Goal Setting
           3. Basic Movement Patterns (with live demos)
@@ -29,14 +29,14 @@ export const initialWorkshops: Workshop[] = [
         title: 'Advanced Nutrition Masterclass',
 
         price: 149.99,
-        targetAudience: 'Intermediate',
+        target_audience: 'Intermediate',
         format: 'In-Person',
         image: '/assets/w2.jpg',
         objectives: 'dsometing ',
         outcomes: 'dsometing ',
         handouts: 'dsometing ',
         evaluation: 'dsometing ',
-        programFlow: 'dsomething',
+        program_flow: 'dsomething',
 
 
     },
@@ -45,28 +45,28 @@ export const initialWorkshops: Workshop[] = [
         title: 'Mental Wellness Workshop',
 
         price: 129.99,
-        targetAudience: 'All Levels',
+        target_audience: 'All Levels',
         format: 'virtual',
         image: '/assets/w3.jpg',
         objectives: 'dsometing ',
         outcomes: 'dsometing ',
         handouts: 'dsometing ',
         evaluation: 'dsometing ',
-        programFlow: 'dsomething',
+        program_flow: 'dsomething',
     },
     {
         idx: '4',
         title: 'High-Intensity Training Program',
 
         price: 199.99,
-        targetAudience: 'Advanced',
+        target_audience: 'Advanced',
         format: 'In-Person',
         image: '/assets/w2.jpg',
         objectives: 'dsometing ',
         outcomes: 'dsometing ',
         handouts: 'dsometing ',
         evaluation: 'dsometing ',
-        programFlow: 'dsomething',
+        program_flow: 'dsomething',
 
 
     }
