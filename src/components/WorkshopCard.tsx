@@ -5,10 +5,9 @@ import { Workshop } from "@/models/workshop.models";
 interface WorkshopCardProps {
     workshop: Workshop;
     onClick: () => void;
-    tag: string;
 }
 
-const WorkshopCard = ({ workshop, onClick, tag = "workshop" }: WorkshopCardProps) => {
+const WorkshopCard = ({ workshop, onClick }: WorkshopCardProps) => {
     // Determine appropriate dimensions and text sizes based on isSmall prop
     const cardClasses = `bg-white border-2 rounded-lg shadow-lg overflow-hidden max-w-lg cursor-pointer h-[19rem] min-w-[20rem] w-[20rem] flex flex-col`;
     const imageClasses = `relative h-32 flex-shrink-0`;
@@ -49,7 +48,7 @@ const WorkshopCard = ({ workshop, onClick, tag = "workshop" }: WorkshopCardProps
                         ₹ {workshop.price.toFixed(0)}/hour
                     </span>
                     <div className=" bg-blue-100 px-2 py-1 rounded-md shadow-sm ">
-                        <p className="text-semibold text-sm text-blue-600">{tag}</p>
+                        <p className="text-semibold text-sm text-blue-600">{workshop.type}</p>
                     </div>
 
                 </div>

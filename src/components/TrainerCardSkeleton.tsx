@@ -2,12 +2,11 @@ import React from 'react';
 
 const TrainerCardSkeleton = () => {
     return (
-        <div className="trainer-card-cont">
+        <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 shadow-sm px-3 sm:px-4 lg:px-6 py-3 sm:py-4 flex flex-col items-center w-full h-auto min-h-[320px] sm:min-h-[360px] lg:min-h-[385px] trainer-card">
             {/* Trainer image skeleton */}
-            <div className="trainer-card-image animate-pulse">
+            <div className="rounded-xl sm:rounded-2xl overflow-hidden mb-2 sm:mb-3 flex items-center justify-center bg-gray-100 relative h-32 sm:h-40 lg:h-48 w-full animate-pulse">
                 <div className="w-full h-full bg-gray-200" />
             </div>
-
             {/* Trainer info skeleton */}
             <div className="text-left w-full min-w-[193px] flex-grow">
                 <div className="h-4 sm:h-5 lg:h-[18px] w-3/4 bg-gray-200 rounded animate-pulse mb-1 sm:mb-2" />

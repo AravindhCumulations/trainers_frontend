@@ -25,34 +25,11 @@ import Popup from '@/components/Popup';
 import { Workshop } from "@/models/workshop.models";
 
 
-
-interface WorkshopDetailsData {
-    idx: string;
-    title: string;
-    price: number;
-    target_audience: string;
-    format: string;
-    image: string;
-    objectives: string;
-    outcomes?: string;
-    handouts?: string;
-    program_flow?: string;
-    evaluation?: string;
-    type: 'workshop' | 'Case Study';
-}
-
 // Main Content
 const TrainerDetailsContent = () => {
     const { user, updateCredits } = useUser();
     const searchParams = useSearchParams();
     // const router = useRouter();
-
-    // globally
-    const [isCompany, setIsCompany] = useState(false);
-
-    useEffect(() => {
-        setIsCompany(user.role === 'user_role');
-    });
 
 
     const [hasOverflow, setHasOverflow] = useState(false);
@@ -269,7 +246,7 @@ const TrainerDetailsContent = () => {
         type: null
     });
 
-    const handleWorkshopClick = (type: 'details' | 'edit' | 'create', item: Workshop, tag: 'Workshop' | 'Case Study') => {
+    const handleWorkshopClick = (type: 'details' | 'edit' | 'create', item: Workshop) => {
 
         if (!item) {
             showError("Failed to load Data")
@@ -606,8 +583,7 @@ const TrainerDetailsContent = () => {
                                                                 evaluation: workshop.evaluation ?? '',
                                                                 type: workshop.type
                                                             }}
-                                                            onClick={() => handleWorkshopClick('details', workshop, 'Workshop')}
-                                                            tag="Workshop"
+                                                            onClick={() => handleWorkshopClick('details', workshop)}
                                                         />
                                                     ))}
                                                 </>

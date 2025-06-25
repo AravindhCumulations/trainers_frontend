@@ -51,13 +51,11 @@ export default function Home() {
 
 
   // helper variables
-  const [isCompany, setIsCompany] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Update isLoggedIn and isCompany when user context changes
   useEffect(() => {
     setIsLoggedIn(user.isLoggedIn);
-    setIsCompany(user.role === 'user_role');
     const initializeData = async () => {
       try {
         const userName = user.email;

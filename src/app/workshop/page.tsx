@@ -16,7 +16,6 @@ import { usePopup } from '@/lib/hooks/usePopup';
 import Popup from '@/components/Popup';
 import { useUser } from '@/context/UserContext'
 import { constructWorkshopPayload, addWorkshop, updateWorkshop, deleteWorkshop } from './workshop.helpers';
-import { initialWorkshops } from '../content/InitialWorkshops';
 
 
 
