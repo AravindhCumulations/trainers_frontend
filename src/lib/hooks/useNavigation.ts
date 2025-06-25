@@ -14,16 +14,19 @@ export const useNavigation = () => {
         const fullPath = `${page}${query}`;
 
         try {
-            // Always use window.location.href for auth-related pages to ensure middleware runs
-            if (page === '/' || page === '/login' || page === '/signup' || page === '/trainer-details' || page === '/trainer-form') {
+            // Only use window.location.href for auth-related pages to ensure middleware runs
+            if (page === '/login' || page === '/signup') {
                 window.location.href = fullPath;
                 return;
             }
 
-            // For other pages, use client-side navigation
+            // For all other pages, use client-side navigation
             if (currentPath === page) {
-                // If on same page, do a hard refresh to ensure fresh state
-                window.location.href = fullPath;
+                // If on same page, do nothing or optionally refresh data (no hard reload)
+                // Optionally, you could add logic to refresh data here if needed
+                // For now, do nothing
+                loading.hideLoader();
+                return;
             } else {
                 await router.push(fullPath);
             }

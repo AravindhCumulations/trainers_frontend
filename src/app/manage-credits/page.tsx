@@ -91,7 +91,12 @@ const ManageCredits = () => {
 
                         if (verifyRes.message.status === 'success') {
                             console.log("Payment verified and credits updated:", verifyRes.message.credits);
-                            updateCredits()
+                            try {
+                                await updateCredits(); // Handle this separately
+                            } catch (creditUpdateErr) {
+                                console.error("Failed to update credits:", creditUpdateErr);
+                                toastError("Failed to update your credits.");
+                            }
                             toastSuccess(`Successfully purchased ${buyAmount} credits!`);
                         } else {
                             alert("Failed to update credits.");

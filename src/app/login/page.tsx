@@ -61,7 +61,7 @@ export default function LoginPage() {
                     email: data.user_details.email,
                     role: data.user_details.role_user === "Trainer" ? "Trainer" : "user_role",
                     profilePic: '',
-                    isLoggedIn: true,
+                    isLoggedIn: data.user_details.is_first_login,
                     credits: 0
                 });
 
@@ -145,16 +145,12 @@ export default function LoginPage() {
 
             <div className="flex flex-1 flex-col justify-center items-center relative">
                 <motion.div className="top-5 left-5 bg-blue-600 rounded-lg px-2.5 py-3 mb-2  hover:cursor-pointer hover:scale-105"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5 }}>
+                >
 
                     <p className="text-white font-extrabold hover:scale-105" onClick={() => handleNavigation('/')}>Trainer&apos;s Mart</p>
                 </motion.div>
                 <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
+
                     className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-2xl max-w-md w-full transition-colors duration-300"
                 >
                     {!showForgotPassword ? (
@@ -220,7 +216,7 @@ export default function LoginPage() {
                                         }`}
                                     disabled={!formData.email || !formData.password}
                                 >
-                                    login
+                                    Login
                                 </motion.button>
                             </form>
 

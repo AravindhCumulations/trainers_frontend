@@ -2,9 +2,9 @@ import React from 'react';
 
 const TrainerCardSkeleton = () => {
     return (
-        <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 shadow-sm px-3 sm:px-4 lg:px-6 py-3 sm:py-4 flex flex-col items-center w-full h-auto min-h-[320px] sm:min-h-[360px] lg:min-h-[385px] trainer-card">
+        <div className="trainer-card-cont">
             {/* Trainer image skeleton */}
-            <div className="rounded-xl sm:rounded-2xl overflow-hidden mb-2 sm:mb-3 flex items-center justify-center bg-gray-100 relative h-32 sm:h-40 lg:h-48 w-full animate-pulse">
+            <div className="trainer-card-image animate-pulse">
                 <div className="w-full h-full bg-gray-200" />
             </div>
 

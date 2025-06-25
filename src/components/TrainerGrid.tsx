@@ -87,7 +87,7 @@ export default function TrainerGrid({
                     ))
                 ) : (
                     <div className="col-span-2 sm:col-span-2 md:col-span-3 lg:col-span-4 xl:col-span-4 text-center text-gray-500 text-sm sm:text-base lg:text-lg font-semibold py-8 sm:py-12 lg:py-14 h-full">
-                        Nothing to display
+                        Unable to load trainers.
                     </div>
                 )}
             </div>

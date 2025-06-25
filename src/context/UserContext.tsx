@@ -33,6 +33,8 @@ const defaultUser: User = {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+
+
 export function UserProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User>(defaultUser);
 
@@ -58,18 +60,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
                 setUser(userData);
 
                 // Fetch credits immediately if user has user_role
-                if (role === 'user_role') {
-                    try {
-                        const response = await creditsApis.getUserCredits();
-                        if (response?.data?.length > 0) {
-                            setUser(prev => ({
-                                ...prev,
-                                credits: response.data[0].credits
-                            }));
-                        }
-                    } catch (error) {
-                        console.error("Error fetching credits:", error);
+                // Fetch credits for all users with valid credentials
+                try {
+                    const response = await creditsApis.getUserCredits();
+                    if (response?.data?.length > 0) {
+                        setUser(prev => ({
+                            ...prev,
+                            credits: response.data[0].credits
+                        }));
                     }
+                } catch (error) {
+                    console.error("Error fetching credits:", error);
                 }
             } else {
                 setUser(defaultUser);
@@ -107,7 +108,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
                 }));
             }
         } catch (error) {
-            console.error("Error fetching credits:", error);
         }
     };
 

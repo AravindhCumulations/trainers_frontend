@@ -100,9 +100,7 @@ export default function WorkshopsPage() {
     }, []);
 
     // handles
-
     useEffect(() => {
-
         setWorkshops(initialWorkshops)
         setCaseStudies(initialWorkshops)
     })

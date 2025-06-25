@@ -17,8 +17,6 @@ const TrainerCard = memo(({ trainer, onClick, viewMode, onWishlistUpdate, callLo
             console.log("1->");
 
             if (callLogin) {
-                console.log("2->");
-
                 callLogin();
             }
             return;

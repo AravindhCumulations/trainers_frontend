@@ -75,7 +75,7 @@ export const initialWorkshops: Workshop[] = [
 
 export const dummyTrainerDetails: TrainerDetailsModel = {
     bio_line: "Helping people unlock their true potential through mindful leadership.",
-    trainers_approach: "My sessions are interactive, story-driven, and focused on experiential learning.",
+    training_approach: "My sessions are interactive, story-driven, and focused on experiential learning.",
     experience: 8,
     city: "Bangalore",
     dob: "1990-05-15",
@@ -120,7 +120,7 @@ export const dummyTrainerDetails: TrainerDetailsModel = {
     twitter: "https://twitter.com/surya_trains",
     personal_website: "https://www.suryatrains.com",
 
-    testimonilas: [
+    testimonials: [
         {
             client_name: "Rohit Verma",
             company: "Wipro",

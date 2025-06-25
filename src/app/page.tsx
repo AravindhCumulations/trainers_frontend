@@ -25,7 +25,7 @@ export default function Home() {
   const { showLoader, hideLoader } = useLoading();
   const { handleNavigation } = useNavigation();
   const { user } = useUser();
-  const { showConfirmation, hidePopup, popupState } = usePopup();
+  const { showConfirmation, hidePopup, popupState, toastError } = usePopup();
   const router = useRouter();
 
 
@@ -40,7 +40,7 @@ export default function Home() {
   ];
 
   // tabs
-  const tabs = ['Featured', 'Unlocked', 'Wish listed'];
+  const tabs = ['Featured', 'Unlocked', 'Wishlisted'];
   const [activeTab, setActiveTab] = useState('Featured');
 
   // trainers list
@@ -60,16 +60,12 @@ export default function Home() {
     setIsCompany(user.role === 'user_role');
     const initializeData = async () => {
       try {
-        const userName = user.name;
+        const userName = user.email;
         showLoader();
         setIsLoading(true);
         await fetchAllTrainers(userName);
+        await fetchCompanyTrainers(userName);
 
-
-
-        if (user.role === 'user_role') {
-          await fetchCompanyTrainers(userName);
-        }
       } catch (error) {
         console.error("Failed to initialize data:", error);
       } finally {
@@ -95,7 +91,7 @@ export default function Home() {
     }
     catch (error) {
       console.error('Error fetching trainers:', error);
-
+      toastError('Unable to fetch featured trainers.');
     }
 
   };
@@ -118,6 +114,8 @@ export default function Home() {
     }
     catch (error) {
       console.error('Error fetching trainers:', error);
+      toastError('Unable to company trainer details.');
+
     }
   };
 
@@ -150,6 +148,7 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error loading all trainers:', error);
+      toastError("Something went wrong while searching for trainers. Please try again.")
     } finally {
       hideLoader();
     }
@@ -321,14 +320,14 @@ export default function Home() {
 
 
         {/* Popular Trainers Section */}
-        {isCompany ? (
+        {user.isLoggedIn ? (
           <div className="flex flex-col w-full lg:max-w-7xl mx-auto mt-[40px]  items-center">
             <div className="tabs mb-[20px] overflow-x-auto whitespace-nowrap scrollbar-hide">
               <div className="flex min-w-max">
                 {tabs.map((tab) => {
                   const isDisabled =
                     (tab === 'Featured' && (!trainers || trainers.length === 0)) ||
-                    (tab === 'Wish listed' && (!wishlistedTrainers || wishlistedTrainers.length === 0)) ||
+                    (tab === 'Wishlisted' && (!wishlistedTrainers || wishlistedTrainers.length === 0)) ||
                     (tab === 'Unlocked' && (!unlockedTrainers || unlockedTrainers.length === 0));
 
                   return (
@@ -360,7 +359,7 @@ export default function Home() {
                 isLoading={isLoading}
               />}
 
-              {activeTab === 'Wish listed' && <TrainerGrid
+              {activeTab === 'Wishlisted' && <TrainerGrid
                 trainers={wishlistedTrainers}
                 paginationMode="client"
                 paginationConfig={{ page: 1, pageSize: 8 }}
@@ -388,7 +387,7 @@ export default function Home() {
               paginationConfig={{ page: 1, pageSize: 12 }}
               pageLocked={true}
               callLogin={callLogin}
-            // isLoading={isLoading}
+              isLoading={isLoading}
             />
           </section>
         )}

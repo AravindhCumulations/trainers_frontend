@@ -68,7 +68,7 @@ export interface TrainerDetailsModel {
     // personalInfo
 
     bio_line: string;
-    trainers_approach: string
+    training_approach: string
     experience: number;
     city: string;
     dob: string;
@@ -94,7 +94,7 @@ export interface TrainerDetailsModel {
     personal_website: string;
 
     // testimonials
-    testimonilas: Testimonial[];
+    testimonials: Testimonial[];
     workshop: Workshop[];
     casestudy: CaseStudy[];
     reviews: Review[];
@@ -123,7 +123,7 @@ export interface TrainerFormDto {
     // personalInfo
     image: string;
     bio_line: string;
-    trainers_approach: string
+    training_approach: string
     experience: number;
     city: string;
     dob: string;
@@ -153,7 +153,7 @@ export interface TrainerFormDto {
     personal_website: string;
 
     // testimonials
-    testimonilas: Testimonial[];
+    testimonials: Testimonial[];
 
     // clients worked
     client_worked: Client[];
@@ -278,10 +278,10 @@ export interface TrainerFormDto {
 //             errors.push('Bio line must be less than 500 characters');
 //         }
 
-//         if (!data.trainers_approach?.trim()) {
+//         if (!data.training_approach?.trim()) {
 //             errors.push('Trainer approach is required');
 //         }
-//         else if (data.trainers_approach.length > 499) {
+//         else if (data.training_approach.length > 499) {
 //             errors.push('Trainer approach must be less than 500 characters');
 //         }
 
@@ -340,7 +340,7 @@ export interface TrainerFormDto {
 //         // Validate education, certifications and testimonials using existing methods
 //         const educationErrors = this.validateEducation(data.education);
 //         const certificationErrors = this.validateCertifications(data.certificates);
-//         const testimonialErrors = this.validateTestimonials(data.testimonilas);
+//         const testimonialErrors = this.validateTestimonials(data.testimonials);
 //         const clientErrors = this.validateClients(data.client_worked);
 
 //         return [...errors, ...educationErrors, ...certificationErrors, ...testimonialErrors, ...clientErrors];
@@ -400,7 +400,7 @@ export class TrainerFormValidator {
             ...this.validateSocialLinks(data),
             ...this.validateEducation(data.education),
             ...this.validateCertifications(data.certificates),
-            ...this.validateTestimonials(data.testimonilas),
+            ...this.validateTestimonials(data.testimonials),
             ...this.validateClients(data.client_worked)
         ];
     }
@@ -483,7 +483,7 @@ export class TrainerFormValidator {
             if (!testimonial.testimonials?.trim()) {
                 errors.push(`Testimonial text is required for entry ${index + 1}`);
             } else if (testimonial.testimonials.length > 200) {
-                errors.push(`Testimonial text must be less than 200 characters for entry ${index + 1}`);
+                errors.push(`Testimonial text must be less than or equals 200 characters for entry ${index + 1}`);
             }
         });
 
@@ -491,21 +491,26 @@ export class TrainerFormValidator {
     }
 
     static validateClients(data: Client[]): string[] {
+        console.log("its here");
+
         const errors: string[] = [];
 
-        if (!data || data.length === 0) {
+        // Remove empty company entries before validation
+        const filteredData = data.filter(client => client.company && client.company.trim() !== '');
+
+        if (!filteredData || filteredData.length === 0) {
             errors.push('At least one company is required');
             return errors;
         }
 
-        if (data.length > 15) {
+        if (filteredData.length > 15) {
             errors.push('Maximum 15 companies can be added');
             return errors;
         }
 
-        data.forEach((client, index) => {
+        filteredData.forEach((client, index) => {
             if (!client.company?.trim()) {
-                errors.push(`Company name is required for entry ${index + 1}`);
+                errors.push(`Company Name cant be Empty : Clients worked With ${index + 1}`);
             }
         });
 
@@ -517,13 +522,13 @@ export class TrainerFormValidator {
 
         if (!this.hasValue(data.bio_line)) {
             errors.push('Bio line is required');
-        } else if (data.bio_line.length > 499) {
-            errors.push('Bio line must be less than 500 characters');
+        } else if (data.bio_line.length > 501) {
+            errors.push('Bio line must be less than or equals 500 characters');
         }
 
-        if (!this.hasValue(data.trainers_approach)) {
+        if (!this.hasValue(data.training_approach)) {
             errors.push('Trainer approach is required');
-        } else if (data.trainers_approach.length > 499) {
+        } else if (data.training_approach.length > 500) {
             errors.push('Trainer approach must be less than 500 characters');
         }
 
@@ -536,7 +541,7 @@ export class TrainerFormValidator {
         }
 
         if (!this.hasValue(data.dob)) {
-            errors.push('Date of birth is required');
+            errors.push('Year of birth is required');
         }
 
         return errors;

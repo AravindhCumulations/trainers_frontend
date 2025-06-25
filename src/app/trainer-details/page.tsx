@@ -48,6 +48,7 @@ const TrainerDetailsContent = () => {
 
     // globally
     const [isCompany, setIsCompany] = useState(false);
+
     useEffect(() => {
         setIsCompany(user.role === 'user_role');
     });
@@ -137,9 +138,12 @@ const TrainerDetailsContent = () => {
                     const response = await trainerApis.getTrainerByName(trainerName);
 
                     setTrainerData(response.data);
+                    setTrainerLocked(false);
 
                     if (!response.data) {
-                        showError('Failed to fetch trainer details');
+                        showError('Failed to fetch trainer details', {
+                            onConfirm: () => handleNavigation('/')
+                        });
                         return;
                     }
                 }
@@ -167,7 +171,10 @@ const TrainerDetailsContent = () => {
 
             } catch (error) {
                 console.error('Error fetching trainer data:', error);
-                showError('Trainer Details not found');
+                showError('Trainer Details not found', {
+                    onConfirm: () => handleNavigation('/')
+                });
+
             } finally {
                 setLoading(false);
             }
@@ -176,10 +183,8 @@ const TrainerDetailsContent = () => {
         fetchTrainerData();
     }, [showError, searchParams]);
 
-
-
     const handleUnlockTrainer = async () => {
-        if (isCompany) {
+        if (user.isLoggedIn) {
             if (!trainerData?.name) {
                 console.error('Trainer data is not available');
                 toastError('Trainer data is not available');
@@ -206,7 +211,12 @@ const TrainerDetailsContent = () => {
                             const res = await creditsApis.unlockTrainer(trainerData.name);
                             if (res) {
                                 setTrainerLocked(false);
-                                updateCredits();
+                                try {
+                                    await updateCredits(); // Handle this separately
+                                } catch (creditUpdateErr) {
+                                    console.error("Failed to update credits:", creditUpdateErr);
+                                    toastError("Failed to update your credits.");
+                                }
                                 const userName = getCurrentUserName();
                                 const updatedTrainerData = await trainerApis.company.getTrainerByName(trainerData.name, userName);
                                 if (updatedTrainerData && updatedTrainerData.message) {
@@ -316,7 +326,7 @@ const TrainerDetailsContent = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8fafc]">
+        <div className="flex flex-col min-h-screen bg-[#f8fafc]">
             <Popup
                 isOpen={popupState.isOpen}
                 type={popupState.type}
@@ -331,7 +341,7 @@ const TrainerDetailsContent = () => {
             <NavBar bgColor="bg-white" />
 
             {/* Main Content */}
-            <main className="mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 bg-blue-100 rounded-t-2xl relative">
+            <main className="w-full flex-1 mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 bg-blue-100 rounded-t-2xl relative">
                 {loading ? (
                     <TrainerDetailsSkeleton />
                 ) : !trainerData ? (
@@ -434,7 +444,7 @@ const TrainerDetailsContent = () => {
                                                 </div>
                                             )}
 
-                                            <div className={`flex flex-col gap-3 ${trainerLocked ? 'blur-sm' : ''}`}>
+                                            <div className={`flex flex-col gap-3 ${!isLoggedInUser && trainerLocked ? 'blur-sm' : ''}`}>
                                                 <div className="flex items-center gap-2">
                                                     <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -475,27 +485,27 @@ const TrainerDetailsContent = () => {
                                                             </>
                                                         ) : (
                                                             <>
-                                                                {trainerData.facebook && (
+                                                                {trainerData.facebook?.trim() && (
                                                                     <a href={trainerData.facebook} target="_blank" rel="noopener noreferrer">
                                                                         <img src="assets/social/Facebook.svg" alt="Facebook" className="w-6 h-6 sm:w-8 sm:h-8" />
                                                                     </a>
                                                                 )}
-                                                                {trainerData.twitter && (
+                                                                {trainerData.twitter?.trim() && (
                                                                     <a href={trainerData.twitter} target="_blank" rel="noopener noreferrer">
                                                                         <img src="assets/social/Twitter.svg" alt="Twitter" className="w-6 h-6 sm:w-8 sm:h-8" />
                                                                     </a>
                                                                 )}
-                                                                {trainerData.linkedin && (
+                                                                {trainerData.linkedin?.trim() && (
                                                                     <a href={trainerData.linkedin} target="_blank" rel="noopener noreferrer">
                                                                         <img src="assets/social/LinkedIn.svg" alt="LinkedIn" className="w-6 h-6 sm:w-8 sm:h-8" />
                                                                     </a>
                                                                 )}
-                                                                {trainerData.instagram && (
+                                                                {trainerData.instagram?.trim() && (
                                                                     <a href={trainerData.instagram} target="_blank" rel="noopener noreferrer">
                                                                         <img src="assets/social/Instagram.svg" alt="Instagram" className="w-6 h-6 sm:w-8 sm:h-8" />
                                                                     </a>
                                                                 )}
-                                                                {trainerData.personal_website && (
+                                                                {trainerData.personal_website?.trim() && (
                                                                     <a href={trainerData.personal_website} target="_blank" rel="noopener noreferrer">
                                                                         <img src="assets/social/Website.svg" alt="Website" className="w-6 h-6 sm:w-8 sm:h-8" />
                                                                     </a>
@@ -529,7 +539,7 @@ const TrainerDetailsContent = () => {
                                         <div className="analytics-item flex flex-col items-start w-full sm:w-1/2 rounded-xl bg-pink-50 p-3 sm:p-4 border-1 border-pink-200 font-light text-xs sm:text-sm">
                                             <p className="text-xs sm:text-sm text-gray-500 mb-1"> Contact Unlocked</p>
                                             <div className="flex items-center gap-2 mb-2">
-                                                <p className="text-2xl sm:text-3xl font-semibold">48</p>
+                                                <p className="text-2xl sm:text-3xl font-semibold">hc</p>
                                                 <span className="inline-block rounded-full bg-pink-100 p-1 sm:p-2">
                                                     <svg xmlns="http://www.w3.org/2000/svg" height="16px" width="16px" viewBox="0 -960 960 960" fill="#000" className="sm:h-6 sm:w-6"><path d="M240-640h360v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85h-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640Zm0 480h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM240-160v-400 400Z" /></svg>
                                                 </span>
@@ -566,47 +576,60 @@ const TrainerDetailsContent = () => {
                                         </div>
                                     </div>
                                     <div className="relative">
-                                        <div className="flex gap-3 sm:gap-4 px-2 sm:px-4 py-4 sm:py-8 overflow-x-auto scrollbar-hidden workshops-container">
-                                            {trainerData.casestudy.map((casestudy) => (
-                                                <WorkshopCard
-                                                    key={casestudy.idx.toString()}
-                                                    workshop={{
-                                                        idx: casestudy.idx.toString(),
-                                                        title: casestudy.title ?? '',
-                                                        objectives: casestudy.objectives ?? '',
-                                                        price: casestudy.price ?? '',
-                                                        targetAudience: casestudy.target_audience ?? '',
-                                                        format: casestudy.format ?? '',
-                                                        image: casestudy.image ?? '',
-                                                        outcomes: casestudy.outcomes ?? '',
-                                                        handouts: casestudy.handouts ?? '',
-                                                        programFlow: casestudy.program_flow ?? '',
-                                                        evaluation: casestudy.evaluation ?? ''
-                                                    }}
-                                                    onClick={() => handleWorkshopClick('details', casestudy, 'Case Study')}
-                                                    tag="CaseStudy"
-                                                />
-                                            ))}
-                                            {trainerData.workshop.map((workshop) => (
-                                                <WorkshopCard
-                                                    key={workshop.idx.toString()}
-                                                    workshop={{
-                                                        idx: workshop.idx.toString(),
-                                                        title: workshop.title ?? '',
-                                                        objectives: workshop.objectives ?? '',
-                                                        price: workshop.price ?? '',
-                                                        targetAudience: workshop.target_audience ?? '',
-                                                        format: workshop.format ?? '',
-                                                        image: workshop.image ?? '',
-                                                        outcomes: workshop.outcomes ?? '',
-                                                        handouts: workshop.handouts ?? '',
-                                                        programFlow: workshop.program_flow ?? '',
-                                                        evaluation: workshop.evaluation ?? ''
-                                                    }}
-                                                    onClick={() => handleWorkshopClick('details', workshop, 'Workshop')}
-                                                    tag="Workshop"
-                                                />
-                                            ))}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+                                            {(!trainerData.casestudy || trainerData.casestudy.length === 0) &&
+                                                (!trainerData.workshop || trainerData.workshop.length === 0) ? (
+                                                <div className="col-span-3" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 150 }}>
+                                                    {isLoggedInUser ? (
+                                                        <p>Add workshops or case studies to display.</p>
+                                                    ) : (
+                                                        <p>No data available.</p>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    {(trainerData.casestudy || []).map((casestudy) => (
+                                                        <WorkshopCard
+                                                            key={casestudy.idx.toString()}
+                                                            workshop={{
+                                                                idx: casestudy.idx.toString(),
+                                                                title: casestudy.title ?? '',
+                                                                objectives: casestudy.objectives ?? '',
+                                                                price: casestudy.price ?? '',
+                                                                targetAudience: casestudy.target_audience ?? '',
+                                                                format: casestudy.format ?? '',
+                                                                image: casestudy.image ?? '',
+                                                                outcomes: casestudy.outcomes ?? '',
+                                                                handouts: casestudy.handouts ?? '',
+                                                                programFlow: casestudy.program_flow ?? '',
+                                                                evaluation: casestudy.evaluation ?? ''
+                                                            }}
+                                                            onClick={() => handleWorkshopClick('details', casestudy, 'Case Study')}
+                                                            tag="CaseStudy"
+                                                        />
+                                                    ))}
+                                                    {(trainerData.workshop || []).map((workshop) => (
+                                                        <WorkshopCard
+                                                            key={workshop.idx.toString()}
+                                                            workshop={{
+                                                                idx: workshop.idx.toString(),
+                                                                title: workshop.title ?? '',
+                                                                objectives: workshop.objectives ?? '',
+                                                                price: workshop.price ?? '',
+                                                                targetAudience: workshop.target_audience ?? '',
+                                                                format: workshop.format ?? '',
+                                                                image: workshop.image ?? '',
+                                                                outcomes: workshop.outcomes ?? '',
+                                                                handouts: workshop.handouts ?? '',
+                                                                programFlow: workshop.program_flow ?? '',
+                                                                evaluation: workshop.evaluation ?? ''
+                                                            }}
+                                                            onClick={() => handleWorkshopClick('details', workshop, 'Workshop')}
+                                                            tag="Workshop"
+                                                        />
+                                                    ))}
+                                                </>
+                                            )}
                                         </div>
                                         {hasOverflow && (
                                             <div className="flex justify-center gap-4 mt-4">
@@ -647,7 +670,7 @@ const TrainerDetailsContent = () => {
                                         <p className="w-full border-b-2 border-blue-500 text-base sm:text-[18px] font-bold leading-tight sm:leading-[28px] text-[#1E2939] pb-3">About Me</p>
                                     </div>
 
-                                    <p className="font-normal text-sm sm:text-[16px] leading-relaxed sm:leading-[26px] py-3 sm:py-4">
+                                    <p className="font-normal text-sm sm:text-[16px] leading-relaxed sm:leading-[26px] py-3 sm:py-4 break-words">
                                         {trainerData.bio_line}
                                     </p>
                                 </div>
@@ -660,8 +683,8 @@ const TrainerDetailsContent = () => {
                                             <p className="w-full border-b-2 border-blue-500 text-base sm:text-[18px] font-bold leading-tight sm:leading-[28px] text-[#1E2939] pb-3">Training Approach</p>
                                         </div>
 
-                                        <p className="font-normal text-sm sm:text-[16px] leading-relaxed sm:leading-[26px] py-3 sm:py-4">
-                                            {trainerData.trainers_approach}
+                                        <p className="font-normal text-sm sm:text-[16px] leading-relaxed sm:leading-[26px] py-3 sm:py-4  break-words">
+                                            {trainerData.training_approach}
                                         </p>
                                     </div>
 
@@ -672,7 +695,7 @@ const TrainerDetailsContent = () => {
                                         </div>
                                         <div className="pt-3 sm:pt-4">
                                             <div className="">
-                                                {trainerData.certificates.map((certificate, index) => {
+                                                {trainerData.certificates?.map ? trainerData.certificates.map((certificate, index) => {
                                                     const isLast = index === trainerData.certificates.length - 1;
 
                                                     return (<div key={index}
@@ -683,7 +706,7 @@ const TrainerDetailsContent = () => {
                                                         </div>
                                                         <p className="text-xs sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[20px]">{certificate.issued_by}</p>
                                                     </div>);
-                                                })}
+                                                }) : null}
                                             </div>
                                         </div>
                                     </div>
@@ -704,26 +727,28 @@ const TrainerDetailsContent = () => {
                                                         <span className="text-sm sm:text-base">{trainerData.avg_rating} ({trainerData.total_reviews})</span>
                                                     </div>
                                                 </div>
-                                                {trainerData.reviews?.slice(0, 3).map((review, i) => (
-                                                    <div key={i} className="bg-[#EDF1FF] rounded-xl p-3 sm:p-4 mb-3">
-                                                        <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
-                                                            <p className="text-sm sm:text-md">{review.user_name}</p>
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="flex">
-                                                                    {[1, 2, 3, 4, 5].map((star) => (
-                                                                        <Star
-                                                                            key={star}
-                                                                            className={`w-3 h-3 sm:w-4 sm:h-4 ${star <= review.rating ? 'fill-[#FE9A00] text-yellow-400' : 'text-gray-300'}`}
-                                                                        />
-                                                                    ))}
+                                                {trainerData.reviews?.slice ? (
+                                                    trainerData.reviews.slice(0, 3).map((review, i) => (
+                                                        <div key={i} className="bg-[#EDF1FF] rounded-xl p-3 sm:p-4 mb-3">
+                                                            <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
+                                                                <p className="text-sm sm:text-md">{review.user_name}</p>
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className="flex">
+                                                                        {[1, 2, 3, 4, 5].map((star) => (
+                                                                            <Star
+                                                                                key={star}
+                                                                                className={`w-3 h-3 sm:w-4 sm:h-4 ${star <= review.rating ? 'fill-[#FE9A00] text-yellow-400' : 'text-gray-300'}`}
+                                                                            />
+                                                                        ))}
+                                                                    </div>
                                                                 </div>
                                                             </div>
+                                                            <p className="text-xs sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[20px] text-gray-500 pt-2">
+                                                                {review.review}
+                                                            </p>
                                                         </div>
-                                                        <p className="text-xs sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[20px] text-gray-500 pt-2">
-                                                            {review.review}
-                                                        </p>
-                                                    </div>
-                                                ))}
+                                                    ))
+                                                ) : null}
                                             </div>
                                         </>
                                     )}
@@ -734,7 +759,7 @@ const TrainerDetailsContent = () => {
                                             <p className="w-full border-b-2 border-blue-500 text-base sm:text-[18px] font-bold leading-tight sm:leading-[28px] pb-3">Clients Worked With</p>
                                         </div>
                                         <div className="flex flex-wrap gap-2 py-3 sm:py-4">
-                                            {trainerData.client_worked.map(client => (
+                                            {(trainerData.client_worked || []).map(client => (
                                                 <div key={client.company} className="rounded-md bg-blue-100 text-[#3B82F6] p-2 sm:p-3 text-xs sm:text-[14px] font-normal leading-tight sm:leading-[20px]">
                                                     {client.company}
                                                 </div>
@@ -748,11 +773,11 @@ const TrainerDetailsContent = () => {
                                             <p className="w-full border-b-2 border-blue-500 text-base sm:text-[18px] font-bold leading-tight sm:leading-[28px] pb-3">Testimonials</p>
                                         </div>
                                         <div className="pt-3 sm:pt-4 flex flex-col gap-3 sm:gap-4">
-                                            {trainerData.testimonilas.map((test, index) => (
+                                            {(trainerData.testimonials || []).map((test, index) => (
                                                 <div key={index} className="bg-[#EDF1FF] rounded-xl p-3 sm:p-4">
                                                     <p className="text-sm sm:text-[16px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">{test.client_name}</p>
-                                                    <p className="text-xs sm:text-[12px] font-normal text-[#1E2939] leading-tight sm:leading-[18px] font-['Segoe_UI']">{test.company}</p>
-                                                    <p className="text-xs sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[20px] py-2">
+                                                    <p className="text-xs sm:text-[12px] font-normal text-[#1E2939] leading-tight sm:leading-[18px]">{test.company}</p>
+                                                    <p className="text-xs sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[20px] py-2  break-words">
                                                         {test.testimonials}
                                                     </p>
                                                 </div>
@@ -766,7 +791,7 @@ const TrainerDetailsContent = () => {
                                             <p className="w-full border-b-2 border-blue-500 text-base sm:text-[18px] font-bold leading-tight sm:leading-[28px] pb-3">Education</p>
                                         </div>
                                         <div className="relative gap-2 pt-3 sm:pt-4">
-                                            {trainerData.education.map((education, index) => {
+                                            {(trainerData.education || []).map((education, index) => {
                                                 const isLast = index === trainerData.education.length - 1;
 
                                                 return (
@@ -850,7 +875,7 @@ const TrainerDetailsContent = () => {
             </main>
 
             {/* Popular Trainers Section */}
-            {!isLoggedInUser && !loading && (
+            {trainerData && !isLoggedInUser && !loading && (
                 <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 trainer-list-section">
                     <h2 className="text-xl sm:text-2xl lg:text-[30px] font-bold mb-4 sm:mb-6 text-gray-800 trainer-list-title">Discover Related Trainers</h2>
                     <TrainerGrid

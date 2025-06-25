@@ -64,7 +64,7 @@ export default function TrainerDetailsPage() {
     const [form, setForm] = useState<TrainerFormDto>({
         // personalInfo
         bio_line: '',
-        trainers_approach: '',
+        training_approach: '',
         experience: 1,
         city: '',
         dob: '',
@@ -92,7 +92,7 @@ export default function TrainerDetailsPage() {
         personal_website: '',
 
         // testimonials
-        testimonilas: [{ client_name: '', company: '', testimonials: '' }],
+        testimonials: [{ client_name: '', company: '', testimonials: '' }],
 
         client_worked: [{ company: '', idx: 0 }],
     });
@@ -104,7 +104,7 @@ export default function TrainerDetailsPage() {
     const initializeFormData = (trainerData: any) => {
         const formData = {
             bio_line: trainerData.bio_line ?? '',
-            trainers_approach: trainerData.trainers_approach ?? '',
+            training_approach: trainerData.training_approach ?? '',
             experience: trainerData.experience ?? 1,
             city: trainerData.city ?? '',
             dob: trainerData.dob ?? '',
@@ -117,7 +117,7 @@ export default function TrainerDetailsPage() {
             image: trainerData.image ?? '', // Keep the existing image URL
             education: trainerData.education ?? [{ course: '', institution: '', year: '' }],
             certificates: trainerData.certificates ?? [{ certificate_name: '', issued_by: '', issued_date: '', certificate_url: '' }],
-            testimonilas: trainerData.testimonilas ?? [{ client_name: '', company: '', testimonials: '' }],
+            testimonials: trainerData.testimonials ?? [{ client_name: '', company: '', testimonials: '' }],
             facebook: trainerData.facebook ?? '',
             instagram: trainerData.instagram ?? '',
             linkedin: trainerData.linkedin ?? '',
@@ -239,21 +239,23 @@ export default function TrainerDetailsPage() {
                     // Initialize form data using the new method
                     initializeFormData(trainerData);
                 } else if (trainerName) {
-                    // Get trainer data using API
-                    if (trainerName) {
-                        const response = await trainerApis.company.getTrainerByName(trainerName, trainerName);
-                        console.log(response.message);
 
-                        if (response.message) {
-                            setIsEdit(true);
-                            // Set the existing image URL as preview if available
-                            if (response.message.image) {
-                                setProfileImagePreview(response.message.image);
-                            }
-                            // Initialize form data using the new method
-                            initializeFormData(response.message);
+                    console.log("request as trainer manage profile");
+
+                    // Get trainer data using API
+                    const response = await trainerApis.company.getTrainerByName(trainerName, trainerName);
+                    console.log(response.message);
+
+                    if (response.message) {
+                        setIsEdit(true);
+                        // Set the existing image URL as preview if available
+                        if (response.message.image) {
+                            setProfileImagePreview(response.message.image);
                         }
+                        // Initialize form data using the new method
+                        initializeFormData(response.message);
                     }
+
                 }
 
 
@@ -346,26 +348,26 @@ export default function TrainerDetailsPage() {
     };
 
     const handleTestimonialChange = (index: number, field: keyof Testimonial, value: string) => {
-        const updatedTestimonials = [...form.testimonilas];
+        const updatedTestimonials = [...form.testimonials];
         updatedTestimonials[index] = {
             ...updatedTestimonials[index],
             [field]: value
         };
         setForm(prev => ({
             ...prev,
-            testimonilas: updatedTestimonials
+            testimonials: updatedTestimonials
         }));
 
         // Track modified testimonials using deep comparison
-        if (!isEqual(updatedTestimonials, initialFormState.current.testimonilas)) {
+        if (!isEqual(updatedTestimonials, initialFormState.current.testimonials)) {
             setModifiedFields(prev => ({
                 ...prev,
-                testimonilas: updatedTestimonials
+                testimonials: updatedTestimonials
             }));
         } else {
             setModifiedFields(prev => {
                 const newModifiedFields = { ...prev };
-                delete newModifiedFields.testimonilas;
+                delete newModifiedFields.testimonials;
                 return newModifiedFields;
             });
         }
@@ -432,31 +434,31 @@ export default function TrainerDetailsPage() {
     };
 
     const addTestimonial = () => {
-        const newTestimonials = [...form.testimonilas, { client_name: '', company: '', testimonials: '' }];
+        const newTestimonials = [...form.testimonials, { client_name: '', company: '', testimonials: '' }];
         setForm(prev => ({
             ...prev,
-            testimonilas: newTestimonials
+            testimonials: newTestimonials
         }));
         // Track modified testimonials using deep comparison
-        if (!isEqual(newTestimonials, initialFormState.current.testimonilas)) {
+        if (!isEqual(newTestimonials, initialFormState.current.testimonials)) {
             setModifiedFields(prev => ({
                 ...prev,
-                testimonilas: newTestimonials
+                testimonials: newTestimonials
             }));
         }
     };
 
     const removeTestimonial = (index: number) => {
-        const updated = form.testimonilas.filter((_, i) => i !== index);
+        const updated = form.testimonials.filter((_, i) => i !== index);
         setForm(prev => ({
             ...prev,
-            testimonilas: updated
+            testimonials: updated
         }));
         // Track modified testimonials using deep comparison
-        if (!isEqual(updated, initialFormState.current.testimonilas)) {
+        if (!isEqual(updated, initialFormState.current.testimonials)) {
             setModifiedFields(prev => ({
                 ...prev,
-                testimonilas: updated
+                testimonials: updated
             }));
         }
     };
@@ -501,21 +503,15 @@ export default function TrainerDetailsPage() {
                 imageUrl = uploadResponse.message.file_url;
             }
 
-
-
-
-
-
-
+            // Clean client_worked before submission
+            const cleanedClientWorked = form.client_worked.filter(client => client.company && client.company.trim() !== '');
 
             let response;
             if (isEdit) {
-
-
-
                 const submitData = {
                     ...modifiedFields,
                     ...(hasImageChanged && { image: imageUrl }), // Only include image if it was changed
+                    client_worked: cleanedClientWorked,
                 };
                 if (modifiedFields.phone) {
                     const phone = `+91-${modifiedFields.phone.replace(/^\+91-/, '')}`;
@@ -523,16 +519,15 @@ export default function TrainerDetailsPage() {
                     submitData.phone = phone; // ✅ Plain object assignment
                 }
 
-
                 response = await trainerApis.trainerForm.editFormData(submitData);
             } else {
-
                 form.trainer = getCurrentUserName();
 
                 const submitData = {
                     ...form,
                     ...(hasImageChanged && { image: imageUrl }), // Only include image if it was changed
-                    phone: form.phone ? `+91-${form.phone.replace(/^\+91-/, '')}` : '' // Ensure phone has +91- prefix
+                    phone: form.phone ? `+91-${form.phone.replace(/^\+91-/, '')}` : '', // Ensure phone has +91- prefix
+                    client_worked: cleanedClientWorked,
                 };
                 if (form.phone) {
                     const phone = `+91-${form.phone.replace(/^\+91-/, '')}`;
@@ -540,14 +535,15 @@ export default function TrainerDetailsPage() {
                     submitData.phone = phone; // ✅ Plain object assignment
                 }
 
+                console.log(submitData);
+
+
                 response = await trainerApis.trainerForm.createFormData(submitData);
                 const responseName = response.data.name
 
                 // updating username in both localStorage & userContext
                 setCurrentUserName(responseName)
                 setName(responseName)
-
-
             }
 
             // Reset image change state after successful submission
@@ -764,10 +760,10 @@ export default function TrainerDetailsPage() {
                                 <div className="relative">
                                     <textarea
                                         id="trainerApproch"
-                                        value={form.trainers_approach}
+                                        value={form.training_approach}
                                         onChange={(e) => {
                                             if (e.target.value.length <= 500) {
-                                                handleChanges('trainers_approach', e.target.value);
+                                                handleChanges('training_approach', e.target.value);
                                             }
                                         }}
                                         placeholder="Share your approch strategy"
@@ -775,7 +771,7 @@ export default function TrainerDetailsPage() {
                                         className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
                                     />
                                     <div className="absolute bottom-2 right-2 text-xs sm:text-sm text-gray-500">
-                                        {form.trainers_approach.length}/500
+                                        {form.training_approach.length}/500
                                     </div>
                                 </div>
                             </div>
@@ -1263,7 +1259,7 @@ export default function TrainerDetailsPage() {
                                     Share testimonials from your clients to build trust with potential new clients.
                                 </p>
 
-                                {form.testimonilas.map((testimonial, index) => (
+                                {form.testimonials.map((testimonial, index) => (
                                     <div key={index} className="mb-4 sm:mb-6">
                                         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-3">
                                             <TextField
@@ -1292,9 +1288,15 @@ export default function TrainerDetailsPage() {
                                                 variant="outlined"
                                                 placeholder="Client testimonial (e.g., 'Working with this trainer has transformed my fitness journey. I've lost 20 pounds and gained confidence.')"
                                                 value={testimonial.testimonials}
-                                                onChange={(e) => handleTestimonialChange(index, "testimonials", e.target.value)}
-                                            />
-                                            {form.testimonilas.length > 1 && (
+                                                onChange={(e) => {
+                                                    if (e.target.value.length <= 200) {
+                                                        handleTestimonialChange(index, "testimonials", e.target.value)
+                                                    }
+                                                }} />
+                                            <div className="absolute bottom-2 right-2 text-xs sm:text-sm text-gray-500 z-10">
+                                                {testimonial.testimonials.length}/200
+                                            </div>
+                                            {form.testimonials.length > 1 && (
                                                 <IconButton
                                                     className="absolute top-0 right-0 text-red-500"
                                                     onClick={() => removeTestimonial(index)}
@@ -1310,8 +1312,8 @@ export default function TrainerDetailsPage() {
                                 <button
                                     type="button"
                                     onClick={addTestimonial}
-                                    disabled={form.testimonilas.length >= 3}
-                                    className={`flex items-center font-medium mt-2 text-sm sm:text-base ${form.testimonilas.length >= 3 ? 'text-gray-400 cursor-not-allowed' : 'text-green-600'}`}
+                                    disabled={form.testimonials.length >= 3}
+                                    className={`flex items-center font-medium mt-2 text-sm sm:text-base ${form.testimonials.length >= 3 ? 'text-gray-400 cursor-not-allowed' : 'text-green-600'}`}
                                 >
                                     <Add fontSize="small" className="mr-1" /> Add another Testimonial
                                 </button>
