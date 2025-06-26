@@ -305,7 +305,6 @@ h2 {
 }
 
 .heading-2xl {
-  font-size: var(--text-5xl);
   font-weight: 700;
   line-height: var(--leading-none);
 }

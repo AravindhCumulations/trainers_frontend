@@ -236,7 +236,7 @@ export default function Home() {
 
             {/* Hero Content */}
             <div className="flex flex-col gap-2 md:gap-3 items-center w-full mt-4 md:mt-6 px-4 md:px-8 lg:px-4 hero-content">
-              <h1 className="font-bold mb-1 md:mb-2 text-center text-2xl md:text-4xl lg:heading-2xl hero-title" aria-label="Hero Title">
+              <h1 className="font-bold mb-1 md:mb-2 text-center text-2xl md:text-4xl lg:text-[48px] heading-2xl hero-title" aria-label="Hero Title">
                 Find & Hire Soft Skills Trainers
               </h1>
               <p className="mb-3 md:mb-5 text-center max-w-2xl text-base md:text-[18px] font-normal font-medium hero-desc" aria-label="Hero Description">
