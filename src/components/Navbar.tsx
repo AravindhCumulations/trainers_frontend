@@ -146,7 +146,7 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
             <header
                 className={`w-full mx-auto  flex flex-col items-center relative z-50 px-0 lg:px-4 ${bgColor} ${textColor} transition-colors duration-200`}
             >
-                <nav className="w-full max-w-9xl mx-auto flex items-center justify-start md:justify-between py-4 px-4 lg:px-0">
+                <nav className="w-full max-w-9xl mx-auto flex items-center justify-start md:justify-between py-4 lg:px-4 lg:px-0">
                     {/* Mobile Menu Button */}
                     <button
                         className="md:hidden p-2"
