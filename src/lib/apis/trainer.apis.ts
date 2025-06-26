@@ -267,8 +267,8 @@ export const trainerApis = {
         // Ratings and Reviews
         ratings: {
             submitReview: async (data: {
-                user: string;
-                trainer: string;
+                users: string;
+                trainers: string;
                 rating: number;
                 review: string;
             }) => {

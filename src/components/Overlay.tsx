@@ -39,14 +39,14 @@ const Overlay: React.FC<OverlayProps> = ({ isOpen, onClose, children, className 
 
     return (
         <div
-            className={`fixed inset-0 bg-black/40 z-50 flex justify-center items-start p-2 sm:p-4 lg:p-8 ${className}`}
+            className={` fixed inset-0 bg-black/40 z-50 flex justify-center items-start p-2 sm:p-4 lg:p-8 ${className}`}
             onClick={onClose}
         >
             <div
                 className="w-full max-w-full flex justify-center items-start"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="w-full max-w-full max-h-[95vh] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-400/50 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-gray-400/70">
+                <div className="w-full max-w-5xl max-h-[95vh] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-400/50 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-gray-400/70">
                     {children}
                 </div>
             </div>

@@ -30,7 +30,7 @@ export interface Review {
 
 
 
-export interface CaseStudy {
+export interface Casestudy {
 
     idx: number,
     title: string,
@@ -84,7 +84,7 @@ export interface TrainerDetailsModel {
     // testimonials
     testimonials: Testimonial[];
     workshop: Workshop[];
-    casestudy: CaseStudy[];
+    Casestudy: Casestudy[];
     reviews: Review[];
 
     creation: string;

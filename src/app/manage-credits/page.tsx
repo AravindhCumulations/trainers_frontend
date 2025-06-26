@@ -20,6 +20,9 @@ const ManageCredits = () => {
     const { user, updateCredits } = useUser();
     const [credits, setCredits] = useState(0);
     const { toastSuccess, toastError, popupState, hidePopup } = usePopup();
+    const [showHistory, setShowHistory] = useState(false);
+    const [history, setHistory] = useState<any[]>([]);
+    const [loadingHistory, setLoadingHistory] = useState(false);
 
     // Synchronize credits with user?.credits whenever user changes
     useEffect(() => {
@@ -120,6 +123,20 @@ const ManageCredits = () => {
         }
     };
 
+    const handleShowHistory = async () => {
+        if (!showHistory) { // Only fetch if opening
+            setLoadingHistory(true);
+            try {
+                const res = await creditsApis.getCreditTransactionHistory();
+                setHistory(res.data || []);
+            } catch (err) {
+                toastError("Failed to load credit history.");
+            }
+            setLoadingHistory(false);
+        }
+        setShowHistory(!showHistory);
+    };
+
     return (
         <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
             <Popup
@@ -173,11 +190,53 @@ const ManageCredits = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <button className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-all duration-200 hover:scale-105">
+                                    <button
+                                        className={`px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-all duration-200 hover:scale-105 flex items-center ${showHistory ? 'ring-2 ring-blue-400' : ''}`}
+                                        onClick={handleShowHistory}
+                                    >
                                         <FaHistory className="mr-2 inline" />
-                                        View History
+                                        {showHistory ? 'Hide History' : 'View History'}
                                     </button>
                                 </div>
+                            </div>
+                        </div>
+                        {/* Expandable Credit History Tab */}
+                        <div
+                            className={`transition-all duration-300 overflow-hidden ${showHistory ? 'max-h-[600px] opacity-100 mt-4' : 'max-h-0 opacity-0'} bg-white rounded-2xl shadow border border-gray-100`}
+                            style={{ minHeight: showHistory ? '120px' : '0px' }}
+                        >
+                            <div className="p-2">
+                                <h2 className="text-xl font-bold mb-4 flex items-center">
+                                    <FaHistory className="mr-2" /> Credit History
+                                </h2>
+                                {loadingHistory ? (
+                                    <div className="text-center py-8">Loading...</div>
+                                ) : history.length === 0 ? (
+                                    <div className="text-center py-8 text-gray-500">No history found.</div>
+                                ) : (
+                                    <div className="overflow-x-auto">
+                                        <table className="min-w-full text-sm">
+                                            <thead>
+                                                <tr className="bg-gray-100">
+                                                    <th className="py-2 px-4 text-left">Type</th>
+                                                    <th className="py-2 px-4 text-left">Credits</th>
+                                                    <th className="py-2 px-4 text-left">Amount</th>
+                                                    <th className="py-2 px-4 text-left">Reference Trainer</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {history.map((item, idx) => (
+                                                    <tr key={idx} className="border-b last:border-none">
+                                                        <td className="py-2 px-4">{item.transaction_type}</td>
+                                                        <td className="py-2 px-4">{item.credits}</td>
+                                                        <td className="py-2 px-4">₹{item.amount}</td>
+                                                        <td className="py-2 px-4">{item.reference_trainer || '-'}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

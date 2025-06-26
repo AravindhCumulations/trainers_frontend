@@ -137,9 +137,9 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
     // Update form data when initialData changes
     useEffect(() => {
         if (initialData) {
-            const normalizedType: 'Workshop' | 'CaseStudy' =
-                initialData.type?.toLowerCase() === 'casestudy'
-                    ? 'CaseStudy'
+            const normalizedType: 'Workshop' | 'Casestudy' =
+                initialData.type?.toLowerCase() === 'Casestudy'
+                    ? 'Casestudy'
                     : 'Workshop';
             // Ensure HTML content is properly handled for QuillEditor fields
             const newInitialData = {
@@ -314,7 +314,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                             <p className="text-sm sm:text-base font-normal text-blue-700">Workshop Image</p>
                             <div className="flex flex-col gap-3 sm:gap-4">
                                 {imagePreview && (
-                                    <div className="relative w-full h-32 sm:h-40 lg:h-48 rounded-lg overflow-hidden">
+                                    <div className="relative w-full h-32 sm:h-40 lg:h-80 rounded-lg overflow-hidden">
                                         <img
                                             src={imagePreview}
                                             alt="Workshop preview"
@@ -523,8 +523,8 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                                         type="radio"
                                         id="case-study"
                                         name="type"
-                                        checked={formData.type === 'CaseStudy'}
-                                        onChange={() => handleChange('type', 'CaseStudy')}
+                                        checked={formData.type === 'Casestudy'}
+                                        onChange={() => handleChange('type', 'Casestudy')}
                                         disabled={isEditMode}
                                         className={`w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 ${isEditMode ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     />

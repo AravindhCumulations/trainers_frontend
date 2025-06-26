@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { Star } from "lucide-react";
 import NavBar from "../../components/Navbar";
 import Footer from "@/components/Footer";
@@ -23,6 +23,7 @@ import { useSearchParams } from 'next/navigation';
 import { usePopup } from '@/lib/hooks/usePopup';
 import Popup from '@/components/Popup';
 import { Workshop } from "@/models/workshop.models";
+import router from "next/router";
 
 
 // Main Content
@@ -31,8 +32,6 @@ const TrainerDetailsContent = () => {
     const searchParams = useSearchParams();
     // const router = useRouter();
 
-
-    const [hasOverflow, setHasOverflow] = useState(false);
 
     // page specific
     const [isLoggedInUser, setIsLoggedInUser] = useState(false);
@@ -53,6 +52,8 @@ const TrainerDetailsContent = () => {
     // looders
     const { showLoader, hideLoader } = useLoading();
     const { popupState, showError, hidePopup, showConfirmation, toastSuccess, showSuccess, toastError } = usePopup();
+
+
 
     const handleWishlistUpdate = (trainer: TrainerCardModel, isWishlisted: boolean) => {
         // Update the trainer in the trainers list
@@ -84,19 +85,35 @@ const TrainerDetailsContent = () => {
         }
     };
 
+    // Inside the workshops display container section:
+    const workshopsContainerRef = useRef<HTMLDivElement>(null);
+    const [workshopsHasOverflow, setWorkshopsHasOverflow] = useState(false);
 
     useEffect(() => {
+        const container = workshopsContainerRef.current;
+        if (!container) return;
+
         const checkOverflow = () => {
-            const container = document.querySelector('.workshops-container');
-            if (container) {
-                setHasOverflow(container.scrollWidth > container.clientWidth);
-            }
+            setWorkshopsHasOverflow(container.scrollWidth > container.clientWidth);
         };
 
-        checkOverflow();
-        window.addEventListener('resize', checkOverflow);
-        return () => window.removeEventListener('resize', checkOverflow);
-    }, [trainerData]);
+        // Initial check after a tick
+        setTimeout(checkOverflow, 0);
+
+        // Listen for scroll (in case content changes)
+        container.addEventListener('scroll', checkOverflow);
+
+        // Listen for resize/content changes
+        const resizeObserver = new window.ResizeObserver(checkOverflow);
+        resizeObserver.observe(container);
+
+        return () => {
+            container.removeEventListener('scroll', checkOverflow);
+            resizeObserver.disconnect();
+        };
+    }, [trainerData?.workshop, trainerData?.Casestudy]);
+
+
 
     useEffect(() => {
         const fetchTrainerData = async () => {
@@ -246,6 +263,20 @@ const TrainerDetailsContent = () => {
         type: null
     });
 
+    const callLogin = () => {
+        showConfirmation(
+            'You need to be logged in to access this feature. Would you like to proceed to the login page?',
+            () => {
+                router.push('/login');
+            },
+            {
+                title: 'Login Required',
+                confirmText: 'Proceed to Login',
+                cancelText: 'Stay Here'
+            }
+        );
+    }
+
     const handleWorkshopClick = (type: 'details' | 'edit' | 'create', item: Workshop) => {
 
         if (!item) {
@@ -278,8 +309,8 @@ const TrainerDetailsContent = () => {
         setIsSubmitting(true);
         try {
             await trainerApis.fileUpload.ratings.submitReview({
-                user: user.email,
-                trainer: trainerData?.name ?? '',
+                users: user.email,
+                trainers: trainerData?.name ?? '',
                 rating: rating,
                 review: reviewText.trim()
             });
@@ -302,6 +333,8 @@ const TrainerDetailsContent = () => {
             setIsSubmitting(false);
         }
     };
+
+
 
     return (
         <div className="flex flex-col min-h-screen bg-[#f8fafc]">
@@ -516,7 +549,7 @@ const TrainerDetailsContent = () => {
                                         <div className="analytics-item flex flex-col items-start w-full sm:w-1/2 rounded-xl bg-pink-50 p-3 sm:p-4 border-1 border-pink-200 font-light text-xs sm:text-sm">
                                             <p className="text-xs sm:text-sm text-gray-500 mb-1"> Contact Unlocked</p>
                                             <div className="flex items-center gap-2 mb-2">
-                                                <p className="text-2xl sm:text-3xl font-semibold">hc</p>
+                                                <p className="text-2xl sm:text-3xl font-semibold">0</p>
                                                 <span className="inline-block rounded-full bg-pink-100 p-1 sm:p-2">
                                                     <svg xmlns="http://www.w3.org/2000/svg" height="16px" width="16px" viewBox="0 -960 960 960" fill="#000" className="sm:h-6 sm:w-6"><path d="M240-640h360v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85h-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640Zm0 480h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM240-160v-400 400Z" /></svg>
                                                 </span>
@@ -553,8 +586,11 @@ const TrainerDetailsContent = () => {
                                         </div>
                                     </div>
                                     <div className="relative">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-                                            {(!trainerData.casestudy || trainerData.casestudy.length === 0) &&
+                                        <div
+                                            ref={workshopsContainerRef}
+                                            className="flex gap-4 px-4 py-8 overflow-x-auto scrollbar-hidden workshops-container"
+                                        >
+                                            {(!trainerData.Casestudy || trainerData.Casestudy.length === 0) &&
                                                 (!trainerData.workshop || trainerData.workshop.length === 0) ? (
                                                 <div className="col-span-3" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 150 }}>
                                                     {isLoggedInUser ? (
@@ -565,7 +601,6 @@ const TrainerDetailsContent = () => {
                                                 </div>
                                             ) : (
                                                 <>
-
                                                     {(trainerData.workshop || []).map((workshop) => (
                                                         <WorkshopCard
                                                             key={workshop.idx.toString()}
@@ -584,21 +619,22 @@ const TrainerDetailsContent = () => {
                                                                 type: workshop.type
                                                             }}
                                                             onClick={() => handleWorkshopClick('details', workshop)}
+
                                                         />
                                                     ))}
                                                 </>
                                             )}
                                         </div>
-                                        {hasOverflow && (
-                                            <div className="flex justify-center gap-4 mt-4">
+                                        {workshopsHasOverflow && (
+                                            <>
                                                 <button
                                                     onClick={() => {
-                                                        const container = document.querySelector('.workshops-container');
-                                                        if (container) {
-                                                            container.scrollLeft -= 300;
-                                                        }
+                                                        const container = workshopsContainerRef.current;
+                                                        if (container) container.scrollLeft -= 300;
                                                     }}
-                                                    className="bg-white hover:bg-gray-50 p-2 rounded-full shadow-md border border-gray-200 transition-all duration-200 hover:scale-105"
+                                                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 p-2 rounded-full shadow-md border border-gray-200 transition-all duration-200 hover:scale-105"
+                                                    style={{ transform: 'translateY(-50%)' }}
+                                                    aria-label="Scroll left"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-6 sm:h-6">
                                                         <path d="M15 18l-6-6 6-6" />
@@ -606,18 +642,18 @@ const TrainerDetailsContent = () => {
                                                 </button>
                                                 <button
                                                     onClick={() => {
-                                                        const container = document.querySelector('.workshops-container');
-                                                        if (container) {
-                                                            container.scrollLeft += 300;
-                                                        }
+                                                        const container = workshopsContainerRef.current;
+                                                        if (container) container.scrollLeft += 300;
                                                     }}
-                                                    className="bg-white hover:bg-gray-50 p-2 rounded-full shadow-md border border-gray-200 transition-all duration-200 hover:scale-105"
+                                                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 p-2 rounded-full shadow-md border border-gray-200 transition-all duration-200 hover:scale-105"
+                                                    style={{ transform: 'translateY(-50%)' }}
+                                                    aria-label="Scroll right"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-6 sm:h-6">
                                                         <path d="M9 18l6-6-6-6" />
                                                     </svg>
                                                 </button>
-                                            </div>
+                                            </>
                                         )}
                                     </div>
                                 </div>
@@ -758,10 +794,10 @@ const TrainerDetailsContent = () => {
                                                         className="relative text-sm sm:text-md font-thin flex justify-start gap-2 mb-2"
                                                     >
                                                         {!isLast && (
-                                                            <div className="absolute left-[7px] top-0 bottom-1 w-[2.5px] bg-blue-300 z-0"></div>
+                                                            <div className="absolute left-1 md:left-2 top-0 bottom-1 w-[2.5px] bg-blue-300 z-0"></div>
                                                         )}
 
-                                                        <span className="flex-shrink-0 w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold z-10 text-xs sm:text-sm"></span>
+                                                        <span className="flex-shrink-0 w-3 h-3 md:w-4 md:h-4 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold z-10 text-xs sm:text-sm"></span>
 
                                                         <div className={`pt-1 ${isLast ? 'pb-0' : 'pb-6 sm:pb-8'} pl-2 pr-2 sm:pr-4`}>
                                                             <p className="text-sm sm:text-[16px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">
@@ -809,7 +845,7 @@ const TrainerDetailsContent = () => {
                                             {/* Review Textarea */}
                                             <textarea
                                                 placeholder="Write your review here..."
-                                                className="w-full border border-gray-300 rounded-md p-3 text-sm sm:text-base resize-none mt-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                className="w-full border border-gray-300 rounded-md p-3 text-sm sm:text-base resize-none mt-2 focus:border-transparent"
                                                 rows={4}
                                                 value={reviewText}
                                                 onChange={(e) => setReviewText(e.target.value)}
@@ -842,6 +878,7 @@ const TrainerDetailsContent = () => {
                         paginationConfig={{ page: 1, pageSize: 12 }}
                         pageLocked={true}
                         onWishlistUpdate={handleWishlistUpdate}
+                        callLogin={callLogin}
                         isLoading={loading}
                     />
                 </section>
@@ -875,14 +912,6 @@ export default function TrainerDetails() {
                         break-inside: avoid;
                         margin-bottom: 1rem;
                     }
-                }
-                
-                .scrollbar-hidden {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
-                .scrollbar-hidden::-webkit-scrollbar {
-                    display: none;
                 }
             `}</style>
             <Suspense fallback={<TrainerDetailsSkeleton />}>

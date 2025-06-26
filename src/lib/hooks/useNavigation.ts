@@ -15,18 +15,16 @@ export const useNavigation = () => {
 
         try {
             // Only use window.location.href for auth-related pages to ensure middleware runs
-            if (page === '/login' || page === '/signup') {
+            // Always use window.location.href for auth-related pages to ensure middleware runs
+            if (page === '/' || page === '/trainer-details' || page === '/manage-credits') {
                 window.location.href = fullPath;
                 return;
             }
 
-            // For all other pages, use client-side navigation
+            // For other pages, use client-side navigation
             if (currentPath === page) {
-                // If on same page, do nothing or optionally refresh data (no hard reload)
-                // Optionally, you could add logic to refresh data here if needed
-                // For now, do nothing
-                loading.hideLoader();
-                return;
+                // If on same page, do a hard refresh to ensure fresh state
+                window.location.href = fullPath;
             } else {
                 await router.push(fullPath);
             }

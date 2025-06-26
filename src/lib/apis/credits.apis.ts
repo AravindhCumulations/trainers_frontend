@@ -85,15 +85,15 @@ export const creditsApis = {
     },
 
     // Create order for payment
-    createOrder: async (username:string,amount: number) => {
+    createOrder: async (username: string, amount: number) => {
         try {
             const response = await axios.post('/api/method/trainer.api.create_order', {
                 username: username,
                 amount: amount
-            }, 
-            {
-                headers: getAuthHeaders(),
-            });
+            },
+                {
+                    headers: getAuthHeaders(),
+                });
             return response.data;
         } catch (error) {
             console.error('Error creating order:', error);
@@ -108,12 +108,30 @@ export const creditsApis = {
                 razorpay_payment_id: paymentId,
                 razorpay_order_id: orderId,
                 razorpay_signature: signature
-            } ,{
+            }, {
                 headers: getAuthHeaders(),
             });
             return response.data;
         } catch (error) {
             console.error('Error verifying payment and updating credits:', error);
+            throw error;
+        }
+    },
+
+    // Get credit transaction history
+    getCreditTransactionHistory: async () => {
+        const user = getUserDetails();
+        try {
+            const response = await axios.get('/api/resource/Credit Transaction', {
+                params: {
+                    filters: JSON.stringify([["user", "=", user.email]]),
+                    fields: JSON.stringify(["user", "credits", "transaction_type", "amount", "reference_trainer"])
+                },
+                headers: getAuthHeaders()
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching credit transaction history:', error);
             throw error;
         }
     }

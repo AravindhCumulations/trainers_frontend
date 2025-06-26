@@ -64,7 +64,7 @@ export interface Workshop {
     evaluation: string;
 
 }
-export interface CaseStudy {
+export interface Casestudy {
 
     idx: number,
     title: string,

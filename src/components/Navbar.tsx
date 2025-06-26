@@ -159,7 +159,7 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                         Trainer&apos;s Mart
                     </Link> */}
                     <button
-                        className={`text-2xl font-extrabold tracking-tight ${textColor} transition-colors duration-200 hover:scale-105 bg-transparent border-none p-0 m-0 cursor-pointer`}
+                        className={`text-2xl font-extrabold tracking-tight ${textColor} transition-colors duration-200 bg-transparent border-none p-0 m-0 cursor-pointer`}
                         onClick={() => handleNavigation('/')}
                     >
                         Trainer&apos;s Mart

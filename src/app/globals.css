@@ -370,10 +370,24 @@ h2 {
 }
 
 .trainer-card-cont {
-  @apply bg-white rounded-xl sm:rounded-2xl border border-[#D1D3D466] shadow-[var(--trainer-card-shadow)] px-3 sm:px-4 lg:px-6 py-3 sm:py-4 flex flex-col items-center w-full h-auto min-h-[320px] sm:min-h-[360px] lg:min-h-[385px] cursor-pointer hover:shadow-md transition-shadow;
-  min-width: 193px;
+  @apply bg-white rounded-xl sm:rounded-2xl border border-[#D1D3D466] shadow-[var(--trainer-card-shadow)] px-3 sm:px-4 lg:px-6 py-3 sm:py-4 flex flex-col items-center w-full h-auto min-h-[320px] sm:min-h-[360px] md:min-w-[230px] lg:min-w-[270.5px] lg:min-h-[385px] cursor-pointer hover:shadow-md transition-shadow;
+  /* min-width: 193px; */
 }
 
 .trainer-card-image {
   @apply rounded-xl sm:rounded-2xl overflow-hidden mb-2 sm:mb-3 flex items-center justify-center bg-gray-100 relative h-32 sm:h-40 lg:h-48 w-full;
+}
+
+/* Hide scrollbar for elements with .scrollbar-hidden, but allow scrolling */
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  overflow-x: auto !important;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
 }

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Trash2, Plus, Edit } from 'lucide-react';
+import { Trash2, Plus, Edit, ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import NavBar from '../../components/Navbar';
 import { Workshop } from '@/models/workshop.models';
@@ -16,6 +16,7 @@ import { usePopup } from '@/lib/hooks/usePopup';
 import Popup from '@/components/Popup';
 import { useUser } from '@/context/UserContext'
 import { constructWorkshopPayload, addWorkshop, updateWorkshop, deleteWorkshop } from './workshop.helpers';
+import { useRouter } from 'next/navigation';
 
 
 
@@ -23,6 +24,7 @@ export default function WorkshopsPage() {
     const [workshops, setWorkshops] = useState<Workshop[]>([]);
     const { toastSuccess, toastError, showConfirmation, popupState, hidePopup } = usePopup();
     const { user } = useUser();
+    const router = useRouter();
 
     const [overlayState, setOverlayState] = useState<{
         isOpen: boolean;
@@ -240,7 +242,7 @@ export default function WorkshopsPage() {
                     <div className="flex flex-col justify-end items-start gap-2 mt-auto">
                         <div className="flex flex-wrap gap-1 sm:gap-2">
                             <span className="text-xs sm:text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded-md">
-                                {item.type ? 'Workshop' : 'Casestudy'}
+                                {item.type === 'Workshop' ? 'Workshop' : 'Casestudy'}
                             </span>
                         </div>
                         <span className="text-green-600 font-bold text-sm sm:text-base">₹ {item.price}/hour</span>
@@ -287,7 +289,17 @@ export default function WorkshopsPage() {
                 <NavBar />
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 my-6 sm:my-8 lg:my-10 w-full flex-grow">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4 sm:gap-0">
-                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">Workshops & Case Studies</h1>
+                        <div className="flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={() => router.back()}
+                                className="p-1 rounded hover:bg-gray-200 transition"
+                                aria-label="Go back"
+                            >
+                                <ArrowLeft className="w-6 h-6 text-gray-700" />
+                            </button>
+                            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">Workshops & Case Studies</h1>
+                        </div>
                         <button
                             onClick={() => {
                                 setOverlayState({ isOpen: true, type: 'create' });

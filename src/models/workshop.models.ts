@@ -10,7 +10,7 @@ export interface Workshop {
     handouts: string;
     program_flow: string;
     evaluation: string;
-    type: 'Workshop' | 'CaseStudy';
+    type: 'Workshop' | 'Casestudy';
 }
 
 export class WorkshopModel {

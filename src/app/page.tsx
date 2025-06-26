@@ -171,17 +171,16 @@ export default function Home() {
 
   const callLogin = () => {
 
-    console.log("Alert check login req is triggered");
 
     showConfirmation(
-      'Please login to continue',
+      'You need to be logged in to access this feature. Would you like to proceed to the login page?',
       () => {
         router.push('/login');
       },
       {
         title: 'Login Required',
-        confirmText: 'Login',
-        cancelText: 'Stay'
+        confirmText: 'Proceed to Login',
+        cancelText: 'Stay Here'
       }
     );
   }
@@ -346,7 +345,7 @@ export default function Home() {
                 })}
               </div>
             </div>
-            <div className="trainer-list min-h-[350px] flex flex-col md:px-8 lg:px-0 items-center justify-between">
+            <div className=" section-cont trainer-list min-h-[350px] flex flex-col px--4 md:px-8 lg:px-4 items-center justify-between">
               {activeTab === 'Featured' && <TrainerGrid
                 trainers={trainers}
                 paginationMode="client"
