@@ -38,7 +38,7 @@ const SearchCategoriesRow: React.FC<SearchCategoriesRowProps> = ({ onCategoryCli
     };
 
     return (
-        <div className="w-full max-w-xs sm:max-w-sm md:max-w-[70%] lg:max-w-[65.6rem] flex items-center gap-1 sm:gap-2 mt-0 justify-center bg-white/20 rounded-full py-2 sm:py-3 md:py-2 px-2 sm:px-3 md:px-2 shadow-md backdrop-blur-md hero-categories">
+        <div className="w-full max-w-xs sm:max-w-sm md:max-w-[70%] lg:max-w-[65.6rem] flex items-center gap-1 sm:gap-2 mt-0 justify-center bg-white/20 rounded-full py-1 sm:py-3 md:py-2 px-2 sm:px-3 md:px-2 shadow-md backdrop-blur-md hero-categories">
             <button
                 onClick={() => handleScroll('left')}
                 className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full bg-white text-xl font-bold hover:bg-white/50 transition hero-categories-left flex-shrink-0"
@@ -55,7 +55,7 @@ const SearchCategoriesRow: React.FC<SearchCategoriesRowProps> = ({ onCategoryCli
                 {getCategories("#ffffff").map((category, index) => (
                     <button
                         key={index}
-                        className="flex flex-col items-center justify-center gap-0.5 sm:gap-1 min-w-[48px] max-w-[48px] sm:min-w-[60px] sm:max-w-[60px] md:min-w-[70px] md:max-w-[70px] hero-category cursor-pointer text-white hover:opacity-80 transition-opacity"
+                        className="flex flex-col items-center justify-center gap-0.5 sm:gap-1 min-w-[48px] max-w-[48px] sm:min-w-[60px] sm:max-w-[60px] md:min-w-[70px] md:max-w-[70px] hero-category cursor-pointer text-white hover:opacity-80 transition-opacity hover:bg-white/20 rounded p-1"
                         onClick={() => handleCategoryClick(category.name)}
                     >
                         {loadingCategory === category.name ? (
