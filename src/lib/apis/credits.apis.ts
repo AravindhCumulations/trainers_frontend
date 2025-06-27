@@ -125,7 +125,7 @@ export const creditsApis = {
             const response = await axios.get('/api/resource/Credit Transaction', {
                 params: {
                     filters: JSON.stringify([["user", "=", user.email]]),
-                    fields: JSON.stringify(["user", "credits", "transaction_type", "amount", "reference_trainer"])
+                    fields: JSON.stringify(["user", "credits", "transaction_type", "amount", "reference_trainer", "trainer_name"])
                 },
                 headers: getAuthHeaders()
             });

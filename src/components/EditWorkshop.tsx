@@ -23,9 +23,9 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
     const errorContainerRef = useRef<HTMLDivElement>(null);
 
 
-    console.log("its here");
 
-    console.log(initialData);
+
+
 
 
     const initialFormData = {
@@ -235,7 +235,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
             const updateData = prepareUpdateData(initialData, modifiedFields, formData, imageUrl);
 
 
-            console.log(updateData);
+
 
 
             if (onUpdate) onUpdate(updateData);

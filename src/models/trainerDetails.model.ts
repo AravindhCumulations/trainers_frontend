@@ -105,6 +105,7 @@ export interface TrainerDetailsModel {
     clients: string[];
     client_worked: Client[];
     is_unlocked?: boolean;
+    total_unlocks: number;
 }
 
 export interface TrainerFormDto {
@@ -479,7 +480,7 @@ export class TrainerFormValidator {
     }
 
     static validateClients(data: Client[]): string[] {
-        console.log("its here");
+
 
         const errors: string[] = [];
 

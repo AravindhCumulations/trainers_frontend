@@ -264,6 +264,8 @@ const TrainerDetailsContent = () => {
     });
 
     const callLogin = () => {
+
+
         showConfirmation(
             'You need to be logged in to access this feature. Would you like to proceed to the login page?',
             () => {
@@ -549,7 +551,7 @@ const TrainerDetailsContent = () => {
                                         <div className="analytics-item flex flex-col items-start w-full sm:w-1/2 rounded-xl bg-pink-50 p-3 sm:p-4 border-1 border-pink-200 font-light text-xs sm:text-sm">
                                             <p className="text-xs sm:text-sm text-gray-500 mb-1"> Contact Unlocked</p>
                                             <div className="flex items-center gap-2 mb-2">
-                                                <p className="text-2xl sm:text-3xl font-semibold">0</p>
+                                                <p className="text-2xl sm:text-3xl font-semibold">{trainerData.total_unlocks}</p>
                                                 <span className="inline-block rounded-full bg-pink-100 p-1 sm:p-2">
                                                     <svg xmlns="http://www.w3.org/2000/svg" height="16px" width="16px" viewBox="0 -960 960 960" fill="#000" className="sm:h-6 sm:w-6"><path d="M240-640h360v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85h-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640Zm0 480h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM240-160v-400 400Z" /></svg>
                                                 </span>

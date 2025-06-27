@@ -188,7 +188,7 @@ function TrainersPageContent() {
     return (
         <div className="bg-white min-h-screen flex flex-col">
             <section className="relative w-full mx-auto flex flex-col items-center header-hero-section bg-white">
-                <div className="w-full bg-gradient-to-b from-blue-400 to-blue-600 text-white  lg:pb-10 px-4 sm:px-6 lg:px-8 flex flex-col items-center rounded-b-[20px] sm:rounded-b-[30px] lg:rounded-b-[40px] relative z-10 header-hero-bg">
+                <div className="w-full bg-gradient-to-b from-blue-400 to-blue-600 text-white  lg:pb-10 px-4  lg:px-8 flex flex-col items-center rounded-b-[20px] sm:rounded-b-[30px] lg:rounded-b-[40px] relative z-10 header-hero-bg">
                     <Navbar bgColor='transparent' />
                     <div className="flex w-full justify-center items-center py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
                         <div className="flex flex-col lg:flex-row w-full max-w-7xl gap-3 sm:gap-4 items-center justify-center">

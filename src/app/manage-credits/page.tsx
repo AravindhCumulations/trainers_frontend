@@ -33,7 +33,7 @@ const ManageCredits = () => {
 
     const handleBuyAmountChange = (amount: number) => {
         setBuyAmount(Math.max(10, buyAmount + amount));
-        console.log(buyAmount);
+
     };
 
     const totalPrice = buyAmount * 5;
@@ -58,13 +58,13 @@ const ManageCredits = () => {
         try {
             const username = user?.email
 
-            console.log("Creating order for user:", username, "with total price:", totalPrice);
+
 
             const orderRes = await creditsApis.createOrder(username, totalPrice);
 
             const { order_id, amount, currency } = orderRes.message;
 
-            console.log("Order created:", order_id, amount, currency);
+
 
             const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
             if (!razorpayKey) {
@@ -81,9 +81,7 @@ const ManageCredits = () => {
                 order_id: order_id,
                 handler: async function (response: RazorpayResponse) {
                     toastSuccess(`Payment successful!`);
-                    console.log("Payment ID:", response.razorpay_payment_id);
-                    console.log("Order ID:", response.razorpay_order_id);
-                    console.log("Signature:", response.razorpay_signature);
+
 
                     try {
                         const verifyRes = await creditsApis.verifyPaymentAndUpdateCredits(
@@ -93,7 +91,7 @@ const ManageCredits = () => {
                         );
 
                         if (verifyRes.message.status === 'success') {
-                            console.log("Payment verified and credits updated:", verifyRes.message.credits);
+
                             try {
                                 await updateCredits(); // Handle this separately
                             } catch (creditUpdateErr) {
@@ -230,7 +228,7 @@ const ManageCredits = () => {
                                                         <td className="py-2 px-4">{item.transaction_type}</td>
                                                         <td className="py-2 px-4">{item.credits}</td>
                                                         <td className="py-2 px-4">₹{item.amount}</td>
-                                                        <td className="py-2 px-4">{item.reference_trainer || '-'}</td>
+                                                        <td className="py-2 px-4">{item.trainer_name || '-'}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -253,7 +251,7 @@ const ManageCredits = () => {
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <p className="text-sm font-medium text-gray-600 mb-1">Exchange Rate</p>
-                                            <p className="text-2xl font-bold text-gray-900">50 Credits = ₹10</p>
+                                            <p className="text-2xl font-bold text-gray-900">10 Credits = ₹50</p>
                                         </div>
                                         <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-full text-sm font-medium">
                                             <span className="mr-1">🔥</span>

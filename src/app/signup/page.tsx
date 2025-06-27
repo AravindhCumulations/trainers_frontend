@@ -6,6 +6,7 @@ import { SignupModel, User } from '@/models/auth.models';
 import { authApis } from "@/lib/apis/auth.apis"
 import { setUserDetailsToLocalStore } from '@/lib/utils/auth.utils';
 import { useNavigation } from "@/lib/hooks/useNavigation";
+import { Eye, EyeOff } from "lucide-react";
 
 
 export default function SignupPage() {
@@ -21,6 +22,8 @@ export default function SignupPage() {
     const [fullName, setFullName] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const { handleNavigation } = useNavigation();
+    const [showPassword, setShowPassword] = useState(false);
+    const [showRePassword, setShowRePassword] = useState(false);
 
 
 
@@ -135,8 +138,8 @@ export default function SignupPage() {
 
         <div className="flex flex-col h-screen bg-blue-100">
             <div className="flex flex-1 flex-col justify-center items-center ">
-                <motion.div className="top-5 left-5 bg-blue-600 rounded-lg px-2.5 py-3 mb-2  hover:cursor-pointer hover:scale-105">
-                    <p className="text-white font-extrabold hover:scale-105" onClick={() => handleNavigation('/')}>Trainer&apos;s Mart</p>
+                <motion.div className="top-5 left-5  rounded-lg px-2.5 py-3 mb-2  hover:cursor-pointer hover:scale-105">
+                    <p className="text-blue-600 text-xl font-extrabold hover:scale-105" onClick={() => handleNavigation('/')}>Trainer&apos;s Mart</p>
                 </motion.div>
                 <motion.div
 
@@ -237,32 +240,71 @@ export default function SignupPage() {
                         </div>
                         <div>
                             <label className="block text-gray-700">Password</label>
-                            <input
-                                name="password"
-                                value={formData?.password}
-                                onChange={(e) => setFormData(prev => ({
-                                    ...prev,
-                                    password: e.target.value,
-                                    roles: prev?.roles || [],
-                                    first_name: prev?.first_name || '',
-                                    last_name: prev?.last_name || '',
-                                    email: prev?.email || ''
-                                }))}
-                                type="password"
-                                placeholder="Create a password"
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
+                            <div className="flex relative">
+                                <input
+                                    name="password"
+                                    value={formData?.password}
+                                    onChange={(e) => setFormData(prev => ({
+                                        ...prev,
+                                        password: e.target.value,
+                                        roles: prev?.roles || [],
+                                        first_name: prev?.first_name || '',
+                                        last_name: prev?.last_name || '',
+                                        email: prev?.email || ''
+                                    }))}
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="Create a password"
+                                    className="w-full flex flex-1  px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                                {showPassword ? (
+                                    <div className="absolute right-4 top-5">
+                                        <EyeOff
+                                            size={22}
+                                            className="transform -translate-y-1/2 cursor-pointer text-gray-500"
+                                            onClick={() => setShowPassword(false)}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="absolute right-4 top-5">
+                                        <Eye
+                                            size={22}
+                                            className="transform -translate-y-1/2 cursor-pointer text-gray-500"
+                                            onClick={() => setShowPassword(true)}
+                                        />
+                                    </div>
+                                )}
+
+                            </div>
                         </div>
                         <div>
                             <label className="block text-gray-700">Re-enter Password</label>
-                            <input
-                                name="rePassword"
-                                value={rePassword}
-                                onChange={(e) => setRePassword(e.target.value)}
-                                type="password"
-                                placeholder="Create a password"
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
+                            <div className="flex relative">
+                                <input
+                                    name="rePassword"
+                                    value={rePassword}
+                                    onChange={(e) => setRePassword(e.target.value)}
+                                    type={showRePassword ? "text" : "password"}
+                                    placeholder="Create a password"
+                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                                {showRePassword ? (
+                                    <div className="absolute right-4 top-5">
+                                        <EyeOff
+                                            size={22}
+                                            className="transform -translate-y-1/2 cursor-pointer text-gray-500"
+                                            onClick={() => setShowRePassword(false)}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="absolute right-4 top-5">
+                                        <Eye
+                                            size={22}
+                                            className="transform -translate-y-1/2 cursor-pointer text-gray-500"
+                                            onClick={() => setShowRePassword(true)}
+                                        />
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {formData?.password && rePassword && formData.password !== rePassword ? (

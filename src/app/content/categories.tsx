@@ -80,7 +80,7 @@ export const getCategories = (color: string) => [
         )
     },
     {
-        name: 'Posh',
+        name: 'POSH',
         icon: (
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-0.855 -0.855 24 24" id="Shield-2--Streamline-Core" height="24" width="24">
                 <desc>

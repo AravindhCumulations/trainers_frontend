@@ -15,7 +15,7 @@ const WorkshopCard = ({ workshop, onClick }: WorkshopCardProps) => {
     const descriptionClasses = `text-sm text-gray-600 line-clamp-3 overflow-hidden`;
     const priceClasses = `text-green-600 font-bold text-sm pl-2 py-2`;
 
-    console.log(workshop);
+
 
 
     return (

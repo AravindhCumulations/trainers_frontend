@@ -6,9 +6,9 @@ export const constructWorkshopPayload = (workshops: Workshop[], trainerId: strin
         name: trainerId
     };
 
-    console.log("under constructWorkshopPayload");
 
-    console.log(workshops);
+
+
 
 
     // Split workshops by type for payload
@@ -31,7 +31,7 @@ export const constructWorkshopPayload = (workshops: Workshop[], trainerId: strin
         ...basePayload,
         workshop: workshopList,
     } as any;
-    console.log('Constructed Workshop Payload:', payload);
+
     return payload;
 };
 

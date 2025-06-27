@@ -228,7 +228,7 @@ export default function TrainerDetailsPage() {
                 if (trainerParam) {
                     setIsEdit(true);
                     const trainerData = JSON.parse(decodeURIComponent(trainerParam));
-                    console.log(trainerData);
+
 
 
                     // Set the existing image URL as preview if available
@@ -240,11 +240,11 @@ export default function TrainerDetailsPage() {
                     initializeFormData(trainerData);
                 } else if (trainerName) {
 
-                    console.log("request as trainer manage profile");
+
 
                     // Get trainer data using API
                     const response = await trainerApis.company.getTrainerByName(trainerName, trainerName);
-                    console.log(response.message);
+
 
                     if (response.message) {
                         setIsEdit(true);
@@ -535,7 +535,7 @@ export default function TrainerDetailsPage() {
                     submitData.phone = phone; // ✅ Plain object assignment
                 }
 
-                console.log(submitData);
+
 
 
                 response = await trainerApis.trainerForm.createFormData(submitData);
@@ -1013,8 +1013,8 @@ export default function TrainerDetailsPage() {
                                                 type="tel"
                                                 value={form.phone.replace(/^\+91-/, '')}
                                                 onChange={(e) => {
-                                                    // Remove any existing +91- prefix and any non-digit characters
-                                                    const cleanNumber = e.target.value.replace(/^\+91-/, '').replace(/\D/g, '');
+                                                    // Remove any existing +91- prefix and any non-digit characters, then limit to 10 digits
+                                                    const cleanNumber = e.target.value.replace(/^\+91-/, '').replace(/\D/g, '').slice(0, 10);
                                                     handleChanges('phone', cleanNumber);
                                                 }}
                                                 placeholder="Enter phone number"

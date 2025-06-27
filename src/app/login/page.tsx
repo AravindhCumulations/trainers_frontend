@@ -144,10 +144,8 @@ export default function LoginPage() {
         <div className="flex flex-col  h-screen  transition-colors duration-300 bg-theme">
 
             <div className="flex flex-1 flex-col justify-center items-center relative">
-                <motion.div className="top-5 left-5 bg-blue-600 rounded-lg px-2.5 py-3 mb-2  hover:cursor-pointer hover:scale-105"
-                >
-
-                    <p className="text-white font-extrabold hover:scale-105" onClick={() => handleNavigation('/')}>Trainer&apos;s Mart</p>
+                <motion.div className="top-5 left-5  rounded-lg px-2.5 py-3 mb-2  hover:cursor-pointer hover:scale-105">
+                    <p className="text-blue-600 text-xl font-extrabold hover:scale-105" onClick={() => handleNavigation('/')}>Trainer&apos;s Mart</p>
                 </motion.div>
                 <motion.div
 

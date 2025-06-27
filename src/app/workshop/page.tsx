@@ -86,7 +86,7 @@ export default function WorkshopsPage() {
 
     const handleDeleteWorkshop = async (idx: string) => {
         try {
-            console.log('Starting delete operation:', { idx });
+
 
             const searchParams = new URLSearchParams(window.location.search);
             const trainerName = searchParams.get('trainer');
@@ -96,21 +96,21 @@ export default function WorkshopsPage() {
 
             const trainerResponse = await trainerApis.getTrainerByName(trainerName);
             const trainerId = trainerResponse.data.name;
-            console.log('Retrieved trainer ID:', trainerId);
+
 
             const updatedWorkshops = deleteWorkshop(workshops, idx);
-            console.log('Updated state after deletion:', { updatedWorkshops });
+
 
             const payload = constructWorkshopPayload(updatedWorkshops, trainerId);
-            console.log('Sending delete payload to API:', payload);
+
 
             // Make API call to update trainer with the modified list
             await trainerApis.trainerForm.editFormData(payload);
-            console.log('Delete API call successful');
+
 
             // // Update local state
             setWorkshops(updatedWorkshops);
-            console.log('Local state updated after deletion');
+
 
             toastSuccess(`${workshops.find(w => w.idx === idx)?.type === 'Workshop' ? 'Workshop' : 'Casestudy'} deleted successfully`);
         } catch (error) {
@@ -122,7 +122,7 @@ export default function WorkshopsPage() {
     const handleEditClick = (item: any, e: React.MouseEvent) => {
         e.stopPropagation(); // Prevent card click event
 
-        console.log("Check your item here", item);
+
 
         setOverlayState({
             isOpen: true,
@@ -146,7 +146,7 @@ export default function WorkshopsPage() {
 
     const handleWorkshopUpdate = async (workshopData: Workshop, isCreate: boolean) => {
         try {
-            console.log('Starting workshop update operation:', { workshopData, isCreate });
+
 
             const searchParams = new URLSearchParams(window.location.search);
             const trainerName = searchParams.get('trainer');
@@ -159,25 +159,25 @@ export default function WorkshopsPage() {
             let updatedWorkshops;
 
             if (isCreate) {
-                console.log('Creating new item');
+
                 updatedWorkshops = addWorkshop(workshops, workshopData);
             } else {
-                console.log('Updating existing item');
+
                 updatedWorkshops = updateWorkshop(workshops, workshopData);
             }
 
-            console.log('Updated state:', { updatedWorkshops });
+
 
             const payload = constructWorkshopPayload(updatedWorkshops, trainerId);
-            console.log('Sending payload to API:', payload);
+
 
             // Make API call to update trainer with the modified list
             await trainerApis.trainerForm.editFormData(payload);
-            console.log('API call successful');
+
 
             // Fetch fresh data from the server
             await fetchWorkshops();
-            console.log('Local state reloaded from server');
+
 
             // Show appropriate success message
             const action = isCreate ? 'created' : 'updated';
@@ -193,7 +193,7 @@ export default function WorkshopsPage() {
 
     const renderCard = (item: Workshop) => {
 
-        console.log("i->", item);
+
 
         // Safely check if item and idx exist
         if (!item || !item.idx) {

@@ -14,7 +14,7 @@ const TrainerCard = memo(({ trainer, onClick, viewMode, onWishlistUpdate, callLo
 
     const handleWishlist = async (name: string, is_wishlisted: number) => {
         if (!user.isLoggedIn || user.role === 'guest') {
-            console.log("1->");
+
 
             if (callLogin) {
                 callLogin();
