@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import TrainerCard from './TrainerCard';
 import PaginationControls from './PaginationControls';
 import { TrainerCardModel } from '../models/trainerCard.model';
