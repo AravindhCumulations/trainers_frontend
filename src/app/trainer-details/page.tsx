@@ -9,7 +9,7 @@ import TrainerGrid from "@/components/TrainerGrid";
 import { trainerApis } from '@/lib/apis/trainer.apis';
 import { TrainerDetailsModel } from '@/models/trainerDetails.model';
 import { useLoading } from '@/context/LoadingContext';
-import { getCurrentUserName, getCurrentUserRole } from '@/lib/utils/auth.utils'
+import { getCurrentUserMail, getCurrentUserName, getCurrentUserRole } from '@/lib/utils/auth.utils'
 import { RatingStars } from "@/components/RatingStars";
 import { useNavigation } from "@/lib/hooks/useNavigation";
 
@@ -121,6 +121,8 @@ const TrainerDetailsContent = () => {
                 const trainerName = searchParams.get('trainer');
                 const userName = getCurrentUserName() || 'guest';
                 const userRole = getCurrentUserRole() || 'guest';
+                const userMail = getCurrentUserMail() || '';
+
 
                 if (!trainerName) {
                     showError('Trainer not found');
@@ -128,6 +130,8 @@ const TrainerDetailsContent = () => {
                 }
 
                 if (userRole === 'Trainer' && userName === trainerName) {
+
+
                     setIsLoggedInUser(true);
 
                     const response = await trainerApis.getTrainerByName(trainerName);
@@ -143,7 +147,7 @@ const TrainerDetailsContent = () => {
                     }
                 }
                 else {
-                    const res = await trainerApis.company.getTrainerByName(trainerName, userName);
+                    const res = await trainerApis.company.getTrainerByName(trainerName, userMail);
 
                     if (!res || !res.message) {
                         showError('Failed to fetch trainer details');
@@ -212,8 +216,8 @@ const TrainerDetailsContent = () => {
                                     console.error("Failed to update credits:", creditUpdateErr);
                                     toastError("Failed to update your credits.");
                                 }
-                                const userName = getCurrentUserName();
-                                const updatedTrainerData = await trainerApis.company.getTrainerByName(trainerData.name, userName);
+                                const userMail = getCurrentUserMail();
+                                const updatedTrainerData = await trainerApis.company.getTrainerByName(trainerData.name, userMail);
                                 if (updatedTrainerData && updatedTrainerData.message) {
                                     setTrainerData(updatedTrainerData.message);
                                 }
@@ -594,7 +598,7 @@ const TrainerDetailsContent = () => {
                                         >
                                             {(!trainerData.Casestudy || trainerData.Casestudy.length === 0) &&
                                                 (!trainerData.workshop || trainerData.workshop.length === 0) ? (
-                                                <div className="col-span-3" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 150 }}>
+                                                <div className="w-full" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 150 }}>
                                                     {isLoggedInUser ? (
                                                         <p>Add workshops or case studies to display.</p>
                                                     ) : (

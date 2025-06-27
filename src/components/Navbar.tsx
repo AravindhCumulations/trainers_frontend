@@ -11,13 +11,14 @@ import { authApis } from "@/lib/apis/auth.apis";
 import { useUser } from '@/context/UserContext';
 import { getCurrentUserName } from "@/lib/utils/auth.utils";
 import { usePopup } from "@/lib/hooks/usePopup";
+import Popup from "./Popup";
 
 
 interface NavBarProps {
     bgColor?: string;
 }
 
-export default function Page({ bgColor = "bg-white" }: NavBarProps) {
+export default function Page({ bgColor = "bg-white", }: NavBarProps) {
 
     const [credit, setCredit] = useState(0);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -25,7 +26,7 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
     const { handleNavigation } = useNavigation();
     const { resetUser, user } = useUser();
     const [isLoading, setIsLoading] = useState(true);
-    const { toastError } = usePopup();
+    const { toastError, showConfirmation, popupState, hidePopup } = usePopup();
 
 
     // Remove redundant state variables that can be derived from user context
@@ -99,6 +100,8 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
     };
 
     const handleLogout = async (): Promise<void> => {
+
+
         try {
             // First call the logout API
             await authApis.logout();
@@ -127,6 +130,8 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
         }
     };
 
+
+
     const handleCredits = (): void => {
         handleNavigation("/manage-credits");
     }
@@ -138,6 +143,18 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
     const handleDrawerItemClick = (path: string): void => {
         handleNavigation(path);
         setIsDrawerOpen(false);
+    };
+
+    const handleLogoutClick = () => {
+        showConfirmation(
+            "Are you sure you want to logout?",
+            handleLogout,
+            {
+                title: "Confirm Logout",
+                confirmText: "Logout",
+                cancelText: "Cancel"
+            }
+        );
     };
 
     return (
@@ -255,7 +272,7 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                                             </button>)}
 
                                             <button
-                                                onClick={handleLogout}
+                                                onClick={handleLogoutClick}
                                                 className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                                             >
                                                 <LogOutIcon className="w-4 h-4" />
@@ -349,7 +366,7 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                                     )}
 
                                     <button
-                                        onClick={handleLogout}
+                                        onClick={handleLogoutClick}
                                         className="w-full px-2 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                                     >
                                         <LogOutIcon className="w-4 h-4" />
@@ -376,6 +393,18 @@ export default function Page({ bgColor = "bg-white" }: NavBarProps) {
                     </div>
                 </div>
             </div>
+
+            {/* Global Popup for confirmations and alerts */}
+            <Popup
+                isOpen={popupState.isOpen}
+                type={popupState.type}
+                message={popupState.message}
+                title={popupState.title}
+                onClose={hidePopup}
+                onConfirm={popupState.onConfirm}
+                confirmText={popupState.confirmText}
+                cancelText={popupState.cancelText}
+            />
         </>
     );
 }

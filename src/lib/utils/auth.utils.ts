@@ -38,6 +38,7 @@ export const getCurrentUserRole = (): string => {
         return "";
     }
 };
+
 export const getCurrentUserMail = (): string => {
     try {
         const raw = localStorage.getItem("user_details");

@@ -243,17 +243,17 @@ export default function TrainerDetailsPage() {
 
 
                     // Get trainer data using API
-                    const response = await trainerApis.company.getTrainerByName(trainerName, trainerName);
+                    const response = await trainerApis.getTrainerByName(trainerName);
 
 
-                    if (response.message) {
+                    if (response.data) {
                         setIsEdit(true);
                         // Set the existing image URL as preview if available
-                        if (response.message.image) {
-                            setProfileImagePreview(response.message.image);
+                        if (response.data.image) {
+                            setProfileImagePreview(response.data.image);
                         }
                         // Initialize form data using the new method
-                        initializeFormData(response.message);
+                        initializeFormData(response.data);
                     }
 
                 }

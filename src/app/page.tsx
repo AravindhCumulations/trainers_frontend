@@ -185,6 +185,7 @@ export default function Home() {
     );
   }
 
+
   const handleWishlistUpdate = (trainer: TrainerCardModel, isWishlisted: boolean) => {
     // Update the trainer in the main trainers list
 
@@ -209,9 +210,6 @@ export default function Home() {
     'trainer name',
     'skill',
     'city',
-    'Negotiation',
-    'Communication',
-    'Leadership'
   ], 100, 50, 2000);
 
   return (
@@ -345,7 +343,7 @@ export default function Home() {
                 })}
               </div>
             </div>
-            <div className=" section-cont trainer-list min-h-[350px] flex flex-col px--4 md:px-8 lg:px-4 items-center justify-between">
+            <div className=" section-cont trainer-list min-h-[350px] flex flex-col md:px-8 lg:px-4 items-center justify-between">
               {activeTab === 'Featured' && <TrainerGrid
                 trainers={trainers}
                 paginationMode="client"
@@ -438,7 +436,8 @@ export default function Home() {
                       blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                     />
                   </div>
-                  <p className="text-lg md:text-[24px] font-normal leading-relaxed md:leading-[36px] text-gray-900"><span className="font-semibold">Connect directly--</span>no commisions, no hassle!</p>
+                  <p className="text-lg md:text-[24px] font-normal leading-relaxed md:leading-[36px] text-gray-900"><span className="font-semibold">
+                    Connect directly—</span>no commisions, no hassle!</p>
                 </div>
               </div>
             </section>

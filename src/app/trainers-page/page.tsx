@@ -264,7 +264,7 @@ function TrainersPageContent() {
                 </div>
             </section>
 
-            <main className="flex-grow">
+            <main className="flex-grow px-4">
                 <div className="w-full max-w-[1352px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
                     <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
                         {searchTitle}

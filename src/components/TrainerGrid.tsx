@@ -68,7 +68,7 @@ export default function TrainerGrid({
     }, [handleNavigation]);
 
     return (
-        <section className="w-full max-w-[1352px] mx-auto flex flex-col trainer-list-section px-4 sm:px-6 lg:px-8">
+        <section className="w-full max-w-[1352px] mx-auto flex flex-col trainer-list-section sm:px-6 lg:px-8">
             <div className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 trainer-list-grid">
                 {isLoading ? (
                     // Show skeleton loaders based on pageSize
@@ -87,7 +87,7 @@ export default function TrainerGrid({
                     ))
                 ) : (
                     <div className="col-span-2 sm:col-span-2 md:col-span-3 lg:col-span-4 xl:col-span-4 text-center text-gray-500 text-sm sm:text-base lg:text-lg font-semibold py-8 sm:py-12 lg:py-14 h-full">
-                        Unable to load trainers.
+                        No trainer&apos;s Found.
                     </div>
                 )}
             </div>
