@@ -213,26 +213,34 @@ const ManageCredits = () => {
                                     <div className="text-center py-8 text-gray-500">No history found.</div>
                                 ) : (
                                     <div className="overflow-x-auto">
-                                        <table className="min-w-full text-sm">
-                                            <thead>
-                                                <tr className="bg-gray-100">
-                                                    <th className="py-2 px-4 text-left">Type</th>
-                                                    <th className="py-2 px-4 text-left">Credits</th>
-                                                    <th className="py-2 px-4 text-left">Amount</th>
-                                                    <th className="py-2 px-4 text-left">Reference Trainer</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {history.map((item, idx) => (
-                                                    <tr key={idx} className="border-b last:border-none">
-                                                        <td className="py-2 px-4">{item.transaction_type}</td>
-                                                        <td className="py-2 px-4">{item.credits}</td>
-                                                        <td className="py-2 px-4">₹{item.amount}</td>
-                                                        <td className="py-2 px-4">{item.trainer_name || '-'}</td>
+                                        <div
+                                            className={
+                                                history.length > 10
+                                                    ? "max-h-80 overflow-y-auto"
+                                                    : ""
+                                            }
+                                        >
+                                            <table className="min-w-full text-sm">
+                                                <thead>
+                                                    <tr className="bg-gray-100">
+                                                        <th className="py-2 px-4 text-left">Type</th>
+                                                        <th className="py-2 px-4 text-left">Credits</th>
+                                                        <th className="py-2 px-4 text-left">Amount</th>
+                                                        <th className="py-2 px-4 text-left">Trainer</th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
+                                                </thead>
+                                                <tbody>
+                                                    {history.map((item, idx) => (
+                                                        <tr key={idx} className="border-b last:border-none">
+                                                            <td className="py-2 px-4">{item.transaction_type}</td>
+                                                            <td className="py-2 px-4">{item.credits}</td>
+                                                            <td className="py-2 px-4">₹{item.amount}</td>
+                                                            <td className="py-2 px-4">{item.trainer_name || '-'}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 )}
                             </div>
