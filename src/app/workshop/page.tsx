@@ -293,7 +293,7 @@ export default function WorkshopsPage() {
                             <button
                                 type="button"
                                 onClick={() => router.back()}
-                                className="p-1 rounded hover:bg-gray-200 transition"
+                                className="p-1 rounded hover:scale-105 transition"
                                 aria-label="Go back"
                             >
                                 <ArrowLeft className="w-6 h-6 text-gray-700" />

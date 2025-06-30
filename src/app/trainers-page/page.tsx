@@ -28,6 +28,9 @@ function TrainersPageContent() {
     const { showLoader, hideLoader } = useLoading();
     const { showConfirmation } = usePopup();
 
+    // Add state for selected category
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
     const callLogin = () => {
         showConfirmation(
             'Please login to continue',
@@ -72,7 +75,7 @@ function TrainersPageContent() {
                 pageSize
             );
 
-            const trainers = response.data?.trainers || [];
+            const trainers = response.data?.results || [];
             const total = response.data?.total || 0;
 
             setSearchResults(trainers);
@@ -109,6 +112,7 @@ function TrainersPageContent() {
         setSearchText('');
         setCurrentPage(1);
         setSearchResults([]);
+        setSelectedCategory(null); // Clear selected category
         updateUrlParams('', citySearch);
         handleSearch('', citySearch, 1, itemsPerPage);
     };
@@ -202,6 +206,7 @@ function TrainersPageContent() {
                                         if (e.target.value === '') {
                                             setCurrentPage(1);
                                             setSearchResults([]);
+                                            setSelectedCategory(null);
                                             updateUrlParams('', citySearch);
                                             handleSearch('', citySearch, 1, itemsPerPage);
                                         }
@@ -234,6 +239,7 @@ function TrainersPageContent() {
                                         setCitySearch(e.target.value);
                                         setCurrentPage(1);
                                         setSearchResults([]);
+                                        setSelectedCategory(null);
                                         updateUrlParams(searchText, e.target.value);
                                         handleSearch(searchText, e.target.value, 1, itemsPerPage);
                                     }}
@@ -299,10 +305,16 @@ function TrainersPageContent() {
                         <button
                             onClick={() => {
                                 setSearchText(category.name);
+                                setSelectedCategory(category.name); // Set selected category
                                 handleSearch(category.name, '', 1, itemsPerPage);
                             }}
                             key={index}
-                            className="py-1.5 sm:py-2 px-3 sm:px-4 text-[#3B82F6] bg-blue-100 text-xs sm:text-sm font-medium rounded-md items-center flex flex-col hover:bg-blue-200 transition-colors duration-200"
+                            className={`py-1.5 sm:py-2 px-3 sm:px-4 
+                                ${selectedCategory === category.name
+                                    ? 'border-2 border-blue-600 bg-blue-50 font-bold text-blue-700'
+                                    : 'bg-blue-100 text-[#3B82F6]'
+                                }
+                                text-xs sm:text-sm font-medium rounded-md items-center flex flex-col hover:bg-blue-200 transition-colors duration-200`}
                         >
                             {category.icon}
                             {category.name}

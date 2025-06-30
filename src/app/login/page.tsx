@@ -33,6 +33,8 @@ export default function LoginPage() {
         newPassword: '',
         confirmPassword: ''
     });
+    // Add state for 4-digit OTP
+    const [otpDigits, setOtpDigits] = useState(['', '', '', '']);
 
     // handles
     const handleLogin = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
@@ -52,6 +54,10 @@ export default function LoginPage() {
         try {
             const data = await authApis.login(formData.email, formData.password);
 
+            console.log("login details");
+            console.log(data);
+
+
             if (data.user_details && data.key_details) {
                 setUserDetailsToLocalStore(data);
 
@@ -61,7 +67,7 @@ export default function LoginPage() {
                     email: data.user_details.email,
                     role: data.user_details.role_user === "Trainer" ? "Trainer" : "user_role",
                     profilePic: '',
-                    isLoggedIn: data.user_details.is_first_login,
+                    isLoggedIn: true,
                     credits: 0
                 });
 
@@ -102,7 +108,8 @@ export default function LoginPage() {
                 setForgotPasswordStep('otp');
                 setError(null);
             } else if (forgotPasswordStep === 'otp') {
-                const response = await authApis.otp.verifyOTP(forgotPasswordData.email, forgotPasswordData.otp);
+                const otp = otpDigits.join('');
+                const response = await authApis.otp.verifyOTP(forgotPasswordData.email, otp);
                 if (response.message.status === 'success') {
                     setError(null);
                     setForgotPasswordStep('reset');
@@ -123,6 +130,7 @@ export default function LoginPage() {
                     newPassword: '',
                     confirmPassword: ''
                 });
+                setOtpDigits(['', '', '', '']);
                 setError(null);
             }
         } catch (err) {
@@ -251,6 +259,7 @@ export default function LoginPage() {
                                             newPassword: '',
                                             confirmPassword: ''
                                         });
+                                        setOtpDigits(['', '', '', '']);
                                         setError(null);
                                     }}
                                     className="text-gray-600  hover:text-gray-900  transition-colors duration-300"
@@ -289,16 +298,36 @@ export default function LoginPage() {
 
                                 {forgotPasswordStep === 'otp' && (
                                     <div>
-                                        <label className="block text-gray-700  font-semibold mb-1">OTP</label>
-                                        <input
-                                            type="text"
-                                            name="otp"
-                                            value={forgotPasswordData.otp}
-                                            onChange={handleForgotPasswordInputChange}
-                                            placeholder="Enter OTP"
-                                            className="w-full px-4 py-3 border border-gray-300  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            required
-                                        />
+                                        <label className="block text-gray-700 font-semibold mb-1">OTP</label>
+                                        <div className="flex gap-2 justify-center">
+                                            {otpDigits.map((digit, idx) => (
+                                                <input
+                                                    key={idx}
+                                                    type="text"
+                                                    inputMode="numeric"
+                                                    maxLength={1}
+                                                    value={digit}
+                                                    onChange={e => {
+                                                        const val = e.target.value.replace(/[^0-9]/g, '');
+                                                        if (!val) return;
+                                                        const newOtp = [...otpDigits];
+                                                        newOtp[idx] = val;
+                                                        setOtpDigits(newOtp);
+                                                        if (val && idx < 3) {
+                                                            document.getElementById(`otp-input-${idx + 1}`)?.focus();
+                                                        }
+                                                    }}
+                                                    onKeyDown={e => {
+                                                        if (e.key === 'Backspace' && !otpDigits[idx] && idx > 0) {
+                                                            document.getElementById(`otp-input-${idx - 1}`)?.focus();
+                                                        }
+                                                    }}
+                                                    id={`otp-input-${idx}`}
+                                                    className="w-12 h-12 text-center border border-gray-300 rounded-lg text-xl focus:ring-2 focus:ring-blue-500"
+                                                    autoFocus={idx === 0}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
                                 )}
 
@@ -355,6 +384,7 @@ export default function LoginPage() {
                                                 newPassword: '',
                                                 confirmPassword: ''
                                             });
+                                            setOtpDigits(['', '', '', '']);
                                         }}
                                         className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-3 rounded-lg font-semibold"
                                     >

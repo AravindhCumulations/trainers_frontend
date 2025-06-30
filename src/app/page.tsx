@@ -112,7 +112,7 @@ export default function Home() {
     }
     catch (error) {
       console.error('Error fetching trainers:', error);
-      toastError('Unable to company trainer details.');
+      toastError('Unable to fetch trainers.');
 
     }
   };
@@ -206,7 +206,6 @@ export default function Home() {
   };
 
   const typingText = useTypingEffect([
-    ...expertise_in,
     'trainer name',
     'skill',
     'city',

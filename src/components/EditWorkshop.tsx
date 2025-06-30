@@ -55,6 +55,12 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
 
     const MAX_CHAR_LIMIT = 300;
 
+    // Add error states for character limits
+    const [objectivesError, setObjectivesError] = useState('');
+    const [outcomesError, setOutcomesError] = useState('');
+    const [handoutsError, setHandoutsError] = useState('');
+    const [evaluationError, setEvaluationError] = useState('');
+
     // Function to strip HTML and count characters
     const getTextLength = (htmlContent: string): number => {
         const tempDiv = document.createElement('div');
@@ -342,13 +348,28 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                             <div className="relative">
                                 <textarea
                                     value={formData.objectives}
-                                    onChange={(e) => handleChange('objectives', e.target.value)}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value.length <= MAX_CHAR_LIMIT) {
+                                            handleChange('objectives', value);
+                                            setObjectivesError('');
+                                        } else {
+                                            setObjectivesError('Only 300 characters are allowed. Please shorten your input.');
+                                        }
+                                    }}
                                     className="min-h-[80px] sm:min-h-[100px] rounded-lg w-full p-2 sm:p-3 border border-blue-100 text-sm sm:text-base text-gray-700 font-normal leading-6 placeholder:text-gray-400 placeholder:text-sm sm:placeholder:text-base placeholder:font-light resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pb-8"
                                     placeholder="Enter workshop objectives"
                                 />
-                                <span className="absolute bottom-2 right-2 text-xs sm:text-sm text-gray-500">
-                                    {formData.objectives.length}/{MAX_CHAR_LIMIT}
-                                </span>
+                                <div className="flex justify-between items-center mt-1">
+                                    <div>
+                                        {objectivesError && (
+                                            <span className="text-xs text-red-500">{objectivesError}</span>
+                                        )}
+                                    </div>
+                                    <div className="text-xs sm:text-sm text-gray-500">
+                                        {formData.objectives.length}/{MAX_CHAR_LIMIT}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -433,13 +454,28 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                             <div className="relative">
                                 <textarea
                                     value={formData.outcomes}
-                                    onChange={(e) => handleChange('outcomes', e.target.value)}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value.length <= MAX_CHAR_LIMIT) {
+                                            handleChange('outcomes', value);
+                                            setOutcomesError('');
+                                        } else {
+                                            setOutcomesError('Only 300 characters are allowed. Please shorten your input.');
+                                        }
+                                    }}
                                     className="min-h-[80px] sm:min-h-[100px] rounded-lg w-full p-2 sm:p-3 border border-blue-100 text-sm sm:text-base text-gray-700 font-normal leading-6 placeholder:text-gray-400 placeholder:text-sm sm:placeholder:text-base placeholder:font-light resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pb-8"
                                     placeholder="Enter workshop outcomes"
                                 />
-                                <span className="absolute bottom-2 right-2 text-xs sm:text-sm text-gray-500">
-                                    {formData.outcomes.length}/{MAX_CHAR_LIMIT}
-                                </span>
+                                <div className="flex justify-between items-center mt-1">
+                                    <div>
+                                        {outcomesError && (
+                                            <span className="text-xs text-red-500">{outcomesError}</span>
+                                        )}
+                                    </div>
+                                    <div className="text-xs sm:text-sm text-gray-500">
+                                        {formData.outcomes.length}/{MAX_CHAR_LIMIT}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -449,13 +485,28 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                             <div className="relative">
                                 <textarea
                                     value={formData.handouts}
-                                    onChange={(e) => handleChange('handouts', e.target.value)}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value.length <= MAX_CHAR_LIMIT) {
+                                            handleChange('handouts', value);
+                                            setHandoutsError('');
+                                        } else {
+                                            setHandoutsError('Only 300 characters are allowed. Please shorten your input.');
+                                        }
+                                    }}
                                     className="min-h-[80px] sm:min-h-[100px] rounded-lg w-full p-2 sm:p-3 border border-blue-100 text-sm sm:text-base text-gray-700 font-normal leading-6 placeholder:text-gray-400 placeholder:text-sm sm:placeholder:text-base placeholder:font-light resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pb-8"
                                     placeholder="Enter workshop handouts"
                                 />
-                                <span className="absolute bottom-2 right-2 text-xs sm:text-sm text-gray-500">
-                                    {formData.handouts.length}/{MAX_CHAR_LIMIT}
-                                </span>
+                                <div className="flex justify-between items-center mt-1">
+                                    <div>
+                                        {handoutsError && (
+                                            <span className="text-xs text-red-500">{handoutsError}</span>
+                                        )}
+                                    </div>
+                                    <div className="text-xs sm:text-sm text-gray-500">
+                                        {formData.handouts.length}/{MAX_CHAR_LIMIT}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -465,13 +516,28 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                             <div className="relative">
                                 <textarea
                                     value={formData.evaluation}
-                                    onChange={(e) => handleChange('evaluation', e.target.value)}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value.length <= MAX_CHAR_LIMIT) {
+                                            handleChange('evaluation', value);
+                                            setEvaluationError('');
+                                        } else {
+                                            setEvaluationError('Only 300 characters are allowed. Please shorten your input.');
+                                        }
+                                    }}
                                     className="min-h-[80px] sm:min-h-[100px] rounded-lg w-full p-2 sm:p-3 border border-blue-100 text-sm sm:text-base text-gray-700 font-normal leading-6 placeholder:text-gray-400 placeholder:text-sm sm:placeholder:text-base placeholder:font-light resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pb-8"
                                     placeholder="Enter workshop evaluation criteria"
                                 />
-                                <span className="absolute bottom-2 right-2 text-xs sm:text-sm text-gray-500">
-                                    {formData.evaluation.length}/{MAX_CHAR_LIMIT}
-                                </span>
+                                <div className="flex justify-between items-center mt-1">
+                                    <div>
+                                        {evaluationError && (
+                                            <span className="text-xs text-red-500">{evaluationError}</span>
+                                        )}
+                                    </div>
+                                    <div className="text-xs sm:text-sm text-gray-500">
+                                        {formData.evaluation.length}/{MAX_CHAR_LIMIT}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -483,8 +549,17 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                                     <input
                                         type="checkbox"
                                         id="in-person"
-                                        checked={formData.format === 'In-Person'}
-                                        onChange={() => handleChange('format', 'In-Person')}
+                                        checked={formData.format.split(',').map(f => f.trim()).includes('In-Person')}
+                                        onChange={() => {
+                                            const formats = formData.format ? formData.format.split(',').map(f => f.trim()) : [];
+                                            let newFormats;
+                                            if (formats.includes('In-Person')) {
+                                                newFormats = formats.filter(f => f !== 'In-Person');
+                                            } else {
+                                                newFormats = [...formats, 'In-Person'];
+                                            }
+                                            handleChange('format', newFormats.join(', '));
+                                        }}
                                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                     />
                                     <label htmlFor="in-person" className="text-sm sm:text-base font-normal">In-person</label>
@@ -493,8 +568,17 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                                     <input
                                         type="checkbox"
                                         id="virtual"
-                                        checked={formData.format === 'Virtual'}
-                                        onChange={() => handleChange('format', 'Virtual')}
+                                        checked={formData.format.split(',').map(f => f.trim()).includes('Virtual')}
+                                        onChange={() => {
+                                            const formats = formData.format ? formData.format.split(',').map(f => f.trim()) : [];
+                                            let newFormats;
+                                            if (formats.includes('Virtual')) {
+                                                newFormats = formats.filter(f => f !== 'Virtual');
+                                            } else {
+                                                newFormats = [...formats, 'Virtual'];
+                                            }
+                                            handleChange('format', newFormats.join(', '));
+                                        }}
                                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                     />
                                     <label htmlFor="virtual" className="text-sm sm:text-base font-normal">Virtual</label>

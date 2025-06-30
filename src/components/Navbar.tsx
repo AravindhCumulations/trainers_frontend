@@ -259,7 +259,7 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
                                             </div>
                                             {isTrainer && (<button
                                                 onClick={() => {
-                                                    handleNavigation(`/trainer-form?trainer=${getCurrentUserName()}`);
+                                                    handleNavigation(`/trainer-details?trainer=${getCurrentUserName()}`);
                                                     setShowDropdown(false);
                                                 }}
                                                 className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"

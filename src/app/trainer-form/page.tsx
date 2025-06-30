@@ -167,11 +167,38 @@ export default function TrainerDetailsPage() {
     const [isExpertiseDropdownOpen, setIsExpertiseDropdownOpen] = useState(false);
     const expertiseDropdownRef = useRef<HTMLDivElement>(null);
 
+    // Add filtered expertise state
+    const [filteredExpertise, setFilteredExpertise] = useState(expertise_in);
+
+    // Function to handle changes with deep comparison
+    const handleChanges = (field: keyof TrainerFormDto, value: string | number) => {
+        setForm(prev => ({
+            ...prev,
+            [field]: value
+        }));
+
+        // Only track modification if value is different from initial state using deep comparison
+        const initialValue = initialFormState.current[field];
+        if (!isEqual(value, initialValue)) {
+            setModifiedFields(prev => ({
+                ...prev,
+                [field]: value
+            }));
+        } else {
+            // If value is same as initial state, remove it from modifiedFields
+            setModifiedFields(prev => {
+                const newModifiedFields = { ...prev };
+                delete newModifiedFields[field];
+                return newModifiedFields;
+            });
+        }
+    };
+
     // Add expertise search handler
     const handleExpertiseSearch = (searchValue: string) => {
         setSearchTerm(searchValue);
         if (!searchValue.trim()) {
-            setFilteredExpertise(expertise_in);
+            setFilteredExpertise(expertise_in); // Reset to all options if search is empty
             return;
         }
         const filtered = expertise_in.filter(exp =>
@@ -189,30 +216,30 @@ export default function TrainerDetailsPage() {
     const handleExpertiseClick = (exp: string) => {
         const selectedExpertise = form.expertise_in.split(',').map(e => e.trim()).filter(e => e !== '');
 
+        let newExpertise: string[];
         if (isExpertiseSelected(exp)) {
             // Remove expertise if already selected
-            const newExpertise = selectedExpertise.filter(e => e !== exp);
-            handleChanges('expertise_in', newExpertise.join(', '));
+            newExpertise = selectedExpertise.filter(e => e !== exp);
         } else {
             // Check if we've reached the limit of 3
             if (selectedExpertise.length >= 3) {
                 return; // Don't add more if we've reached the limit
             }
             // Add new expertise
-            const newValue = form.expertise_in
-                ? `${form.expertise_in}, ${exp}`
-                : exp;
-            handleChanges('expertise_in', newValue);
+            newExpertise = [...selectedExpertise, exp];
         }
+        handleChanges('expertise_in', newExpertise.join(', '));
 
-        // Reset search and filter after selection
+        // Clear search and reset dropdown list to all options
         setSearchTerm('');
         setFilteredExpertise(expertise_in);
-        setIsExpertiseDropdownOpen(false);
-    };
 
-    // Add filtered expertise state
-    const [filteredExpertise, setFilteredExpertise] = useState(expertise_in);
+        // Only close dropdown if 3 tags are now selected
+        if (newExpertise.length >= 3) {
+            setIsExpertiseDropdownOpen(false);
+        }
+        // Otherwise, keep it open
+    };
 
     // Add useEffect to fetch trainer data
     useEffect(() => {
@@ -270,30 +297,6 @@ export default function TrainerDetailsPage() {
     }, []);
 
 
-
-    // Function to handle changes with deep comparison
-    const handleChanges = (field: keyof TrainerFormDto, value: string | number) => {
-        setForm(prev => ({
-            ...prev,
-            [field]: value
-        }));
-
-        // Only track modification if value is different from initial state using deep comparison
-        const initialValue = initialFormState.current[field];
-        if (!isEqual(value, initialValue)) {
-            setModifiedFields(prev => ({
-                ...prev,
-                [field]: value
-            }));
-        } else {
-            // If value is same as initial state, remove it from modifiedFields
-            setModifiedFields(prev => {
-                const newModifiedFields = { ...prev };
-                delete newModifiedFields[field];
-                return newModifiedFields;
-            });
-        }
-    };
 
     const handleEducationChange = (index: number, field: keyof Education, value: string) => {
         const updatedEducation = [...form.education];
@@ -651,10 +654,12 @@ export default function TrainerDetailsPage() {
         setIsDropdownOpen(false);
     };
 
+    // Add state for testimonial errors
+    const [testimonialErrors, setTestimonialErrors] = useState<string[]>([]);
 
-
-    // When preparing data for API submission
-
+    // Add state for bio and training approach errors
+    const [bioError, setBioError] = useState('');
+    const [trainingApproachError, setTrainingApproachError] = useState('');
 
     return (
 
@@ -736,16 +741,27 @@ export default function TrainerDetailsPage() {
                                         id="bio"
                                         value={form.bio_line}
                                         onChange={(e) => {
-                                            if (e.target.value.length <= 500) {
-                                                handleChanges('bio_line', e.target.value);
+                                            const value = e.target.value;
+                                            if (value.length <= 500) {
+                                                handleChanges('bio_line', value);
+                                                setBioError('');
+                                            } else {
+                                                setBioError('Only 500 characters are allowed. Please shorten your input.');
                                             }
                                         }}
                                         placeholder="Share your training philosophy and what makes you unique..."
                                         rows={4}
                                         className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
                                     />
-                                    <div className="absolute bottom-2 right-2 text-xs sm:text-sm text-gray-500">
-                                        {form.bio_line.length}/500
+                                    <div className="flex justify-between items-center mt-1">
+                                        <div>
+                                            {bioError && (
+                                                <span className="text-xs text-red-500">{bioError}</span>
+                                            )}
+                                        </div>
+                                        <div className="text-xs sm:text-sm text-gray-500">
+                                            {form.bio_line.length}/500
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -762,16 +778,27 @@ export default function TrainerDetailsPage() {
                                         id="trainerApproch"
                                         value={form.training_approach}
                                         onChange={(e) => {
-                                            if (e.target.value.length <= 500) {
-                                                handleChanges('training_approach', e.target.value);
+                                            const value = e.target.value;
+                                            if (value.length <= 500) {
+                                                handleChanges('training_approach', value);
+                                                setTrainingApproachError('');
+                                            } else {
+                                                setTrainingApproachError('Only 500 characters are allowed. Please shorten your input.');
                                             }
                                         }}
                                         placeholder="Share your approch strategy"
                                         rows={3}
                                         className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
                                     />
-                                    <div className="absolute bottom-2 right-2 text-xs sm:text-sm text-gray-500">
-                                        {form.training_approach.length}/500
+                                    <div className="flex justify-between items-center mt-1">
+                                        <div>
+                                            {trainingApproachError && (
+                                                <span className="text-xs text-red-500">{trainingApproachError}</span>
+                                            )}
+                                        </div>
+                                        <div className="text-xs sm:text-sm text-gray-500">
+                                            {form.training_approach.length}/500
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1289,12 +1316,26 @@ export default function TrainerDetailsPage() {
                                                 placeholder="Client testimonial (e.g., 'Working with this trainer has transformed my fitness journey. I've lost 20 pounds and gained confidence.')"
                                                 value={testimonial.testimonials}
                                                 onChange={(e) => {
-                                                    if (e.target.value.length <= 200) {
-                                                        handleTestimonialChange(index, "testimonials", e.target.value)
+                                                    const value = e.target.value;
+                                                    let errors = [...testimonialErrors];
+                                                    if (value.length > 200) {
+                                                        errors[index] = "Only 200 characters are allowed. Please shorten your input.";
+                                                    } else {
+                                                        errors[index] = "";
+                                                        handleTestimonialChange(index, "testimonials", value);
                                                     }
-                                                }} />
-                                            <div className="absolute bottom-2 right-2 text-xs sm:text-sm text-gray-500 z-10">
-                                                {testimonial.testimonials.length}/200
+                                                    setTestimonialErrors(errors);
+                                                }}
+                                            />
+                                            <div className="flex justify-between items-center mt-1">
+                                                <div>
+                                                    {testimonialErrors[index] && (
+                                                        <span className="text-xs text-red-500">{testimonialErrors[index]}</span>
+                                                    )}
+                                                </div>
+                                                <div className="text-xs sm:text-sm text-gray-500">
+                                                    {testimonial.testimonials.length}/200
+                                                </div>
                                             </div>
                                             {form.testimonials.length > 1 && (
                                                 <IconButton

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense, useRef } from "react";
-import { Star } from "lucide-react";
+import { ArrowLeft, Star } from "lucide-react";
 import NavBar from "../../components/Navbar";
 import Footer from "@/components/Footer";
 import WorkshopDetails from '@/components/WorkshopDetails';
@@ -23,14 +23,14 @@ import { useSearchParams } from 'next/navigation';
 import { usePopup } from '@/lib/hooks/usePopup';
 import Popup from '@/components/Popup';
 import { Workshop } from "@/models/workshop.models";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 
 
 // Main Content
 const TrainerDetailsContent = () => {
     const { user, updateCredits } = useUser();
     const searchParams = useSearchParams();
-    // const router = useRouter();
+    const router = useRouter();
 
 
     // page specific
@@ -136,6 +136,9 @@ const TrainerDetailsContent = () => {
 
                     const response = await trainerApis.getTrainerByName(trainerName);
 
+                    console.log(response);
+
+
                     setTrainerData(response.data);
                     setTrainerLocked(false);
 
@@ -149,14 +152,14 @@ const TrainerDetailsContent = () => {
                 else {
                     const res = await trainerApis.company.getTrainerByName(trainerName, userMail);
 
-                    if (!res || !res.message) {
+                    if (!res || !res.data) {
                         showError('Failed to fetch trainer details');
                         return;
                     }
 
-                    setTrainerData(res.message);
+                    setTrainerData(res.data);
 
-                    if (res.message.is_unlocked) {
+                    if (res.data.is_unlocked) {
                         setTrainerLocked(false);
 
                     }
@@ -381,6 +384,25 @@ const TrainerDetailsContent = () => {
                                 <div className="row-span-2 col-span-1">
                                     {/* ProfileCard */}
                                     <div className="profile-card shadow-lg flex flex-col gap-3 justify-center items-center rounded-xl bg-white p-4 sm:p-6 lg:p-10 h-full">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (typeof window !== 'undefined') {
+                                                    const ref = document.referrer;
+                                                    if (ref && (ref.includes('/login') || ref.includes('/signup'))) {
+                                                        router.push('/');
+                                                    } else {
+                                                        router.back();
+                                                    }
+                                                } else {
+                                                    router.back();
+                                                }
+                                            }}
+                                            className="p-1 rounded hover:scale-105 transition self-start"
+                                            aria-label="Go back"
+                                        >
+                                            <ArrowLeft className="w-6 h-6 text-gray-700" />
+                                        </button>
                                         <div className="trainer-profile w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-200 flex items-center justify-center">
                                             <img src={trainerData.image} alt="img" className="w-full h-full object-cover rounded-full" />
                                         </div>
