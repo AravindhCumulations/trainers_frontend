@@ -86,6 +86,7 @@ export default function SignupPage() {
             const newUser = SignupModel.createUser(signupData);
             const data = await authApis.singUp(newUser);
 
+
             await handleSignupResponse(data);
         } catch (err) {
             setError('Failed to create account. Please try again.');
@@ -108,6 +109,9 @@ export default function SignupPage() {
     };
 
     const handleSignupResponse = async (data: any) => {
+
+
+
         if (data.status !== "success") {
             if (data.message?.status === "error" && data.message.message) {
                 setError(data.message.message);

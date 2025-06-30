@@ -54,8 +54,8 @@ export default function LoginPage() {
         try {
             const data = await authApis.login(formData.email, formData.password);
 
-            console.log("login details");
-            console.log(data);
+
+
 
 
             if (data.user_details && data.key_details) {
@@ -159,6 +159,8 @@ export default function LoginPage() {
 
                     className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-2xl max-w-md w-full transition-colors duration-300"
                 >
+                    <p className="text-blue-600 text-xl font-extrabold hover:scale-105 self-center" onClick={() => handleNavigation('/')}>Trainer&apos;s Mart</p>
+
                     {!showForgotPassword ? (
                         <>
                             <h2 className="text-3xl font-bold text-center text-gray-900  mb-6 transition-colors duration-300">Welcome Back</h2>

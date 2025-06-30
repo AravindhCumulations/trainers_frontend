@@ -95,7 +95,6 @@ const ManageCredits = () => {
                             try {
                                 await updateCredits(); // Handle this separately
                             } catch (creditUpdateErr) {
-                                console.error("Failed to update credits:", creditUpdateErr);
                                 toastError("Failed to update your credits.");
                             }
                             toastSuccess(`Successfully purchased ${buyAmount} credits!`);

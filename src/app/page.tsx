@@ -301,7 +301,8 @@ export default function Home() {
                   </div>
                   <button
                     className="w-full md:w-fit h-[50px] md:h-[60px] border border-white text-white px-4 md:px-6 py-2 rounded-xl md:rounded-2xl font-semibold text-sm md:text-base bg-transparent hover:bg-white hover:text-blue-700 text-base transition are-you-a-trainer-btn whitespace-nowrap"
-                    onClick={() => handleNavigation('/trainer-form')}
+                    onClick={() => handleNavigation('/signup')}
+
                   >
                     Create a Profile
                   </button>

@@ -330,7 +330,7 @@ function TrainersPageContent() {
 
 export default function TrainersPage() {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={null}>
             <TrainersPageContent />
         </Suspense>
     );

@@ -121,7 +121,7 @@ const TrainerDetailsContent = () => {
                 const trainerName = searchParams.get('trainer');
                 const userName = getCurrentUserName() || 'guest';
                 const userRole = getCurrentUserRole() || 'guest';
-                const userMail = getCurrentUserMail() || '';
+                const userMail = getCurrentUserMail() || 'guest';
 
 
                 if (!trainerName) {
@@ -136,7 +136,7 @@ const TrainerDetailsContent = () => {
 
                     const response = await trainerApis.getTrainerByName(trainerName);
 
-                    console.log(response);
+
 
 
                     setTrainerData(response.data);
@@ -219,7 +219,7 @@ const TrainerDetailsContent = () => {
                                     console.error("Failed to update credits:", creditUpdateErr);
                                     toastError("Failed to update your credits.");
                                 }
-                                const userMail = getCurrentUserMail();
+                                const userMail = getCurrentUserMail() || 'guest';
                                 const updatedTrainerData = await trainerApis.company.getTrainerByName(trainerData.name, userMail);
                                 if (updatedTrainerData && updatedTrainerData.message) {
                                     setTrainerData(updatedTrainerData.message);
@@ -329,11 +329,14 @@ const TrainerDetailsContent = () => {
             setReviewText('');
             toastSuccess('Review submitted successfully!');
 
+            const userMail = getCurrentUserMail() || 'guest';
+
+
             // Refresh trainer data to show new review
             const trainerName = searchParams.get('trainer');
             if (trainerName) {
-                const response = await trainerApis.company.getTrainerByName(trainerName, user.name);
-                setTrainerData(response.message);
+                const response = await trainerApis.company.getTrainerByName(trainerName, userMail);
+                setTrainerData(response.data);
             }
         } catch (error) {
             console.error('Error submitting review:', error);
@@ -389,7 +392,7 @@ const TrainerDetailsContent = () => {
                                             onClick={() => {
                                                 if (typeof window !== 'undefined') {
                                                     const ref = document.referrer;
-                                                    if (ref && (ref.includes('/login') || ref.includes('/signup'))) {
+                                                    if (ref && (ref.includes('/login') || ref.includes('/signup') || ref.includes('/trainer-form'))) {
                                                         router.push('/');
                                                     } else {
                                                         router.back();
