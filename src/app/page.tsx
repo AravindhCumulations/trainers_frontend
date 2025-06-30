@@ -13,7 +13,6 @@ import Image from 'next/image';
 import { useUser } from '@/context/UserContext';
 import { TrainerCardModel } from '@/models/trainerCard.model';
 import { useTypingEffect } from '@/hooks/useTypingEffect';
-import { expertise_in } from './content/ExpertiseIN';
 import { usePopup } from '@/lib/hooks/usePopup';
 import { useRouter } from 'next/navigation';
 import Popup from '@/components/Popup';
