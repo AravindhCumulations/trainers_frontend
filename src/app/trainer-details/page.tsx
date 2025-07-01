@@ -28,7 +28,7 @@ import { useRouter } from "next/navigation";
 
 // Main Content
 const TrainerDetailsContent = () => {
-    const { user, updateCredits } = useUser();
+    const { user, updateCredits, setProfilePic } = useUser();
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -131,17 +131,13 @@ const TrainerDetailsContent = () => {
 
                 if (userRole === 'Trainer' && userName === trainerName) {
 
-
                     setIsLoggedInUser(true);
 
                     const response = await trainerApis.getTrainerByName(trainerName);
 
-
-
-
                     setTrainerData(response.data);
+                    setProfilePic(response.data.image);
                     setTrainerLocked(false);
-
                     if (!response.data) {
                         showError('Failed to fetch trainer details', {
                             onConfirm: () => handleNavigation('/')

@@ -9,7 +9,7 @@ import { creditsApis } from "@/lib/apis/credits.apis";
 import { LogOutIcon, Menu } from "lucide-react";
 import { authApis } from "@/lib/apis/auth.apis";
 import { useUser } from '@/context/UserContext';
-import { getCurrentUserName } from "@/lib/utils/auth.utils";
+import { getCurrentUserName, getCurrentUserFullName } from "@/lib/utils/auth.utils";
 import { usePopup } from "@/lib/hooks/usePopup";
 import Popup from "./Popup";
 
@@ -157,6 +157,14 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
         );
     };
 
+    // Utility to get initials from full name
+    const getInitials = (fullName: string): string => {
+        if (!fullName) return "";
+        const names = fullName.trim().split(/\s+/);
+        if (names.length === 1) return names[0][0]?.toUpperCase() || "";
+        return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+    };
+
     return (
         <>
             {/* Navbar */}
@@ -214,14 +222,22 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
                                         onClick={() => setShowDropdown(!showDropdown)}
                                     >
                                         <div className="trainer-profile w-[36px] h-[36px] rounded-full bg-gray-200 flex items-center justify-center relative">
-                                            <Image
-                                                src={(user.profilePic ? user.profilePic : '/assets/prof-1.jpeg')}
-                                                alt="Profile"
-                                                fill
-                                                className="object-cover rounded-full"
-                                                placeholder="blur"
-                                                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                                            />
+                                            {user.profilePic ? (
+                                                <Image
+                                                    src={user.profilePic}
+                                                    alt="Profile"
+                                                    fill
+                                                    className="object-cover rounded-full"
+                                                    placeholder="blur"
+                                                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                                                />
+                                            ) : (
+
+                                                <span className="text-lg font-bold text-blue-600">
+                                                    {getInitials(getCurrentUserFullName())}
+                                                </span>
+
+                                            )}
                                         </div>
                                         <svg
                                             width="24"
