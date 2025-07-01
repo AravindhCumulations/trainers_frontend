@@ -221,8 +221,8 @@ const TrainerDetailsContent = () => {
                                 }
                                 const userMail = getCurrentUserMail() || 'guest';
                                 const updatedTrainerData = await trainerApis.company.getTrainerByName(trainerData.name, userMail);
-                                if (updatedTrainerData && updatedTrainerData.message) {
-                                    setTrainerData(updatedTrainerData.message);
+                                if (updatedTrainerData && updatedTrainerData.data) {
+                                    setTrainerData(updatedTrainerData.data);
                                 }
                                 showSuccess('Trainer unlocked successfully!');
                             } else {
@@ -413,7 +413,10 @@ const TrainerDetailsContent = () => {
                                             <div className="trainer-name text-center text-lg sm:text-xl lg:text-[24px] font-bold leading-tight sm:leading-[32px] text-[#1E2939]">{trainerData.full_name}</div>
                                             {isLoggedInUser && (
                                                 <div className="w-full flex justify-center">
-                                                    <button onClick={() => handleNavigation(`/trainer-form?trainerData=${encodeURIComponent(JSON.stringify(trainerData))}`)}
+                                                    <button onClick={() => {
+                                                        showLoader();
+                                                        window.location.href = `/trainer-form?trainerData=${encodeURIComponent(JSON.stringify(trainerData))}`;
+                                                    }}
                                                         className="rounded-2xl bg-blue-500 flex justify-center items-center text-white py-1.5 px-3 font-semibold hover:scale-105 text-sm sm:text-base">Edit profile</button>
                                                 </div>
                                             )}
@@ -459,13 +462,21 @@ const TrainerDetailsContent = () => {
                                             </p>
 
                                             {/* Languages */}
-                                            <p className="flex items-center gap-1">
+                                            <p className="flex items-center gap-1 cursor-pointer" title={trainerData.language}>
                                                 <span className="inline-block">
                                                     <svg xmlns="http://www.w3.org/2000/svg" height="16px" width="16px" viewBox="0 -960 960 960" fill="#000" className="sm:h-5 sm:w-5">
                                                         <path d="M809.65-318q-22.65 0-38.15-15.7-15.5-15.71-15.5-38.14v-89.73Q756-484 771.65-500q15.64-16 38-16Q832-516 848-500.2q16 15.79 16 38.36v90.27q0 22.57-15.85 38.07-15.86 15.5-38.5 15.5ZM792-192v-54.91q-47-7.09-77.5-42.04Q684-323.89 684-372h36q0 37.8 26.1 63.9T810-282q37 0 63.34-26.1 26.33-26.1 26.33-63.9H936q0 48.01-31.05 82.88T828-247v55h-36ZM336-480q-60 0-102-42t-42-102q0-60 42-102t102-42q17.07 0 33.54 4Q386-760 402-752q-20 28-31 60.5T360-624q0 35 10.89 68.15Q381.78-522.69 402-496q-16 8-32.46 12-16.47 4-33.54 4ZM48-192v-92q0-25.13 12.5-46.57Q73-352 95-366q47-28 99-44t108-21q-40 23-63 62.5T216-284v92H48Zm528-288q-60 0-102-42t-42-102q0-60 42-102t102-42q60 0 102 42t42 102q0 60-42 102t-102 42Zm-.5-72q29.5 0 51-21 21.5-21.01 21.5-50.5 0-29.5-21.5-51t-51-21.5q-29.49 0-50.5 21.5-21 21.5-21 51 0 29.49 21 50.5 21.01 21 50.5 21ZM288-192v-92q0-25.13 12.5-46.57Q313-352 334-365q55-33 116.5-50T576-432q17 0 34.5 1.5T646-427q-8 17-12 35.5t-4 35.5q-13-2-26.5-3t-27.5-1q-55 0-107 14t-98 42q-5 4-8 9.07-3 5.06-3 10.93v20h294q14 23 33 41.5t45 30.5H288Zm288-432Zm0 360Z" />
                                                     </svg>
                                                 </span>
-                                                {trainerData.language}
+                                                {(() => {
+                                                    const langs = (trainerData.language || '').split(',').map(l => l.trim()).filter(Boolean);
+                                                    const maxToShow = 2;
+                                                    if (langs.length <= maxToShow) {
+                                                        return langs.join(', ');
+                                                    } else {
+                                                        return `${langs.slice(0, maxToShow).join(', ')}, +${langs.length - maxToShow}`;
+                                                    }
+                                                })()}
                                             </p>
                                         </div>
 
@@ -904,7 +915,7 @@ const TrainerDetailsContent = () => {
                 <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 trainer-list-section">
                     <h2 className="text-xl sm:text-2xl lg:text-[30px] font-bold mb-4 sm:mb-6 text-gray-800 trainer-list-title">Discover Related Trainers</h2>
                     <TrainerGrid
-                        trainers={trainers}
+                        trainers={trainers.filter(t => t.name !== searchParams.get('trainer'))}
                         paginationMode="client"
                         paginationConfig={{ page: 1, pageSize: 12 }}
                         pageLocked={true}

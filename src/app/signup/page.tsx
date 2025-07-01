@@ -53,10 +53,6 @@ export default function SignupPage() {
             setError('First name is required');
             return false;
         }
-        if (!formData.last_name.trim()) {
-            setError('Last name is required');
-            return false;
-        }
         if (formData.roles.length === 0) {
             setError('Please select a role');
             return false;
@@ -142,13 +138,13 @@ export default function SignupPage() {
 
         <div className="flex flex-col h-screen bg-blue-100">
             <div className="flex flex-1 flex-col justify-center items-center ">
-                <motion.div className="top-5 left-5  rounded-lg px-2.5 py-3 mb-2  hover:cursor-pointer hover:scale-105">
-                    <p className="text-blue-600 text-xl font-extrabold hover:scale-105" onClick={() => handleNavigation('/')}>Trainer&apos;s Mart</p>
-                </motion.div>
+
                 <motion.div
 
                     className="bg-white/80 backdrop-blur-lg p-8 rounded-xl shadow-lg max-w-md w-full"
                 >
+                    <p className="text-blue-600 text-xl font-extrabold hover:scale-105 self-center mb-3 text-center">Trainer&apos;s Mart</p>
+
                     <h2 className="text-[clamp(20px,5vw,30px)] font-bold text-center text-gray-900">Sign Up</h2>
 
                     {error && (

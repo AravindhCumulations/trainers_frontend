@@ -54,10 +54,6 @@ export default function LoginPage() {
         try {
             const data = await authApis.login(formData.email, formData.password);
 
-
-
-
-
             if (data.user_details && data.key_details) {
                 setUserDetailsToLocalStore(data);
 
@@ -73,12 +69,12 @@ export default function LoginPage() {
 
                 if (data.user_details.role_user === "Trainer") {
                     if (data.user_details.is_first_login) {
-                        handleNavigation('/trainer-form');
+                        window.location.href = '/trainer-form';
                         return;
                     }
-                    handleNavigation('/trainer-details', { 'trainer': data.user_details.name });
+                    window.location.href = `/trainer-details?trainer=${data.user_details.name}`;
                 } else {
-                    handleNavigation('/');
+                    window.location.href = '/';
                 }
             }
         } catch (err: any) {
@@ -152,14 +148,12 @@ export default function LoginPage() {
         <div className="flex flex-col  h-screen  transition-colors duration-300 bg-theme">
 
             <div className="flex flex-1 flex-col justify-center items-center relative">
-                <motion.div className="top-5 left-5  rounded-lg px-2.5 py-3 mb-2  hover:cursor-pointer hover:scale-105">
-                    <p className="text-blue-600 text-xl font-extrabold hover:scale-105" onClick={() => handleNavigation('/')}>Trainer&apos;s Mart</p>
-                </motion.div>
+
                 <motion.div
 
                     className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-2xl max-w-md w-full transition-colors duration-300"
                 >
-                    <p className="text-blue-600 text-xl font-extrabold hover:scale-105 self-center" onClick={() => handleNavigation('/')}>Trainer&apos;s Mart</p>
+                    <p className="text-blue-600 text-xl font-extrabold hover:scale-105 self-center mb-3 text-center">Trainer&apos;s Mart</p>
 
                     {!showForgotPassword ? (
                         <>
@@ -242,7 +236,7 @@ export default function LoginPage() {
                                 Don&apos;t have an account?&nbsp;
                                 <a className="text-blue-600  font-semibold hover:underline ml-1 transition-colors duration-300 cursor-pointer"
                                     onClick={() => {
-                                        handleNavigation('/signup');
+                                        window.location.href = '/signup';
                                         setError(null);
                                     }}
                                 >Sign up</a>
@@ -398,7 +392,7 @@ export default function LoginPage() {
                     )}
                 </motion.div>
                 <a className="text-blue-600 font-semibold cursor-pointer mt-3 underline"
-                    onClick={() => handleNavigation('/')}
+                    onClick={() => window.location.href = '/'}
                 >skip</a>
             </div>
 

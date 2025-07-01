@@ -16,7 +16,13 @@ export const useNavigation = () => {
         try {
             // Only use window.location.href for auth-related pages to ensure middleware runs
             // Always use window.location.href for auth-related pages to ensure middleware runs
-            if (page === '/' || page === '/trainer-details' || page === '/manage-credits') {
+            if (
+                page === '/' ||
+                page === '/trainer-details' ||
+                page === '/manage-credits' ||
+                page === '/login' ||
+                page === '/signup'
+            ) {
                 window.location.href = fullPath;
                 return;
             }
