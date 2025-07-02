@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import SearchCategoriesRow from '@/components/SearchCategoriesRow';
 import { trainerApis } from '@/lib/apis/trainer.apis';
 import { useLoading } from '@/context/LoadingContext';
-import { getCurrentUserName } from "@/lib/utils//auth.utils";
 import { useNavigation } from "@/lib/hooks/useNavigation";
 import Image from 'next/image';
 import { useUser } from '@/context/UserContext';
