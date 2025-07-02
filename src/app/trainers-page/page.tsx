@@ -6,7 +6,6 @@ import Footer from '../../components/Footer';
 import TrainerGrid from '../../components/TrainerGrid';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { trainerApis } from '../../lib/apis/trainer.apis';
-import { getCurrentUserName } from '@/lib/utils/auth.utils'
 import { useLoading } from '@/context/LoadingContext';
 import { TrainerCardModel } from '@/models/trainerCard.model';
 import { indianCities } from '@/app/content/IndianCities';
