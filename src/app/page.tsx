@@ -139,7 +139,7 @@ export default function Home() {
     setSearchText('');
     showLoader();
     try {
-      const response = await trainerApis.searchTrainers(getCurrentUserName());
+      const response = await trainerApis.searchTrainers(user.email);
       if (response.message) {
         setTrainers(response.message);
       }

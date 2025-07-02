@@ -12,6 +12,8 @@ import { TrainerCardModel } from '@/models/trainerCard.model';
 import { indianCities } from '@/app/content/IndianCities';
 import { getCategories } from "@/app/content/categories";
 import { usePopup } from '@/lib/hooks/usePopup';
+import Popup from '@/components/Popup';
+import { useUser } from '@/context/UserContext';
 
 
 function TrainersPageContent() {
@@ -26,7 +28,8 @@ function TrainersPageContent() {
     const [totalItems, setTotalItems] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const { showLoader, hideLoader } = useLoading();
-    const { showConfirmation } = usePopup();
+    const { popupState, showConfirmation, hidePopup } = usePopup();
+    const { user } = useUser();
 
     // Add state for selected category
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -68,7 +71,7 @@ function TrainersPageContent() {
             setIsLoading(true);
             updateUrlParams(searchValue, cityValue);
             const response = await trainerApis.searchTrainers(
-                getCurrentUserName(),
+                user.email,
                 searchValue,
                 cityValue,
                 page,
@@ -191,6 +194,16 @@ function TrainersPageContent() {
 
     return (
         <div className="bg-white min-h-screen flex flex-col">
+            <Popup
+                isOpen={popupState.isOpen}
+                type={popupState.type}
+                message={popupState.message}
+                title={popupState.title}
+                onClose={hidePopup}
+                onConfirm={popupState.onConfirm}
+                confirmText={popupState.confirmText}
+                cancelText={popupState.cancelText}
+            />
             <section className="relative w-full mx-auto flex flex-col items-center header-hero-section bg-white">
                 <div className="w-full bg-gradient-to-b from-blue-400 to-blue-600 text-white  lg:pb-10 px-4  lg:px-8 flex flex-col items-center rounded-b-[20px] sm:rounded-b-[30px] lg:rounded-b-[40px] relative z-10 header-hero-bg">
                     <Navbar bgColor='transparent' />
