@@ -100,7 +100,7 @@ const TrainerCard = memo(({ trainer, onClick, viewMode, onWishlistUpdate, callLo
                 </span>
 
                 <span className="block text-[#EAB308] text-sm sm:text-base" aria-label={`${trainer.avg_rating} out of 5 stars`}>
-                    {'★'.repeat(Math.round(trainer.avg_rating))}{'☆'.repeat(5 - Math.round(trainer.avg_rating))}
+                    {'★'.repeat(Math.round(trainer.avg_rating))}{'☆'.repeat(5 - Math.round(trainer.avg_rating))}&nbsp;({trainer.avg_rating})
                 </span>
 
                 <div className="text-[#4B5563]">

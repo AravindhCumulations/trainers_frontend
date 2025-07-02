@@ -66,14 +66,14 @@ const TrainerDetailsContent = () => {
         );
     };
 
-    const fetchAllTrainers = async (userName: string) => {
-        if (!userName) {
+    const fetchAllTrainers = async (userMail: string) => {
+        if (!userMail) {
             return;
         }
         showLoader();
 
         try {
-            const allTrainersData = await trainerApis.getAllTrainers(userName, 1, 8);
+            const allTrainersData = await trainerApis.getAllTrainers(userMail, 1, 8);
             setTrainers(allTrainersData.All_trainers);
         }
         catch (error) {
@@ -123,6 +123,9 @@ const TrainerDetailsContent = () => {
                 const userRole = getCurrentUserRole() || 'guest';
                 const userMail = getCurrentUserMail() || 'guest';
 
+                console.log("get the mail here : ", userMail);
+
+
 
                 if (!trainerName) {
                     showError('Trainer not found');
@@ -163,7 +166,7 @@ const TrainerDetailsContent = () => {
                         setTrainerLocked(true);
                     }
 
-                    await fetchAllTrainers(userName);
+                    await fetchAllTrainers(userMail);
 
                 }
 
