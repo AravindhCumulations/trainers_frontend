@@ -2,6 +2,7 @@
 export interface TrainerCardModel {
     name: string;
     full_name: string;
+    first_name: string;
     avg_rating: number;
     expertise_in: string;
     experience: number;

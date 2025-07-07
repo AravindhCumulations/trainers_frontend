@@ -13,7 +13,7 @@ import { useUser } from '@/context/UserContext';
 
 export default function LoginPage() {
     const router = useRouter();
-    const { setUser } = useUser();
+    const { setUser, resetUser } = useUser();
     const [formData, setFormData] = useState<LoginFormData>({
         email: '',
         password: ''
@@ -56,7 +56,7 @@ export default function LoginPage() {
 
             if (data.user_details && data.key_details) {
                 setUserDetailsToLocalStore(data);
-
+                resetUser();
                 // Set user context
                 setUser({
                     name: data.user_details.name,
@@ -393,7 +393,7 @@ export default function LoginPage() {
                 </motion.div>
                 <a className="text-blue-600 font-semibold cursor-pointer mt-3 underline"
                     onClick={() => window.location.href = '/'}
-                >skip</a>
+                >Go Back</a>
             </div>
 
         </div>

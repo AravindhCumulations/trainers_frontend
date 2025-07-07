@@ -196,7 +196,7 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
                             isLoggedIn ? (
                                 <div className="relative flex justify-center items-center gap-[20px]">
 
-                                    <div onClick={handleCredits} className={` h-[44px] p-1 px-2 flex  justify-around items-center hover:cursor-pointer hover:${hoverColor} rounded-[36px] transition-colors duration-200`}>
+                                    <div onClick={handleCredits} className={`group h-[44px] p-1 px-2 flex  justify-around items-center hover:cursor-pointer hover:${hoverColor} rounded-[36px] transition-colors duration-200 relative`}>
                                         <svg
                                             width="24"
                                             height="24"
@@ -214,6 +214,10 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
                                             </g>
                                         </svg>
                                         <div className="font-bold text-base flex p-2">{user.credits ?? credit} Credits</div>
+                                        {/* Tooltip for credits */}
+                                        <div className="hidden md:block absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-64 px-3 py-2 rounded bg-gray-900 text-white text-xs text-center opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200">
+                                            Spend your credits to unlock this trainer&apos;s full details.
+                                        </div>
                                     </div>
 
 
@@ -229,7 +233,7 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
                                                     fill
                                                     className="object-cover rounded-full"
                                                     placeholder="blur"
-                                                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                                                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                                                 />
                                             ) : (
 
@@ -271,6 +275,9 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
                                     {showDropdown && (
                                         <div className="absolute top-11 right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50 border border-1 border-gray-200">
                                             <div className="px-4 py-2 border-b border-gray-200">
+                                                <p className="text-base font-semibold text-gray-900 line-clamp-1" title={getCurrentUserFullName()}>
+                                                    {getCurrentUserFullName()}
+                                                </p>
                                                 <p className="text-sm text-gray-600 line-clamp-1">{user.email}</p>
                                             </div>
                                             {isTrainer && (<button
@@ -342,9 +349,10 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-3 p-2">
                                         <div>
+                                            <p className="text-base font-semibold text-gray-900" title={getCurrentUserFullName()}>
+                                                {getCurrentUserFullName()}
+                                            </p>
                                             <p className="text-sm font-medium text-gray-900">{user.email}</p>
-
-                                            <p className="text-sm text-gray-500">{user.credits || credit} Credits</p>
 
                                         </div>
                                     </div>

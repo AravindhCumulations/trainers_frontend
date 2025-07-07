@@ -65,7 +65,7 @@ export const getCurrentUserFullName = (): string => {
         const userDetails = JSON.parse(raw);
 
         if (userDetails && typeof userDetails === "object" && 'first_name' in userDetails && typeof userDetails === "object" && 'last_name' in userDetails) {
-            return userDetails.first_name + userDetails.last_name;
+            return userDetails.first_name + " " + userDetails.last_name;
         }
 
         return "";

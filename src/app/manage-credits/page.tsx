@@ -234,7 +234,19 @@ const ManageCredits = () => {
                                                             <td className="py-2 px-4">{item.transaction_type}</td>
                                                             <td className="py-2 px-4">{item.credits}</td>
                                                             <td className="py-2 px-4">₹{item.amount}</td>
-                                                            <td className="py-2 px-4">{item.trainer_name || '-'}</td>
+                                                            <td className="py-2 px-4">
+                                                                {item.reference_trainer ? (
+                                                                    <a
+                                                                        href={`/trainer-details?trainer=${item.reference_trainer}`}
+                                                                        className="text-blue-600 hover:underline"
+
+                                                                    >
+                                                                        {item.trainer_name}
+                                                                    </a>
+                                                                ) : (
+                                                                    '-'
+                                                                )}
+                                                            </td>
                                                         </tr>
                                                     ))}
                                                 </tbody>

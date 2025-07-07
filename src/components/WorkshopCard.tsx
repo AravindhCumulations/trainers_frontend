@@ -45,7 +45,7 @@ const WorkshopCard = ({ workshop, onClick }: WorkshopCardProps) => {
                 </div>
                 <div className="flex justify-between items-center mt-auto">
                     <span className={priceClasses}>
-                        ₹ {workshop.price.toFixed(0)}/hour
+                        ₹ {workshop.price.toFixed(0)}&nbsp;pax/session
                     </span>
                     <div className=" bg-blue-100 px-2 py-1 rounded-md shadow-sm ">
                         <p className="text-semibold text-sm text-blue-600">{workshop.type}</p>

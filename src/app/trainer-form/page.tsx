@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import isEqual from 'lodash/isEqual';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 import NavBar from '../../components/Navbar';
 import { Education, Certification, Testimonial, TrainerFormValidator } from '@/models/trainerDetails.model';
@@ -22,13 +23,16 @@ import { languages } from "@/app/content/Languages";
 import { trainerApis } from "@/lib/apis/trainer.apis";
 import { useLoading } from '@/context/LoadingContext';
 import { useNavigation } from "@/lib/hooks/useNavigation";
-import { getCurrentUserName, setCurrentUserName } from '@/lib/utils/auth.utils';
+import { getCurrentUserMail, getCurrentUserName, setCurrentUserName } from '@/lib/utils/auth.utils';
 import { TrainerFormDto } from '@/models/trainerDetails.model';
 import { expertise_in } from '@/app/content/ExpertiseIN';
 import { useUser } from '@/context/UserContext';
+import { authApis } from '@/lib/apis/auth.apis';
 
 // Add type for tracking modified fields
 type ModifiedTrainerFields = Partial<TrainerFormDto>;
+
+declare module 'react-google-recaptcha';
 
 export default function TrainerDetailsPage() {
 
@@ -44,8 +48,9 @@ export default function TrainerDetailsPage() {
 
     // dropDowns
     const [searchTerm, setSearchTerm] = useState('');
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
+    const [languageSearchTerm, setLanguageSearchTerm] = useState('');
+    const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
 
     // loaders and Navigations
     const { showLoader, hideLoader } = useLoading();
@@ -57,8 +62,8 @@ export default function TrainerDetailsPage() {
 
     // elemRefs
 
-    const dropdownRef = useRef<HTMLDivElement>(null);
     const cityDropdownRef = useRef<HTMLDivElement>(null);
+    const languageDropdownRef = useRef<HTMLDivElement>(null);
 
     //form
     const [form, setForm] = useState<TrainerFormDto>({
@@ -479,10 +484,17 @@ export default function TrainerDetailsPage() {
         }
     };
 
+    // Add state for captcha
+    const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+    const [captchaError, setCaptchaError] = useState<string>('');
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         setErrors([]);
+        setCaptchaError('');
+        // Require captcha only in create mode
+
         // Validate form before submission
         const validationErrors = TrainerFormValidator.validateForm(form);
         if (validationErrors.length > 0) {
@@ -524,7 +536,34 @@ export default function TrainerDetailsPage() {
 
                 response = await trainerApis.trainerForm.editFormData(submitData);
             } else {
-                form.trainer = getCurrentUserName();
+
+                if (!isEdit) {
+                    if (!captchaToken) {
+                        setCaptchaError('Please complete the captcha to continue.');
+                        setTimeout(() => {
+                            errorContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            errorContainerRef.current?.focus();
+                        }, 100);
+                        return;
+                    }
+                    // Backend verification
+                    try {
+                        showLoader();
+                        const verifyRes = await authApis.captcha.verifyCaptcha(captchaToken);
+                        if (!verifyRes.data || !verifyRes.data.success) {
+                            setCaptchaError('Captcha verification failed. Please try again.');
+                            hideLoader();
+                            return;
+                        }
+                    } catch (err) {
+                        setCaptchaError('Captcha verification failed. Please try again.');
+                        hideLoader();
+                        return;
+                    }
+                }
+
+
+                form.trainer = getCurrentUserMail();
 
                 const submitData = {
                     ...form,
@@ -538,10 +577,8 @@ export default function TrainerDetailsPage() {
                     submitData.phone = phone; // ✅ Plain object assignment
                 }
 
-
-
-
                 response = await trainerApis.trainerForm.createFormData(submitData);
+
                 const responseName = response.data.name
 
                 // updating username in both localStorage & userContext
@@ -578,18 +615,6 @@ export default function TrainerDetailsPage() {
         }
     };
 
-    const handleLanguageSearch = (searchValue: string) => {
-        setSearchTerm(searchValue);
-        if (!searchValue.trim()) {
-            setFilteredLanguages(languages);
-            return;
-        }
-        const filtered = languages.filter(lang =>
-            lang.toLowerCase().includes(searchValue.toLowerCase())
-        );
-        setFilteredLanguages(filtered);
-    };
-
     const handleCitySearch = (searchValue: string) => {
         setSearchTerm(searchValue);
         if (!searchValue.trim()) {
@@ -602,11 +627,11 @@ export default function TrainerDetailsPage() {
         setFilteredCities(filtered);
     };
 
-    // Update handleClickOutside to include expertise dropdown
+    // Update handleClickOutside to include language dropdown
     const handleClickOutside = (event: MouseEvent) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-            setIsDropdownOpen(false);
-            setSearchTerm('');
+        if (languageDropdownRef.current && !languageDropdownRef.current.contains(event.target as Node)) {
+            setIsLanguageDropdownOpen(false);
+            setLanguageSearchTerm('');
             setFilteredLanguages(languages);
         }
         if (cityDropdownRef.current && !cityDropdownRef.current.contains(event.target as Node)) {
@@ -629,29 +654,36 @@ export default function TrainerDetailsPage() {
     }, []);
 
     const isLanguageSelected = (lang: string) => {
-        const selectedLanguages = form.language.split(',').map(l => l.trim());
+        const selectedLanguages = form.language.split(',').map(l => l.trim()).filter(l => l !== '');
         return selectedLanguages.includes(lang);
     };
 
     const handleLanguageClick = (lang: string) => {
-        const selectedLanguages = form.language.split(',').map(l => l.trim());
-
+        const selectedLanguages = form.language.split(',').map(l => l.trim()).filter(l => l !== '');
+        let newLanguages: string[];
         if (isLanguageSelected(lang)) {
             // Remove language if already selected
-            const newLanguages = selectedLanguages.filter(l => l !== lang);
-            handleChanges('language', newLanguages.join(', '));
+            newLanguages = selectedLanguages.filter(l => l !== lang);
         } else {
             // Add new language
-            const newValue = form.language
-                ? `${form.language}, ${lang}`
-                : lang;
-            handleChanges('language', newValue);
+            newLanguages = [...selectedLanguages, lang];
         }
-
-        // Reset search and filter after selection
-        setSearchTerm('');
+        handleChanges('language', newLanguages.join(', '));
+        // Do not close dropdown after selection
+        setLanguageSearchTerm('');
         setFilteredLanguages(languages);
-        setIsDropdownOpen(false);
+    };
+
+    const handleLanguageSearch = (searchValue: string) => {
+        setLanguageSearchTerm(searchValue);
+        if (!searchValue.trim()) {
+            setFilteredLanguages(languages);
+            return;
+        }
+        const filtered = languages.filter(lang =>
+            lang.toLowerCase().includes(searchValue.toLowerCase())
+        );
+        setFilteredLanguages(filtered);
     };
 
     // Add state for testimonial errors
@@ -968,7 +1000,7 @@ export default function TrainerDetailsPage() {
                                 </div>
 
                                 {/* Languages Known */}
-                                <div className="relative" ref={dropdownRef}>
+                                <div className="relative" ref={languageDropdownRef}>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Languages Known</label>
                                     <input
                                         type="text"
@@ -976,15 +1008,15 @@ export default function TrainerDetailsPage() {
                                         readOnly
                                         placeholder="Select languages from dropdown"
                                         className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
-                                        onFocus={() => setIsDropdownOpen(true)}
+                                        onFocus={() => setIsLanguageDropdownOpen(true)}
                                     />
-                                    {isDropdownOpen && (
+                                    {isLanguageDropdownOpen && (
                                         <div className="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10">
                                             <input
                                                 type="text"
                                                 placeholder="Search languages..."
                                                 className="w-full px-3 sm:px-4 py-2 border-b border-gray-300 focus:outline-none text-sm sm:text-base"
-                                                value={searchTerm}
+                                                value={languageSearchTerm}
                                                 onChange={(e) => handleLanguageSearch(e.target.value)}
                                                 autoFocus
                                             />
@@ -1447,6 +1479,22 @@ export default function TrainerDetailsPage() {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Captcha Section */}
+                        {!isEdit && (
+                            <div className="flex flex-col items-center">
+                                <ReCAPTCHA
+                                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+                                    onChange={token => {
+                                        setCaptchaToken(token);
+                                        console.log('reCAPTCHA token:', token);
+                                    }}
+                                />
+                                {captchaError && (
+                                    <span className="text-xs text-red-500 mt-2">{captchaError}</span>
+                                )}
+                            </div>
+                        )}
 
                         <div className="flex flex-col gap-3 sm:gap-4">
                             {isEdit && (

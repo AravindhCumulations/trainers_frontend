@@ -25,6 +25,30 @@ import Popup from '@/components/Popup';
 import { Workshop } from "@/models/workshop.models";
 import { useRouter } from "next/navigation";
 
+// Add this LockOverlay component near the top (after imports, before TrainerDetailsContent)
+const LockOverlay = ({ message = "Kindly unlock to access these details." }) => (
+    <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
+        {/* Blurred background */}
+        <div className="absolute inset-0 backdrop-blur-sm  rounded-xl" />
+        {/* Centered lock icon and tooltip, not blurred */}
+        <div className=" w-full h-full  relative flex flex-col items-center justify-center rounded">
+            <svg
+                className="w-8 h-8 text-gray-700 drop-shadow"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                style={{ marginBottom: '0.5rem' }}
+            >
+                <rect width="18" height="11" x="3" y="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            <span className="bg-blue-100 text-gray-800 text-xs px-3 py-2 rounded shadow sm:opacity-0 sm:group-hover:opacity-100 opacity-100 transition-opacity mt-1 whitespace-nowrap">
+                {message}
+            </span>
+        </div>
+    </div>
+);
 
 // Main Content
 const TrainerDetailsContent = () => {
@@ -286,6 +310,10 @@ const TrainerDetailsContent = () => {
     }
 
     const handleWorkshopClick = (type: 'details' | 'edit' | 'create', item: Workshop) => {
+
+        if (trainerLocked) {
+            return;
+        }
 
         if (!item) {
             showError("Failed to load Data")
@@ -643,25 +671,33 @@ const TrainerDetailsContent = () => {
                                             ) : (
                                                 <>
                                                     {(trainerData.workshop || []).map((workshop) => (
-                                                        <WorkshopCard
-                                                            key={workshop.idx.toString()}
-                                                            workshop={{
-                                                                idx: workshop.idx.toString(),
-                                                                title: workshop.title ?? '',
-                                                                objectives: workshop.objectives ?? '',
-                                                                price: workshop.price ?? '',
-                                                                target_audience: workshop.target_audience ?? '',
-                                                                format: workshop.format ?? '',
-                                                                image: workshop.image ?? '',
-                                                                outcomes: workshop.outcomes ?? '',
-                                                                handouts: workshop.handouts ?? '',
-                                                                program_flow: workshop.program_flow ?? '',
-                                                                evaluation: workshop.evaluation ?? '',
-                                                                type: workshop.type
-                                                            }}
-                                                            onClick={() => handleWorkshopClick('details', workshop)}
-
-                                                        />
+                                                        <div key={workshop.idx.toString()} className={`relative group`}>
+                                                            <WorkshopCard
+                                                                workshop={{
+                                                                    idx: workshop.idx.toString(),
+                                                                    title: workshop.title ?? '',
+                                                                    objectives: workshop.objectives ?? '',
+                                                                    price: workshop.price ?? '',
+                                                                    target_audience: workshop.target_audience ?? '',
+                                                                    format: workshop.format ?? '',
+                                                                    image: workshop.image ?? '',
+                                                                    outcomes: workshop.outcomes ?? '',
+                                                                    handouts: workshop.handouts ?? '',
+                                                                    program_flow: workshop.program_flow ?? '',
+                                                                    evaluation: workshop.evaluation ?? '',
+                                                                    type: workshop.type
+                                                                }}
+                                                                onClick={() => {
+                                                                    // Prevent click if locked
+                                                                    handleWorkshopClick('details', workshop);
+                                                                }}
+                                                            />
+                                                            {trainerLocked && (
+                                                                <div className="absolute inset-0 z-30 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    <LockOverlay message="Kindly unlock to access this workshop." />
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     ))}
                                                 </>
                                             )}
@@ -673,7 +709,7 @@ const TrainerDetailsContent = () => {
                                                         const container = workshopsContainerRef.current;
                                                         if (container) container.scrollLeft -= 300;
                                                     }}
-                                                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 p-2 rounded-full shadow-md border border-gray-200 transition-all duration-200 hover:scale-105"
+                                                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/60 hover:bg-white/80 p-2 rounded-full shadow-md border border-blue-500 transition-all duration-200 hover:scale-105"
                                                     style={{ transform: 'translateY(-50%)' }}
                                                     aria-label="Scroll left"
                                                 >
@@ -686,7 +722,7 @@ const TrainerDetailsContent = () => {
                                                         const container = workshopsContainerRef.current;
                                                         if (container) container.scrollLeft += 300;
                                                     }}
-                                                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 p-2 rounded-full shadow-md border border-gray-200 transition-all duration-200 hover:scale-105"
+                                                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/60 hover:bg-white/80 p-2 rounded-full shadow-md border border-blue-500 transition-all duration-200 hover:scale-105"
                                                     style={{ transform: 'translateY(-50%)' }}
                                                     aria-label="Scroll right"
                                                 >
@@ -718,9 +754,18 @@ const TrainerDetailsContent = () => {
                                             <p className="w-full border-b-2 border-blue-500 text-base sm:text-[18px] font-bold leading-tight sm:leading-[28px] text-[#1E2939] pb-3">Training Approach</p>
                                         </div>
 
-                                        <p className="font-normal text-sm sm:text-[16px] leading-relaxed sm:leading-[26px] py-3 sm:py-4  break-words">
-                                            {trainerData.training_approach}
-                                        </p>
+                                        {(!isLoggedInUser && trainerLocked) ? (
+                                            <div className="relative group">
+                                                <p className="font-normal text-sm sm:text-[16px] leading-relaxed sm:leading-[26px] py-3 sm:py-4 break-words select-none bg-blue-50 rounded-md px-4 py-6">
+                                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officiis odio eaque in obcaecati, ipsa at! Itaque molestias odit cumque maxime laborum explicabo sequi voluptatibus.
+                                                </p>
+                                                <LockOverlay />
+                                            </div>
+                                        ) : (
+                                            <p className="font-normal text-sm sm:text-[16px] leading-relaxed sm:leading-[26px] py-3 sm:py-4  break-words">
+                                                {trainerData.training_approach}
+                                            </p>
+                                        )}
                                     </div>
 
                                     {/* Certifications */}
@@ -729,20 +774,40 @@ const TrainerDetailsContent = () => {
                                             <p className="w-full border-b-2 border-blue-500 text-base sm:text-[18px] font-bold leading-tight sm:leading-[28px] pb-3">Certifications</p>
                                         </div>
                                         <div className="pt-3 sm:pt-4">
-                                            <div className="">
-                                                {trainerData.certificates?.map ? trainerData.certificates.map((certificate, index) => {
-                                                    const isLast = index === trainerData.certificates.length - 1;
-
-                                                    return (<div key={index}
-                                                        className={`border-l-4 border-blue-500 bg-[#EDF1FF] rounded-xl p-3 sm:p-4 ${isLast ? '' : 'mb-3 sm:mb-4'}`}>
+                                            {(!isLoggedInUser && trainerLocked) ? (
+                                                <div className="relative group">
+                                                    <div className={`border-l-4 border-blue-500 bg-[#EDF1FF] rounded-xl p-3 sm:p-4 mb-3 sm:mb-4`}>
                                                         <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
-                                                            <p className="text-sm sm:text-[15.88px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">{certificate.certificate_name}</p>
-                                                            <p className="text-xs sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[20px]">({certificate.issued_date})</p>
+                                                            <p className="text-sm sm:text-[15.88px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">Lorem ipsum dolor sit.</p>
+                                                            <p className="text-xs sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[20px]">(2025)</p>
                                                         </div>
-                                                        <p className="text-xs sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[20px]">{certificate.issued_by}</p>
-                                                    </div>);
-                                                }) : null}
-                                            </div>
+                                                        <p className="text-xs sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[20px]">Lorem, ipsum.</p>
+                                                    </div>
+                                                    <div className={`border-l-4 border-blue-500 bg-[#EDF1FF] rounded-xl p-3 sm:p-4 mb-3 sm:mb-4`}>
+                                                        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                                                            <p className="text-sm sm:text-[15.88px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">Lorem ipsum dolor sit.</p>
+                                                            <p className="text-xs sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[20px]">(2025)</p>
+                                                        </div>
+                                                        <p className="text-xs sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[20px]">Lorem, ipsum.</p>
+                                                    </div>
+                                                    <LockOverlay />
+                                                </div>
+                                            ) : (
+                                                <div className="">
+                                                    {trainerData.certificates?.map ? trainerData.certificates.map((certificate, index) => {
+                                                        const isLast = index === trainerData.certificates.length - 1;
+
+                                                        return (<div key={index}
+                                                            className={`border-l-4 border-blue-500 bg-[#EDF1FF] rounded-xl p-3 sm:p-4 ${isLast ? '' : 'mb-3 sm:mb-4'}`}>
+                                                            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                                                                <p className="text-sm sm:text-[15.88px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">{certificate.certificate_name}</p>
+                                                                <p className="text-xs sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[20px]">({certificate.issued_date})</p>
+                                                            </div>
+                                                            <p className="text-xs sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[20px]">{certificate.issued_by}</p>
+                                                        </div>);
+                                                    }) : null}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 
@@ -826,31 +891,60 @@ const TrainerDetailsContent = () => {
                                             <p className="w-full border-b-2 border-blue-500 text-base sm:text-[18px] font-bold leading-tight sm:leading-[28px] pb-3">Education</p>
                                         </div>
                                         <div className="relative gap-2 pt-3 sm:pt-4">
-                                            {(trainerData.education || []).map((education, index) => {
-                                                const isLast = index === trainerData.education.length - 1;
-
-                                                return (
-                                                    <div
-                                                        key={index}
-                                                        className="relative text-sm sm:text-md font-thin flex justify-start gap-2 mb-2"
-                                                    >
-                                                        {!isLast && (
+                                            {(!isLoggedInUser && trainerLocked) ? (
+                                                <div className="relative group">
+                                                    <div className="space-y-2  select-none">
+                                                        <div className="relative text-sm sm:text-md font-thin flex justify-start gap-2 mb-2">
                                                             <div className="absolute left-1 md:left-2 top-0 bottom-1 w-[2.5px] bg-blue-300 z-0"></div>
-                                                        )}
-
-                                                        <span className="flex-shrink-0 w-3 h-3 md:w-4 md:h-4 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold z-10 text-xs sm:text-sm"></span>
-
-                                                        <div className={`pt-1 ${isLast ? 'pb-0' : 'pb-6 sm:pb-8'} pl-2 pr-2 sm:pr-4`}>
-                                                            <p className="text-sm sm:text-[16px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">
-                                                                {education.course}
-                                                                &nbsp;&nbsp;
-                                                                <span className="text-[#F54900]">({education.year})</span>
-                                                            </p>
-                                                            <p className="text-sm sm:text-[16px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">{education.institution}</p>
+                                                            <span className="flex-shrink-0 w-3 h-3 md:w-4 md:h-4 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold z-10 text-xs sm:text-sm"></span>
+                                                            <div className="pt-1 pb-0 pl-2 pr-2 sm:pr-4">
+                                                                <p className="text-sm sm:text-[16px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">
+                                                                    Lorem ipsum dolor sit amet. &nbsp;&nbsp;
+                                                                    <span className="text-[#F54900]">(2025)</span>
+                                                                </p>
+                                                                <p className="text-sm sm:text-[16px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">Lorem, ipsum dolor.</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="relative text-sm sm:text-md font-thin flex justify-start gap-2 mb-2">
+                                                            <span className="flex-shrink-0 w-3 h-3 md:w-4 md:h-4 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold z-10 text-xs sm:text-sm"></span>
+                                                            <div className="pt-1 pb-0 pl-2 pr-2 sm:pr-4">
+                                                                <p className="text-sm sm:text-[16px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">
+                                                                    Lorem ipsum dolor sit amet. &nbsp;&nbsp;
+                                                                    <span className="text-[#F54900]">(2025)</span>
+                                                                </p>
+                                                                <p className="text-sm sm:text-[16px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">Lorem, ipsum dolor.</p>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                );
-                                            })}
+                                                    <LockOverlay />
+                                                </div>
+                                            ) : (
+                                                (trainerData.education || []).map((education, index) => {
+                                                    const isLast = index === trainerData.education.length - 1;
+
+                                                    return (
+                                                        <div
+                                                            key={index}
+                                                            className="relative text-sm sm:text-md font-thin flex justify-start gap-2 mb-2"
+                                                        >
+                                                            {!isLast && (
+                                                                <div className="absolute left-1 md:left-2 top-0 bottom-1 w-[2.5px] bg-blue-300 z-0"></div>
+                                                            )}
+
+                                                            <span className="flex-shrink-0 w-3 h-3 md:w-4 md:h-4 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold z-10 text-xs sm:text-sm"></span>
+
+                                                            <div className={`pt-1 ${isLast ? 'pb-0' : 'pb-6 sm:pb-8'} pl-2 pr-2 sm:pr-4`}>
+                                                                <p className="text-sm sm:text-[16px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">
+                                                                    {education.course}
+                                                                    &nbsp;&nbsp;
+                                                                    <span className="text-[#F54900]">({education.year})</span>
+                                                                </p>
+                                                                <p className="text-sm sm:text-[16px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">{education.institution}</p>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })
+                                            )}
                                         </div>
                                     </div>
 

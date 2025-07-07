@@ -95,6 +95,22 @@ export const authApis = {
 
     },
 
+
+    captcha: {
+        verifyCaptcha: async (token: string) => {
+            try {
+                const response = await axios.post('/api/method/trainer.api.verify_captcha', {
+                    token: token
+                });
+                return response.data;
+            } catch (error) {
+                console.error('Error fetching user permissions:', error);
+                throw error;
+            }
+        }
+
+    },
+
     // Generate OTP
 
     // Reset Password

@@ -7,10 +7,12 @@ import { authApis } from "@/lib/apis/auth.apis"
 import { setUserDetailsToLocalStore } from '@/lib/utils/auth.utils';
 import { useNavigation } from "@/lib/hooks/useNavigation";
 import { Eye, EyeOff } from "lucide-react";
+import { useUser } from '@/context/UserContext';
 
 
 export default function SignupPage() {
 
+    const { setUser, resetUser } = useUser();
     const [formData, setFormData] = useState<User>({
         email: '',
         first_name: '',
@@ -118,6 +120,16 @@ export default function SignupPage() {
         if (!data.user_details || !data.key_details) return;
 
         const success = setUserDetailsToLocalStore(data);
+        resetUser();
+        setUser({
+            name: data.user_details.name,
+            email: data.user_details.email,
+            role: data.user_details.role_user === "Trainer" ? "Trainer" : "user_role",
+            profilePic: '',
+            isLoggedIn: true,
+            credits: 0
+        });
+
         if (!success) return;
 
         if (data.user_details.role_user === "Trainer") {
@@ -195,7 +207,7 @@ export default function SignupPage() {
                             </label>
                         </div>
 
-                        {formData?.roles[0] === 'company' ? (
+                        {formData?.roles[0] === 'user_role' ? (
                             <div>
                                 <label className="block text-gray-700">Company Name</label>
                                 <input
@@ -341,7 +353,7 @@ export default function SignupPage() {
                 </motion.div>
                 <a className="text-blue-600 font-semibold cursor-pointer mt-3 underline"
                     onClick={() => handleNavigation('/')}
-                >skip</a>
+                >Go Back</a>
 
             </div>
 

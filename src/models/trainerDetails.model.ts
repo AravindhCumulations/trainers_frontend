@@ -326,7 +326,8 @@ export class TrainerFormValidator {
 
     private static validateSocialLinks(data: TrainerFormDto): string[] {
         const errors: string[] = [];
-        const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+        // Require URLs to start with http:// or https://
+        const urlPattern = /^https?:\/\/[^\s]+$/i;
 
         const links = [
             { field: data.personal_website, label: 'website' },
@@ -337,8 +338,12 @@ export class TrainerFormValidator {
         ];
 
         links.forEach(link => {
-            if (link.field && !urlPattern.test(link.field)) {
-                errors.push(`Invalid ${link.label} URL format`);
+            if (link.field) {
+                const isValid = urlPattern.test(link.field);
+                console.log(`Validating ${link.label}: ${link.field} => ${isValid ? 'valid' : 'invalid'}`);
+                if (!isValid) {
+                    errors.push(`Invalid ${link.label} URL format. Please include http:// or https://`);
+                }
             }
         });
 
