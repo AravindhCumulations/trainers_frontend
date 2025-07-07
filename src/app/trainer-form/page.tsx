@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import isEqual from 'lodash/isEqual';
-import ReCAPTCHA from 'react-google-recaptcha';
+import dynamic from 'next/dynamic';
 
 import NavBar from '../../components/Navbar';
 import { Education, Certification, Testimonial, TrainerFormValidator } from '@/models/trainerDetails.model';
@@ -32,7 +32,8 @@ import { authApis } from '@/lib/apis/auth.apis';
 // Add type for tracking modified fields
 type ModifiedTrainerFields = Partial<TrainerFormDto>;
 
-declare module 'react-google-recaptcha';
+// Dynamically import reCAPTCHA to avoid SSR issues
+const ReCAPTCHA = dynamic(() => import('react-google-recaptcha'), { ssr: false });
 
 export default function TrainerDetailsPage() {
 
@@ -1484,7 +1485,7 @@ export default function TrainerDetailsPage() {
                         {!isEdit && (
                             <div className="flex flex-col items-center">
                                 <ReCAPTCHA
-                                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+                                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
                                     onChange={token => {
                                         setCaptchaToken(token);
                                         console.log('reCAPTCHA token:', token);

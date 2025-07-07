@@ -709,7 +709,7 @@ const TrainerDetailsContent = () => {
                                                         const container = workshopsContainerRef.current;
                                                         if (container) container.scrollLeft -= 300;
                                                     }}
-                                                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/60 hover:bg-white/80 p-2 rounded-full shadow-md border border-blue-500 transition-all duration-200 hover:scale-105"
+                                                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-blue-200 hover:bg-white/80 p-2 rounded-full shadow-md border border-blue-500 transition-all duration-200 hover:scale-105"
                                                     style={{ transform: 'translateY(-50%)' }}
                                                     aria-label="Scroll left"
                                                 >
@@ -722,7 +722,7 @@ const TrainerDetailsContent = () => {
                                                         const container = workshopsContainerRef.current;
                                                         if (container) container.scrollLeft += 300;
                                                     }}
-                                                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/60 hover:bg-white/80 p-2 rounded-full shadow-md border border-blue-500 transition-all duration-200 hover:scale-105"
+                                                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-blue/60 hover:bg-white/80 p-2 rounded-full shadow-md border border-blue-500 transition-all duration-200 hover:scale-105"
                                                     style={{ transform: 'translateY(-50%)' }}
                                                     aria-label="Scroll right"
                                                 >
