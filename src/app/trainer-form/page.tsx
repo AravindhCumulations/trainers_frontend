@@ -538,29 +538,27 @@ export default function TrainerDetailsPage() {
                 response = await trainerApis.trainerForm.editFormData(submitData);
             } else {
 
-                if (!isEdit) {
-                    if (!captchaToken) {
-                        setCaptchaError('Please complete the captcha to continue.');
-                        setTimeout(() => {
-                            errorContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            errorContainerRef.current?.focus();
-                        }, 100);
-                        return;
-                    }
-                    // Backend verification
-                    try {
-                        showLoader();
-                        const verifyRes = await authApis.captcha.verifyCaptcha(captchaToken);
-                        if (!verifyRes.data || !verifyRes.data.success) {
-                            setCaptchaError('Captcha verification failed. Please try again.');
-                            hideLoader();
-                            return;
-                        }
-                    } catch (err) {
+                if (!captchaToken) {
+                    setCaptchaError('Please complete the captcha to continue.');
+                    setTimeout(() => {
+                        errorContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        errorContainerRef.current?.focus();
+                    }, 100);
+                    return;
+                }
+                // Backend verification
+                try {
+                    showLoader();
+                    const verifyRes = await authApis.captcha.verifyCaptcha(captchaToken);
+                    if (!verifyRes.data || !verifyRes.data.success) {
                         setCaptchaError('Captcha verification failed. Please try again.');
                         hideLoader();
                         return;
                     }
+                } catch (err) {
+                    setCaptchaError('Captcha verification failed. Please try again.');
+                    hideLoader();
+                    return;
                 }
 
 
@@ -1051,7 +1049,7 @@ export default function TrainerDetailsPage() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                                     {/* Hourly Rate */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Hourly Rate</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">&nbsp;per session per 50 pax</label>
                                         <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500">
                                             <span className="text-gray-500 text-sm sm:text-base">₹</span>
                                             <input

@@ -12,6 +12,7 @@ import { useUser } from '@/context/UserContext';
 import { getCurrentUserName, getCurrentUserFullName } from "@/lib/utils/auth.utils";
 import { usePopup } from "@/lib/hooks/usePopup";
 import Popup from "./Popup";
+import { getIsFirstLogin } from "@/lib/utils/auth.utils";
 
 
 interface NavBarProps {
@@ -27,6 +28,7 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
     const { resetUser, user } = useUser();
     const [isLoading, setIsLoading] = useState(true);
     const { toastError, showConfirmation, popupState, hidePopup } = usePopup();
+    const [showProfilePopup, setShowProfilePopup] = useState(false);
 
 
     // Remove redundant state variables that can be derived from user context
@@ -165,8 +167,47 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
         return (names[0][0] + names[names.length - 1][0]).toUpperCase();
     };
 
+    const handleSkipProfileCompletion = () => {
+        setShowProfilePopup(false);
+        // Handle skip logic, e.g., navigate to a default page
+    };
+
+    const handleProceedToProfileCompletion = () => {
+        setShowProfilePopup(false);
+        // Update the local storage to indicate that the user has completed the first login process
+        const userDetailsString = localStorage.getItem("user_details");
+        if (userDetailsString) {
+            const userDetails = JSON.parse(userDetailsString);
+            userDetails.if_first_login = false; // Set the flag to false
+            localStorage.setItem("user_details", JSON.stringify(userDetails));
+        }
+        handleNavigation(`/trainer-form`);
+    };
+
+    const handleProfileClick = () => {
+        if (getIsFirstLogin()) {
+            setShowProfilePopup(true);
+        } else {
+            handleNavigation(`/trainer-details?trainer=${getCurrentUserName()}`);
+        }
+    };
+
     return (
         <>
+            {/* Profile Completion Popup */}
+            {showProfilePopup && (
+                <Popup
+                    isOpen={showProfilePopup}
+                    type="confirmation"
+                    message="We recommend completing your profile to get the best experience."
+                    title="Please Complete Your Profile"
+                    onClose={handleSkipProfileCompletion}
+                    onConfirm={handleProceedToProfileCompletion}
+                    confirmText="Proceed"
+                    cancelText="Skip"
+                />
+            )}
+
             {/* Navbar */}
             <header
                 className={`w-full mx-auto  flex flex-col items-center relative z-50 px-0 md:px-2 lg:px-4 ${bgColor} ${textColor} transition-colors duration-200`}
@@ -233,7 +274,7 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
                                                     fill
                                                     className="object-cover rounded-full"
                                                     placeholder="blur"
-                                                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                                                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                                                 />
                                             ) : (
 
@@ -280,19 +321,18 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
                                                 </p>
                                                 <p className="text-sm text-gray-600 line-clamp-1">{user.email}</p>
                                             </div>
-                                            {isTrainer && (<button
-                                                onClick={() => {
-                                                    handleNavigation(`/trainer-details?trainer=${getCurrentUserName()}`);
-                                                    setShowDropdown(false);
-                                                }}
-                                                className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
-                                            >
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                                    <circle cx="12" cy="7" r="4"></circle>
-                                                </svg>
-                                                My Profile
-                                            </button>)}
+                                            {isTrainer && (
+                                                <button
+                                                    onClick={handleProfileClick}
+                                                    className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                                >
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                        <circle cx="12" cy="7" r="4"></circle>
+                                                    </svg>
+                                                    My Profile
+                                                </button>
+                                            )}
 
                                             <button
                                                 onClick={handleLogoutClick}
@@ -378,7 +418,7 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
 
                                     {isTrainer && (
                                         <button
-                                            onClick={() => handleDrawerItemClick(`/trainer-form?trainer=${getCurrentUserName()}`)}
+                                            onClick={handleProfileClick}
                                             className="w-full px-2 py-2 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                                         >
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

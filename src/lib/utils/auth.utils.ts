@@ -123,6 +123,7 @@ export const setUserDetailsToLocalStore = (data: {
         email?: string;
         role_user?: string;
         last_login?: string | null;
+        is_first_login?: boolean;
     };
     key_details: {
         api_key?: string;
@@ -141,6 +142,7 @@ export const setUserDetailsToLocalStore = (data: {
                 email: userDetails.email ?? "",
                 role_user: userDetails.role_user ?? "",
                 last_login: userDetails.last_login ?? null,
+                is_first_login: userDetails.is_first_login ?? false,
             };
 
             const keys = {
@@ -198,6 +200,19 @@ export const setKeyDetailsToLocalStore = (data: {
     } catch (error) {
         console.error("Error setting user details:", error);
         return false;
+    }
+    return false;
+};
+
+export const getIsFirstLogin = (): boolean => {
+    try {
+        const userDetailsString = localStorage.getItem("user_details");
+        if (userDetailsString) {
+            const userDetails = JSON.parse(userDetailsString);
+            return userDetails.is_first_login ?? false;
+        }
+    } catch (error) {
+        console.error("Error retrieving first login status:", error);
     }
     return false;
 };

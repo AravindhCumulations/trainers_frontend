@@ -657,7 +657,7 @@ const TrainerDetailsContent = () => {
                                     <div className="relative">
                                         <div
                                             ref={workshopsContainerRef}
-                                            className="flex gap-4 px-4 py-8 overflow-x-auto scrollbar-hidden workshops-container"
+                                            className="flex gap-4 px-5 py-8 overflow-x-auto scrollbar-hidden workshops-container"
                                         >
                                             {(!trainerData.Casestudy || trainerData.Casestudy.length === 0) &&
                                                 (!trainerData.workshop || trainerData.workshop.length === 0) ? (
@@ -709,11 +709,11 @@ const TrainerDetailsContent = () => {
                                                         const container = workshopsContainerRef.current;
                                                         if (container) container.scrollLeft -= 300;
                                                     }}
-                                                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-blue-200 hover:bg-white/80 p-2 rounded-full shadow-md border border-blue-500 transition-all duration-200 hover:scale-105"
+                                                    className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 bg-blue-400 hover:bg-blue-200 p-2 rounded-full shadow-md  transition-all duration-200 hover:scale-105"
                                                     style={{ transform: 'translateY(-50%)' }}
                                                     aria-label="Scroll left"
                                                 >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-6 sm:h-6">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" color="#FFFFFF" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-6 sm:h-6">
                                                         <path d="M15 18l-6-6 6-6" />
                                                     </svg>
                                                 </button>
@@ -722,11 +722,11 @@ const TrainerDetailsContent = () => {
                                                         const container = workshopsContainerRef.current;
                                                         if (container) container.scrollLeft += 300;
                                                     }}
-                                                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-blue/60 hover:bg-white/80 p-2 rounded-full shadow-md border border-blue-500 transition-all duration-200 hover:scale-105"
+                                                    className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 bg-blue-400 hover:bg-blue-200 p-2 rounded-full shadow-md  transition-all duration-200 hover:scale-105"
                                                     style={{ transform: 'translateY(-50%)' }}
                                                     aria-label="Scroll right"
                                                 >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-6 sm:h-6">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" color="#FFFFFF" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-6 sm:h-6">
                                                         <path d="M9 18l6-6-6-6" />
                                                     </svg>
                                                 </button>

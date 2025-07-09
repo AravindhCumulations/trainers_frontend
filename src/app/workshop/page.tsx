@@ -245,7 +245,7 @@ export default function WorkshopsPage() {
                                 {item.type === 'Workshop' ? 'Workshop' : 'Casestudy'}
                             </span>
                         </div>
-                        <span className="text-green-600 font-bold text-sm sm:text-base">₹ {item.price}pax/session</span>
+                        <span className="text-green-600 font-bold text-sm sm:text-base" >₹ {item.price}&nbsp;<span title='per session per 50 pax'>| 50pax/session</span></span>
                     </div>
                 </div>
             </motion.div>

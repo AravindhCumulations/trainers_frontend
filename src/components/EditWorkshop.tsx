@@ -303,7 +303,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
 
                         {/* Price */}
                         <div className="flex flex-col gap-2">
-                            <p className="text-sm sm:text-base font-normal text-blue-700">Price</p>
+                            <p className="text-sm sm:text-base font-normal text-blue-700">per session per 50 pax</p>
                             <input
                                 type="number"
                                 value={formData.price}

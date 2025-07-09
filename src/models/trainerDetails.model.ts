@@ -359,8 +359,10 @@ export class TrainerFormValidator {
         if (!/^(\+91[\-\s]?|91[\-\s]?)?[6-9]\d{9}$/.test(phone.trim())) {
             errors.push('Invalid phone number format');
         }
+
         return errors;
     }
+
 }
 
 

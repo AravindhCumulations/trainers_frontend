@@ -147,7 +147,7 @@ const TrainerCard = memo(({ trainer, onClick, viewMode, onWishlistUpdate, callLo
             {/* Trainer bottom info */}
             <div className="flex items-center w-full justify-between mt-auto trainer-card-bottom h-6 sm:h-7 lg:h-[30px]">
                 <span className="text-xs sm:text-sm font-semibold text-[#111827] leading-tight sm:leading-[20px] trainer-card-price">
-                    ₹{trainer.charge}/hour
+                    ₹{trainer.charge}&nbsp;| 50pax/session
                 </span>
                 <span className="flex items-center text-xs sm:text-sm font-normal text-[#6B7280] leading-tight sm:leading-[20px] trainer-card-views justify-between gap-1 sm:gap-[4px] text-center">
                     <svg width="14" height="13" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex items-center sm:w-4 sm:h-4 lg:w-[17px] lg:h-4">
