@@ -17,19 +17,20 @@ import { getIsFirstLogin } from "@/lib/utils/auth.utils";
 
 interface NavBarProps {
     bgColor?: string;
+    handleNavigation?: (page: string, params?: Record<string, string>) => void;
 }
 
-export default function Page({ bgColor = "bg-white", }: NavBarProps) {
+export default function Page({ bgColor = "bg-white", handleNavigation }: NavBarProps) {
 
     const [credit, setCredit] = useState(0);
     const [showDropdown, setShowDropdown] = useState(false);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const { handleNavigation } = useNavigation();
+    const { handleNavigation: navigationHandle } = useNavigation();
     const { resetUser, user } = useUser();
     const [isLoading, setIsLoading] = useState(true);
     const { toastError, showConfirmation, popupState, hidePopup } = usePopup();
-    const [showProfilePopup, setShowProfilePopup] = useState(false);
 
+    const navHandler = handleNavigation || navigationHandle;
 
     // Remove redundant state variables that can be derived from user context
     const isLoggedIn = user.isLoggedIn;
@@ -94,11 +95,11 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
 
 
     const handleLogin = (): void => {
-        handleNavigation("/login");
+        navHandler("/login");
     };
 
     const handleSignup = (): void => {
-        handleNavigation("/signup");
+        navHandler("/signup");
     };
 
     const handleLogout = async (): Promise<void> => {
@@ -135,7 +136,7 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
 
 
     const handleCredits = (): void => {
-        handleNavigation("/manage-credits");
+        navHandler("/manage-credits");
     }
 
     const handleDrawerClose = (): void => {
@@ -143,7 +144,7 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
     };
 
     const handleDrawerItemClick = (path: string): void => {
-        handleNavigation(path);
+        navHandler(path);
         setIsDrawerOpen(false);
     };
 
@@ -167,46 +168,20 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
         return (names[0][0] + names[names.length - 1][0]).toUpperCase();
     };
 
-    const handleSkipProfileCompletion = () => {
-        setShowProfilePopup(false);
-        // Handle skip logic, e.g., navigate to a default page
-    };
 
-    const handleProceedToProfileCompletion = () => {
-        setShowProfilePopup(false);
-        // Update the local storage to indicate that the user has completed the first login process
-        const userDetailsString = localStorage.getItem("user_details");
-        if (userDetailsString) {
-            const userDetails = JSON.parse(userDetailsString);
-            userDetails.if_first_login = false; // Set the flag to false
-            localStorage.setItem("user_details", JSON.stringify(userDetails));
-        }
-        handleNavigation(`/trainer-form`);
-    };
 
     const handleProfileClick = () => {
         if (getIsFirstLogin()) {
-            setShowProfilePopup(true);
-        } else {
-            handleNavigation(`/trainer-details?trainer=${getCurrentUserName()}`);
+            navHandler(`/trainer-form`);
+        }
+        else {
+            navHandler(`/trainer-details?trainer=${getCurrentUserName()}`);
         }
     };
 
     return (
         <>
-            {/* Profile Completion Popup */}
-            {showProfilePopup && (
-                <Popup
-                    isOpen={showProfilePopup}
-                    type="confirmation"
-                    message="We recommend completing your profile to get the best experience."
-                    title="Please Complete Your Profile"
-                    onClose={handleSkipProfileCompletion}
-                    onConfirm={handleProceedToProfileCompletion}
-                    confirmText="Proceed"
-                    cancelText="Skip"
-                />
-            )}
+
 
             {/* Navbar */}
             <header
@@ -226,7 +201,7 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
                     </Link> */}
                     <button
                         className={`text-2xl font-extrabold tracking-tight ${textColor} transition-colors duration-200 bg-transparent border-none p-0 m-0 cursor-pointer`}
-                        onClick={() => handleNavigation('/')}
+                        onClick={() => navHandler('/')}
                     >
                         Trainer&apos;s Mart
                     </button>
@@ -274,7 +249,7 @@ export default function Page({ bgColor = "bg-white", }: NavBarProps) {
                                                     fill
                                                     className="object-cover rounded-full"
                                                     placeholder="blur"
-                                                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                                                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                                                 />
                                             ) : (
 

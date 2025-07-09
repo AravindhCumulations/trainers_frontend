@@ -157,7 +157,8 @@ export class TrainerFormValidator {
             ...this.validateEducation(data.education),
             ...this.validateCertifications(data.certificates),
             ...this.validateTestimonials(data.testimonials),
-            ...this.validateClients(data.client_worked)
+            ...this.validateClients(data.client_worked),
+            ...this.validatePhoneNumber(data.phone)
         ];
     }
 
@@ -356,10 +357,22 @@ export class TrainerFormValidator {
 
     static validatePhoneNumber(phone: string) {
         const errors: string[] = [];
-        if (!/^(\+91[\-\s]?|91[\-\s]?)?[6-9]\d{9}$/.test(phone.trim())) {
-            errors.push('Invalid phone number format');
+        let phoneToValidate = phone.trim();
+        let digitsOnly = '';
+        if (phoneToValidate.startsWith('+91-')) {
+            digitsOnly = phoneToValidate.replace(/^\+91-/, '');
+        } else {
+            phoneToValidate = `+91-${phoneToValidate.replace(/^\+91-?/, '')}`;
+            digitsOnly = phoneToValidate.replace(/^\+91-/, '');
         }
-
+        // Check if all are digits and length is 10
+        if (!/^\d{10}$/.test(digitsOnly)) {
+            errors.push('Phone number must be exactly 10 digits');
+        }
+        // Check if it starts with 6-9
+        if (!/^[6-9]/.test(digitsOnly)) {
+            errors.push('Phone number must start with 6, 7, 8, or 9');
+        }
         return errors;
     }
 

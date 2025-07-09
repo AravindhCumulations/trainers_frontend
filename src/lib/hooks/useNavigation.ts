@@ -3,12 +3,20 @@
 import { useLoading } from '@/context/LoadingContext';
 import { useRouter, usePathname } from 'next/navigation';
 
-export const useNavigation = () => {
+export const useNavigation = (blockNavigation?: () => Promise<boolean> | boolean) => {
     const loading = useLoading();
     const router = useRouter();
     const currentPath = usePathname();
 
     const handleNavigation = async (page: string, params?: Record<string, string>) => {
+        // If a blockNavigation function is provided, check before navigating
+        if (blockNavigation) {
+            const shouldProceed = await Promise.resolve(blockNavigation());
+            if (!shouldProceed) {
+                loading.hideLoader();
+                return;
+            }
+        }
         loading.showLoader();
         const query = params ? `?${new URLSearchParams(params).toString()}` : '';
         const fullPath = `${page}${query}`;

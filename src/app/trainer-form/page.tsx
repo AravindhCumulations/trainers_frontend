@@ -22,12 +22,14 @@ import { indianCities } from "@/app/content/IndianCities";
 import { languages } from "@/app/content/Languages";
 import { trainerApis } from "@/lib/apis/trainer.apis";
 import { useLoading } from '@/context/LoadingContext';
-import { useNavigation } from "@/lib/hooks/useNavigation";
+import { useNavigation as useNavigationBase } from "@/lib/hooks/useNavigation";
 import { getCurrentUserMail, getCurrentUserName, setCurrentUserName } from '@/lib/utils/auth.utils';
 import { TrainerFormDto } from '@/models/trainerDetails.model';
 import { expertise_in } from '@/app/content/ExpertiseIN';
 import { useUser } from '@/context/UserContext';
 import { authApis } from '@/lib/apis/auth.apis';
+import { usePopup } from '@/lib/hooks/usePopup';
+import Popup from '@/components/Popup';
 
 // Add type for tracking modified fields
 type ModifiedTrainerFields = Partial<TrainerFormDto>;
@@ -55,7 +57,7 @@ export default function TrainerDetailsPage() {
 
     // loaders and Navigations
     const { showLoader, hideLoader } = useLoading();
-    const { handleNavigation } = useNavigation();
+    const { popupState, showConfirmation, hidePopup } = usePopup();
 
     // content
     const [filteredLanguages, setFilteredLanguages] = useState(languages);
@@ -531,7 +533,6 @@ export default function TrainerDetailsPage() {
                 };
                 if (modifiedFields.phone) {
                     const phone = `+91-${modifiedFields.phone.replace(/^\+91-/, '')}`;
-                    TrainerFormValidator.validatePhoneNumber(phone)
                     submitData.phone = phone; // ✅ Plain object assignment
                 }
 
@@ -572,7 +573,6 @@ export default function TrainerDetailsPage() {
                 };
                 if (form.phone) {
                     const phone = `+91-${form.phone.replace(/^\+91-/, '')}`;
-                    TrainerFormValidator.validatePhoneNumber(phone)
                     submitData.phone = phone; // ✅ Plain object assignment
                 }
 
@@ -692,10 +692,31 @@ export default function TrainerDetailsPage() {
     const [bioError, setBioError] = useState('');
     const [trainingApproachError, setTrainingApproachError] = useState('');
 
+    // Block navigation if there are unsaved changes in create mode
+    const blockNavigation = () => {
+        if (!isEdit && hasFormChanges) {
+            return new Promise<boolean>((resolve) => {
+                showConfirmation(
+                    'Your profile is incomplete. Are you sure you want to leave without completing your profile?',
+                    () => resolve(true),
+                    {
+                        title: 'Complete Your Profile',
+                        confirmText: 'Leave',
+                        cancelText: 'Stay',
+                    }
+                );
+            });
+        }
+        return true;
+    };
+
+    // Use enhanced navigation hook
+    const { handleNavigation } = useNavigationBase(blockNavigation);
+
     return (
 
         <div className="min-h-screen bg-theme">
-            <NavBar />
+            <NavBar handleNavigation={handleNavigation} />
 
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 my-4 sm:my-6 lg:my-8">
                 <div className="max-w-4xl mx-auto bg-white rounded-xl overflow-hidden">
@@ -1049,7 +1070,7 @@ export default function TrainerDetailsPage() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                                     {/* Hourly Rate */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">&nbsp;per session per 50 pax</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">&nbsp;Price (per session for 50 pax)</label>
                                         <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500">
                                             <span className="text-gray-500 text-sm sm:text-base">₹</span>
                                             <input
@@ -1520,6 +1541,17 @@ export default function TrainerDetailsPage() {
                 </div>
             </div>
             <Footer />
+            {/* Global Popup for confirmations and alerts */}
+            <Popup
+                isOpen={popupState.isOpen}
+                type={popupState.type}
+                message={popupState.message}
+                title={popupState.title}
+                onClose={hidePopup}
+                onConfirm={popupState.onConfirm}
+                confirmText={popupState.confirmText}
+                cancelText={popupState.cancelText}
+            />
         </div>
     );
 } 
