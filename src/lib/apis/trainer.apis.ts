@@ -47,12 +47,13 @@ export const trainerApis = {
     },
 
     // Search trainers with filters and fields
-    searchTrainers: async (user: string, search_text?: string, city?: string, page: number = 1, limit: number = 10) => {
+    searchTrainers: async (user: string, search_text?: string, city?: string, page: number = 1, limit: number = 10, category?: string) => {
         try {
             const params: Record<string, string> = {};
             params.user = user;
             if (search_text) params.search_text = search_text;
             if (city) params.city_filter = city;
+            if (category) params.category = category;
             params.page = page.toString();
             params.page_size = limit.toString();
 

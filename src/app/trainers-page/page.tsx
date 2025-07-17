@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, Suspense, useRef } from 'react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import TrainerGrid from '../../components/TrainerGrid';
@@ -9,7 +9,7 @@ import { trainerApis } from '../../lib/apis/trainer.apis';
 import { useLoading } from '@/context/LoadingContext';
 import { TrainerCardModel } from '@/models/trainerCard.model';
 import { indianCities } from '@/app/content/IndianCities';
-import { getCategories } from "@/app/content/categories";
+import { getCategories, extraCategoryNames } from "@/app/content/categories";
 import { usePopup } from '@/lib/hooks/usePopup';
 import Popup from '@/components/Popup';
 import { useUser } from '@/context/UserContext';
@@ -31,7 +31,11 @@ function TrainersPageContent() {
     const { user } = useUser();
 
     // Add state for selected category
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const [selectedCategory, setSelectedCategory] = useState('');
+    // Track first load 
+    const isFirstLoadRef = useRef(true);
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
+
 
     const callLogin = () => {
         showConfirmation(
@@ -47,7 +51,7 @@ function TrainersPageContent() {
         );
     };
 
-    const updateUrlParams = (search: string, city: string) => {
+    const updateUrlParams = (search: string, city: string, category: string) => {
         const params = new URLSearchParams(searchParams.toString());
 
         if (search) {
@@ -61,20 +65,29 @@ function TrainersPageContent() {
         } else {
             params.delete('city');
         }
-
+        
+        if (category) {
+            params.set('category_name', category);
+        } else {
+            params.delete('category_name')
+        }
+        console.log("update params value search " + search + " city " + city + " category " + category);
+        
         router.push(`?${params.toString()}`);
     };
 
-    const handleSearch = async (searchValue = searchText, cityValue = citySearch, page = currentPage, pageSize = itemsPerPage) => {
+    const handleSearch = async (searchValue = searchText, cityValue = citySearch, page = currentPage, pageSize = itemsPerPage, category = selectedCategory) => {
         try {
             setIsLoading(true);
-            updateUrlParams(searchValue, cityValue);
+            
+            updateUrlParams(searchValue, cityValue, category);
             const response = await trainerApis.searchTrainers(
                 user.email,
                 searchValue,
                 cityValue,
                 page,
-                pageSize
+                pageSize,
+                category || undefined
             );
 
             const trainers = response.data?.results || [];
@@ -83,8 +96,8 @@ function TrainersPageContent() {
             setSearchResults(trainers);
             setTotalItems(total);
 
-            if (searchValue || cityValue) {
-                setSearchTitle(`Search Results ${searchValue ? `for  "${searchValue}"` : ''}${cityValue ? ` in "${cityValue}"` : ''}`);
+            if (searchValue || cityValue || category) {
+                setSearchTitle(`Search Results ${searchValue ? `for  "${searchValue}"` : ''}${cityValue ? ` in "${cityValue}"` : ''}${category ? ` in "${category}"` : ''}`);
             } else {
                 setSearchTitle('All Trainers');
             }
@@ -101,30 +114,42 @@ function TrainersPageContent() {
     const handlePageChange = (newConfig: { page: number; pageSize: number }) => {
         setCurrentPage(newConfig.page);
         setItemsPerPage(newConfig.pageSize);
-        handleSearch(searchText, citySearch, newConfig.page, newConfig.pageSize);
+        handleSearch(searchText, citySearch, newConfig.page, newConfig.pageSize, selectedCategory);
     };
 
     const handleSearchClick = () => {
         setCurrentPage(1);
         setSearchResults([]);
-        handleSearch(searchText, citySearch, 1, itemsPerPage);
+        handleSearch(searchText, citySearch, 1, itemsPerPage, selectedCategory);
     };
 
     const handleClearSearch = () => {
         setSearchText('');
         setCurrentPage(1);
         setSearchResults([]);
-        setSelectedCategory(null); // Clear selected category
-        updateUrlParams('', citySearch);
-        handleSearch('', citySearch, 1, itemsPerPage);
+        setSelectedCategory(''); // Clear selected category
+        updateUrlParams('', citySearch, selectedCategory);
+        handleSearch('', citySearch, 1, itemsPerPage, selectedCategory);
     };
 
     const handleClearCity = () => {
         setCitySearch('');
         setCurrentPage(1);
         setSearchResults([]);
-        updateUrlParams(searchText, '');
-        handleSearch(searchText, '', 1, itemsPerPage);
+        updateUrlParams(searchText, '', selectedCategory);
+        handleSearch(searchText, '', 1, itemsPerPage, selectedCategory);
+    };
+
+    const handleClearCategory = () => {
+        setSelectedCategory('');
+        setCurrentPage(1);
+        setSearchResults([]);
+        updateUrlParams(searchText, citySearch, '');
+        handleSearch(searchText, citySearch, 1, itemsPerPage, '');
+        console.log("category value " + selectedCategory);
+        
+        console.log("clearing category");
+        
     };
 
     const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -162,15 +187,17 @@ function TrainersPageContent() {
 
                 const city = searchParams.get('city') || undefined;
                 const searchText = searchParams.get('search_text') || undefined;
+                const category = searchParams.get('category_name') || undefined;
 
-                if (city || searchText) {
+                if (city || searchText || category) {
                     if (city) setCitySearch(city);
                     if (searchText) setSearchText(searchText);
-                    if (searchText || city) {
-                        setSearchTitle(`Search Results for${searchText ? ` "${searchText}"` : ''}${city ? ` in "${city}"` : ''}`);
+                    if (category) setSelectedCategory(category);
+                    if (searchText || city || category) {
+                        setSearchTitle(`Search Results for${searchText ? ` "${searchText}"` : ''}${city ? ` in "${city}"` : ''}${category ? ` in "${category}"` : ''}`);
                     }
                 }
-                await handleSearch(searchText, city, 1, itemsPerPage);
+                await handleSearch(searchText, city, 1, itemsPerPage, selectedCategory);
             } catch (error) {
                 console.error('Error in initial search:', error);
                 setSearchResults([]);
@@ -184,7 +211,10 @@ function TrainersPageContent() {
             }
         };
 
-        initializeSearch();
+        if (isFirstLoadRef.current) {
+            isFirstLoadRef.current = false;
+            initializeSearch();
+        }
     }, [searchParams]);
 
     useEffect(() => {
@@ -204,27 +234,28 @@ function TrainersPageContent() {
                 cancelText={popupState.cancelText}
             />
             <section className="relative w-full mx-auto flex flex-col items-center header-hero-section bg-white">
-                <div className="w-full bg-gradient-to-b from-blue-400 to-blue-600 text-white  lg:pb-10 px-4  lg:px-8 flex flex-col items-center rounded-b-[20px] sm:rounded-b-[30px] lg:rounded-b-[40px] relative z-10 header-hero-bg">
+                <div className="w-full bg-gradient-to-b from-blue-400 to-blue-600 text-white  lg:pb-10 px-4  lg:px-8 flex flex-col items-center rounded-b-[20px] sm:rounded-b-[30px] lg:rounded-b-[40px] relative z-10 header-hero-bg pb-2">
                     <Navbar bgColor='transparent' />
-                    <div className="flex w-full justify-center items-center py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
-                        <div className="flex flex-col lg:flex-row w-full max-w-7xl gap-3 sm:gap-4 items-center justify-center">
-                            <div className="w-full lg:w-[60%] flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md mb-3 sm:mb-4 lg:mb-5 hero-search-bar">
+                    <div className="flex flex-col lg:flex-row w-full max-w-7xl gap-3 sm:gap-4 items-center justify-center">
+                        {/* Search Bar */}
+                        <div className="w-full lg:w-1/3 flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md lg:mb-0 hero-search-bar mb-0">
                                 <input
                                     type="text"
-                                    placeholder="Search by trainer name, skill, or city..."
+                                    placeholder={isSearchFocused ? '' : "Search by trainer name, skill, or city..."}
                                     value={searchText}
+                                    onFocus={() => setIsSearchFocused(true)}
+                                    onBlur={() => setIsSearchFocused(false)}
                                     onChange={(e) => {
                                         setSearchText(e.target.value);
                                         if (e.target.value === '') {
                                             setCurrentPage(1);
                                             setSearchResults([]);
-                                            setSelectedCategory(null);
-                                            updateUrlParams('', citySearch);
+                                            updateUrlParams('', citySearch, selectedCategory);
                                             handleSearch('', citySearch, 1, itemsPerPage);
                                         }
                                     }}
                                     onKeyPress={handleKeyPress}
-                                    className="flex-1 px-3 sm:px-5 py-2 rounded-full outline-none text-white bg-transparent placeholder-white/80 text-sm sm:text-base font-normal hero-search-input"
+                                    className="flex-1 px-3 sm:px-5 min-w-0 py-2 rounded-full outline-none text-white bg-transparent placeholder-white/80 text-sm sm:text-base font-normal hero-search-input"
                                 />
                                 {searchText && (
                                     <div className="pr-2 cursor-pointer" onClick={handleClearSearch}>
@@ -244,18 +275,65 @@ function TrainersPageContent() {
                                     </svg>
                                 </div>
                             </div>
-                            <div className="w-full lg:w-[40%] flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md mb-3 sm:mb-4 lg:mb-5 hero-search-city-bar relative">
+                        {/* Category and City */}
+                        <div className="w-full flex flex-col sm:flex-row lg:flex-row lg:w-2/3 gap-3 sm:gap-4 lg:gap-4">
+                            {/* Category */}
+                            <div className="w-full sm:w-1/2 lg:w-1/2 flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md hero-search-category-bar relative">
+                                <select
+                                    value={selectedCategory || ''}
+                                    onChange={(e) => {
+                                        const category = e.target.value;
+                                        console.log(category);
+                                        
+                                        setSelectedCategory(category);
+                                        console.log(selectedCategory);
+                                        
+                                        setCurrentPage(1);
+                                        setSearchResults([]);
+                                        // Do NOT clear citySearch here
+                                        handleSearch(searchText, citySearch, 1, itemsPerPage, category);
+                                    }}
+                                    className="flex-1 px-3 sm:px-5 py-2 rounded-full outline-none text-white bg-transparent placeholder-white/80 text-sm sm:text-base font-normal hero-search-input appearance-none cursor-pointer hover:bg-white/10 transition-colors duration-200"
+                                >
+                                    <option value="" className="text-gray-900 bg-white">Choose Category</option>
+                                    {getCategories('#3B82F6').map((category) => (
+                                        <option key={category.name} value={category.name} className="text-gray-900 bg-white hover:bg-blue-50">
+                                            {category.name}
+                                        </option>
+                                    ))}
+                                    {extraCategoryNames.map((name) => (
+                                        <option key={name} value={name} className="text-gray-900 bg-white hover:bg-blue-50">
+                                            {name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="absolute right-10 sm:right-12 pointer-events-none">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="sm:w-5 sm:h-5">
+                                        <path d="M7 10l5 5 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </div>
+                                {selectedCategory && (
+                                    <div className="pr-2 cursor-pointer hover:bg-white/10 rounded-full p-1 transition-colors duration-200" onClick={() => {
+                                        handleClearCategory();
+                                    }}>
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="sm:w-5 sm:h-5">
+                                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="white" />
+                                        </svg>
+                                    </div>
+                                )}
+                            </div>
+                            {/* City */}
+                            <div className="w-full sm:w-1/2 lg:w-1/2 flex flex-row items-center gap-2 bg-white/30 rounded-full p-1.5 shadow-md backdrop-blur-md hero-search-city-bar relative">
                                 <select
                                     value={citySearch}
                                     onChange={(e) => {
                                         setCitySearch(e.target.value);
                                         setCurrentPage(1);
                                         setSearchResults([]);
-                                        setSelectedCategory(null);
-                                        updateUrlParams(searchText, e.target.value);
-                                        handleSearch(searchText, e.target.value, 1, itemsPerPage);
+                                        updateUrlParams(searchText, e.target.value, selectedCategory);
+                                        handleSearch(searchText, e.target.value, 1, itemsPerPage, selectedCategory);
                                     }}
-                                    className="flex-1 px-3 sm:px-5 py-2 rounded-full outline-none text-white bg-transparent placeholder-white/80 text-sm sm:text-base font-normal hero-search-input appearance-none cursor-pointer hover:bg-white/10 transition-colors duration-200"
+                                    className="flex-1 px-3 sm:px-5 py-2 rounded-full outline-none text-white bg-transparent placeholder-white/80 text-sm sm:text-base font-normal hero-search-input appearance-none cursor-pointer hover:bg-white/10 transition-colors duration-200 min-w-0"
                                 >
                                     <option value="" className="text-gray-900 bg-white">Choose City</option>
                                     {indianCities.map((city) => (
@@ -321,19 +399,24 @@ function TrainersPageContent() {
                                 handleSearch(category.name, '', 1, itemsPerPage);
                             }}
                             key={index}
-                            className={`py-1.5 sm:py-2 px-3 sm:px-4 
+                            className={`relative py-1.5 sm:py-2 px-3 sm:px-4 w-32 min-h-16
                                 ${selectedCategory === category.name
                                     ? 'border-2 border-blue-600 bg-blue-50 font-bold text-blue-700'
                                     : 'bg-blue-100 text-[#3B82F6]'
                                 }
-                                text-xs sm:text-sm font-medium rounded-md items-center flex flex-col hover:bg-blue-200 transition-colors duration-200`}
+                                text-xs sm:text-sm font-medium rounded-md items-center flex flex-col justify-center hover:bg-blue-200 transition-colors duration-200 group overflow-visible`}
+                            title={category.name}
                         >
                             {category.icon}
-                            {category.name}
+                            <span className="w-full break-words whitespace-normal text-center block">
+                                {category.name}
+                            </span>
                         </button>
                     ))}
                 </div>
             </div>
+
+            
 
             <Footer />
         </div>

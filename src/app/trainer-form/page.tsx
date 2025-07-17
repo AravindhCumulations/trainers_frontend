@@ -478,12 +478,15 @@ export default function TrainerDetailsPage() {
         const file = e.target.files?.[0];
         if (file) {
             setHasImageChanged(true);
-            setProfileImage(file);
+            // Remove spaces from the file name
+            const sanitizedFileName = file.name.replace(/\s+/g, '');
+            const sanitizedFile = new File([file], sanitizedFileName, { type: file.type });
+            setProfileImage(sanitizedFile);
             const reader = new FileReader();
             reader.onloadend = () => {
                 setProfileImagePreview(reader.result as string);
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(sanitizedFile);
         }
     };
 
@@ -763,7 +766,7 @@ export default function TrainerDetailsPage() {
                                     type="file"
                                     ref={fileInputRef}
                                     onChange={handleImageChange}
-                                    accept="image/*"
+                                    accept="image/png, image/jpeg, image/jpg, image/gif, image/webp"
                                     className="hidden"
                                 />
                                 <button

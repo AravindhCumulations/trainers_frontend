@@ -338,6 +338,10 @@ const ManageCredits = () => {
                                         <span className="text-gray-600">Total Credits:</span>
                                         <span className="font-bold text-blue-600">{buyAmount}</span>
                                     </div>
+                                    <div className="flex justify-between items-center mb-4">
+                                        <span className="text-gray-600">Unlock Count:</span>
+                                        <span className="font-bold text-blue-600">{buyAmount / 10}</span>
+                                    </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-gray-600">Total Price:</span>
                                         <span className="text-2xl font-bold text-gray-900">₹{totalPrice.toFixed(2)}</span>

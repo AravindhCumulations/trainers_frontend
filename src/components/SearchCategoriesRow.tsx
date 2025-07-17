@@ -55,8 +55,9 @@ const SearchCategoriesRow: React.FC<SearchCategoriesRowProps> = ({ onCategoryCli
                 {getCategories("#ffffff").map((category, index) => (
                     <button
                         key={index}
-                        className="flex flex-col items-center justify-center gap-0.5 sm:gap-1 min-w-[48px] max-w-[48px] sm:min-w-[60px] sm:max-w-[60px] md:min-w-[70px] md:max-w-[70px] hero-category cursor-pointer text-white hover:opacity-80 transition-opacity hover:bg-white/20 rounded p-1"
+                        className="group flex flex-col items-center justify-center gap-0.5 sm:gap-1 min-w-[48px] max-w-[48px] sm:min-w-[60px] sm:max-w-[60px] md:min-w-[70px] md:max-w-[70px] hero-category cursor-pointer text-white hover:opacity-80 transition-opacity hover:bg-white/20 rounded p-1"
                         onClick={() => handleCategoryClick(category.name)}
+                        title={category.name}
                     >
                         {loadingCategory === category.name ? (
                             <div className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">
@@ -67,7 +68,14 @@ const SearchCategoriesRow: React.FC<SearchCategoriesRowProps> = ({ onCategoryCli
                                 {category.icon}
                             </div>
                         )}
-                        <span className="text-[10px] sm:text-xs font-medium text-center whitespace-nowrap overflow-hidden text-ellipsis w-full">{category.name}</span>
+                        <span className="relative w-full flex justify-center">
+                            <span className="text-[10px] sm:text-xs font-medium text-center whitespace-nowrap overflow-hidden text-ellipsis w-full">
+                                {category.name}
+                            </span>
+                        </span>
+                        {/* <span className="absolute z-50 top-full mt-1 hidden group-hover:flex bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap pointer-events-none">
+                                {category.name}
+                        </span> */}
                     </button>
                 ))}
             </div>

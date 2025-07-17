@@ -113,7 +113,9 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            setSelectedImage(file);
+            const sanitizedFileName = file.name.replace(/\s+/g, '');
+            const sanitizedFile = new File([file], sanitizedFileName, { type: file.type });
+            setSelectedImage(sanitizedFile);
             const reader = new FileReader();
             reader.onloadend = () => {
                 const base64String = reader.result as string;
@@ -124,7 +126,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                     image: base64String
                 }));
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(sanitizedFile);
         }
     };
 
@@ -330,7 +332,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                                 )}
                                 <input
                                     type="file"
-                                    accept="image/*"
+                                    accept="image/png, image/jpeg, image/jpg, image/gif, image/webp"
                                     onChange={handleImageUpload}
                                     className="block text-sm sm:text-base text-gray-500 font-normal
                                            file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2 file:px-3 sm:file:px-4
