@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, Suspense, useRef } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import TrainerGrid from '../../components/TrainerGrid';

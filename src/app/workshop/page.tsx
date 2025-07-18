@@ -207,59 +207,59 @@ export default function WorkshopsPage() {
         }
     };
 
-    const renderPreviewCard = () => {
-        return (
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-lg shadow-lg overflow-hidden relative group cursor-pointer flex flex-col h-full border-2 border-dashed border-blue-300"
-                onClick={() => setOverlayState({ isOpen: true, type: 'preview', data: sampleWorkshop })}
-            >
-                <div className="relative h-32 sm:h-40 lg:h-48">
-                    <Image
-                        src={sampleWorkshop.image}
-                        alt={sampleWorkshop.title}
-                        fill
-                        className="object-cover opacity-80"
-                    />
-                    <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">
-                        <div className="text-center text-white">
-                            <Eye className="w-8 h-8 mx-auto mb-2" />
-                            <p className="text-sm font-medium">Preview</p>
-                        </div>
-                    </div>
-                </div>
+    // const renderPreviewCard = () => {
+    //     return (
+    //         <motion.div
+    //             initial={{ opacity: 0, y: 20 }}
+    //             animate={{ opacity: 1, y: 0 }}
+    //             className="bg-white rounded-lg shadow-lg overflow-hidden relative group cursor-pointer flex flex-col h-full border-2 border-dashed border-blue-300"
+    //             onClick={() => setOverlayState({ isOpen: true, type: 'preview', data: sampleWorkshop })}
+    //         >
+    //             <div className="relative h-32 sm:h-40 lg:h-48">
+    //                 <Image
+    //                     src={sampleWorkshop.image}
+    //                     alt={sampleWorkshop.title}
+    //                     fill
+    //                     className="object-cover opacity-80"
+    //                 />
+    //                 <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">
+    //                     <div className="text-center text-white">
+    //                         <Eye className="w-8 h-8 mx-auto mb-2" />
+    //                         <p className="text-sm font-medium">Preview</p>
+    //                     </div>
+    //                 </div>
+    //             </div>
 
-                <div className="p-3 sm:p-4 lg:p-6 flex flex-col flex-grow">
-                    <span className="whitespace-nowrap w-fit self-end text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                        {sampleWorkshop.format}
-                    </span>
-                    <div className="flex justify-between items-start mb-2">
-                        <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold line-clamp-2">{sampleWorkshop.title}</h2>
-                    </div>
-                    <p className="text-gray-600 mb-3 sm:mb-4 flex-grow line-clamp-3 text-sm sm:text-base">{sampleWorkshop.objectives}</p>
-                    <div className="flex flex-col justify-end items-start gap-2 mt-auto">
-                        <div className="flex flex-wrap gap-1 sm:gap-2">
-                            <span className="text-xs sm:text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded-md">
-                                {sampleWorkshop.type}
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <span className="text-xs sm:text-sm font-semibold text-[#111827] leading-tight sm:leading-[20px] trainer-card-price">
-                                ₹{sampleWorkshop.price}
-                            </span>
-                            <span
-                                className="text-blue-600 text-sm cursor-pointer"
-                                title={`₹${sampleWorkshop.price} per session for 50 pax`}
-                            >
-                                ⓘ
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </motion.div>
-        );
-    };
+    //             <div className="p-3 sm:p-4 lg:p-6 flex flex-col flex-grow">
+    //                 <span className="whitespace-nowrap w-fit self-end text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+    //                     {sampleWorkshop.format}
+    //                 </span>
+    //                 <div className="flex justify-between items-start mb-2">
+    //                     <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold line-clamp-2">{sampleWorkshop.title}</h2>
+    //                 </div>
+    //                 <p className="text-gray-600 mb-3 sm:mb-4 flex-grow line-clamp-3 text-sm sm:text-base">{sampleWorkshop.objectives}</p>
+    //                 <div className="flex flex-col justify-end items-start gap-2 mt-auto">
+    //                     <div className="flex flex-wrap gap-1 sm:gap-2">
+    //                         <span className="text-xs sm:text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded-md">
+    //                             {sampleWorkshop.type}
+    //                         </span>
+    //                     </div>
+    //                     <div className="flex items-center gap-1">
+    //                         <span className="text-xs sm:text-sm font-semibold text-[#111827] leading-tight sm:leading-[20px] trainer-card-price">
+    //                             ₹{sampleWorkshop.price}
+    //                         </span>
+    //                         <span
+    //                             className="text-blue-600 text-sm cursor-pointer"
+    //                             title={`₹${sampleWorkshop.price} per session for 50 pax`}
+    //                         >
+    //                             ⓘ
+    //                         </span>
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         </motion.div>
+    //     );
+    // };
 
     const renderCard = (item: Workshop) => {
 
