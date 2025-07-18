@@ -50,9 +50,20 @@ const WorkshopDetails: React.FC<WorkshopDetailsProps> = ({ workshop, onClose }) 
                 <span className="bg-green-100 text-green-800 px-2 sm:px-4 py-1 text-xs sm:text-sm rounded-full">
                     💻 {workshop.format}
                 </span>
-                <span className="bg-yellow-100 text-yellow-800 px-2 sm:px-4 py-1 text-xs sm:text-sm rounded-full">
+                <div className="bg-yellow-100 text-yellow-800 px-2 sm:px-4 py-1 text-xs sm:text-sm rounded-full flex items-center gap-2">
+                    <span>
+                        💰 ₹{workshop.price}
+                    </span>
+                    <span
+                        className="text-blue-600 text-sm cursor-pointer"
+                        title={`₹${workshop.price} per session for 50 pax`}>
+                        ⓘ
+                    </span>
+                </div>
+                {/* <span className="bg-yellow-100 text-yellow-800 px-2 sm:px-4 py-1 text-xs sm:text-sm rounded-full">
                     💰 ₹{workshop.price}
-                </span>
+                </span> */}
+                
                 <span className="bg-orange-100 text-yellow-800 px-2 sm:px-4 py-1 text-xs sm:text-sm rounded-full">
                     {workshop.type === "Workshop" ? "🛠 Workshop" : "📘 Case Study"}
                 </span>

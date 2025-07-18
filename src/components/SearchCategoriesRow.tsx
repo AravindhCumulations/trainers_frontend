@@ -52,13 +52,29 @@ const SearchCategoriesRow: React.FC<SearchCategoriesRowProps> = ({ onCategoryCli
                 className="flex gap-4 sm:gap-6 md:gap-10 overflow-x-auto hero-categories-list flex-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                 style={{ scrollBehavior: 'smooth' }}
             >
-                {getCategories("#ffffff").map((category, index) => (
-                    <button
-                        key={index}
-                        className="group flex flex-col items-center justify-center gap-0.5 sm:gap-1 min-w-[48px] max-w-[48px] sm:min-w-[60px] sm:max-w-[60px] md:min-w-[70px] md:max-w-[70px] hero-category cursor-pointer text-white hover:opacity-80 transition-opacity hover:bg-white/20 rounded p-1"
-                        onClick={() => handleCategoryClick(category.name)}
-                        title={category.name}
-                    >
+                {getCategories("#ffffff").map((category, index) => {
+                    // Calculate dynamic width based on text length
+                    const getButtonWidth = (text: string) => {
+                        const baseWidth = 52; // minimum width
+                        const charWidth = 4.5; // increased width per character for better fit
+                        const calculatedWidth = baseWidth + (text.length * charWidth);
+                        return Math.min(calculatedWidth, 120); // increased max width limit
+                    };
+                    
+                    const buttonWidth = getButtonWidth(category.name);
+                    
+                    return (
+                        <button
+                            key={index}
+                            className="group flex flex-col items-center justify-center gap-0.5 sm:gap-1 hero-category cursor-pointer text-white hover:opacity-80 transition-opacity hover:bg-white/20 rounded p-1"
+                            style={{
+                                minWidth: `${buttonWidth}px`,
+                                maxWidth: `${buttonWidth}px`,
+                                width: `${buttonWidth}px`
+                            }}
+                            onClick={() => handleCategoryClick(category.name)}
+                            title={category.name}
+                        >
                         {loadingCategory === category.name ? (
                             <div className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">
                                 <Loader isLoading={true} size="sm" />
@@ -69,15 +85,16 @@ const SearchCategoriesRow: React.FC<SearchCategoriesRowProps> = ({ onCategoryCli
                             </div>
                         )}
                         <span className="relative w-full flex justify-center">
-                            <span className="text-[10px] sm:text-xs font-medium text-center whitespace-nowrap overflow-hidden text-ellipsis w-full">
+                            <span className="text-[10px] sm:text-xs font-medium text-center break-words leading-tight w-full">
                                 {category.name}
                             </span>
                         </span>
                         {/* <span className="absolute z-50 top-full mt-1 hidden group-hover:flex bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap pointer-events-none">
                                 {category.name}
                         </span> */}
-                    </button>
-                ))}
+                        </button>
+                    );
+                })}
             </div>
             <button
                 onClick={() => handleScroll('right')}

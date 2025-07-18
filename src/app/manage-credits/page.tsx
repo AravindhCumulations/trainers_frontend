@@ -339,7 +339,14 @@ const ManageCredits = () => {
                                         <span className="font-bold text-blue-600">{buyAmount}</span>
                                     </div>
                                     <div className="flex justify-between items-center mb-4">
-                                        <span className="text-gray-600">Unlock Count:</span>
+                                        <span className="text-gray-600 flex items-center gap-1">Unlock Count:
+                                        <span
+                                            className="text-blue-600 text-sm cursor-pointer align-middle"
+                                            title="Number of trainers you can unlock with this amount of credits">
+                                            ⓘ
+                                        </span>
+                                        </span>
+
                                         <span className="font-bold text-blue-600">{buyAmount / 10}</span>
                                     </div>
                                     <div className="flex justify-between items-center">

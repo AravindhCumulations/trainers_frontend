@@ -52,6 +52,11 @@ export const useNavigation = (blockNavigation?: () => Promise<boolean> | boolean
                 loading.hideLoader();
             }, 100);
         }
+        
+        // Additional safety: hide loader after a longer timeout to prevent stuck state
+        setTimeout(() => {
+            loading.hideLoader();
+        }, 2000);
     };
 
     return { handleNavigation };

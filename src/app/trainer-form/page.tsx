@@ -30,6 +30,8 @@ import { useUser } from '@/context/UserContext';
 import { authApis } from '@/lib/apis/auth.apis';
 import { usePopup } from '@/lib/hooks/usePopup';
 import Popup from '@/components/Popup';
+import Overlay from '@/components/Overlay';
+import { Eye } from 'lucide-react';
 
 // Add type for tracking modified fields
 type ModifiedTrainerFields = Partial<TrainerFormDto>;
@@ -177,6 +179,13 @@ export default function TrainerDetailsPage() {
 
     // Add filtered expertise state
     const [filteredExpertise, setFilteredExpertise] = useState(expertise_in);
+
+    // Add preview state for trainer profile
+    const [previewState, setPreviewState] = useState<{
+        isOpen: boolean;
+    }>({
+        isOpen: false
+    });
 
     // Function to handle changes with deep comparison
     const handleChanges = (field: keyof TrainerFormDto, value: string | number) => {
@@ -590,7 +599,23 @@ export default function TrainerDetailsPage() {
 
             // Reset image change state after successful submission
             setHasImageChanged(false);
-            await handleNavigation('/trainer-details', { 'trainer': getCurrentUserName() });
+            
+            // Clear modified fields to prevent popup
+            setModifiedFields({});
+            
+            // Hide loader before navigation to prevent stuck state
+            hideLoader();
+            
+            // Use setTimeout to ensure state updates are processed before navigation
+            setTimeout(async () => {
+                try {
+                    await handleNavigation('/trainer-details', { 'trainer': getCurrentUserName() });
+                } catch (navError) {
+                    console.error('Navigation error:', navError);
+                    // Fallback navigation
+                    window.location.href = `/trainer-details?trainer=${getCurrentUserName()}`;
+                }
+            }, 100);
         } catch (error: any) {
             console.error('Submission error:', error);
 
@@ -722,6 +747,20 @@ export default function TrainerDetailsPage() {
             <NavBar handleNavigation={handleNavigation} />
 
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 my-4 sm:my-6 lg:my-8">
+
+                {/* Preview Button - Outside the form container */}
+                {!isEdit && (
+                <div className="flex justify-center my-6 sm:mt-8">
+                    <button
+                        onClick={() => setPreviewState({ isOpen: true })}
+                        className="flex items-center justify-center gap-2 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition text-base font-medium shadow-lg hover:shadow-xl"
+                    >
+                        <Eye className="w-5 h-5" />
+                        Sample Trainer Profile
+                    </button>
+                </div>
+                )}
+
                 <div className="max-w-4xl mx-auto bg-white rounded-xl overflow-hidden">
                     <div className="flex flex-col justify-center items-center text-center text-white py-3 sm:py-4 lg:py-[16px] bg-theme-header"
                     >
@@ -1252,8 +1291,8 @@ export default function TrainerDetailsPage() {
                                 <button
                                     type="button"
                                     onClick={addEducation}
-                                    disabled={form.education.length >= 3}
-                                    className={`flex items-center font-medium mt-2 text-sm sm:text-base ${form.education.length >= 3 ? 'text-gray-400 cursor-not-allowed' : 'text-green-600'}`}
+                                    // disabled={form.education.length >= 3}
+                                    className={`flex items-center font-medium mt-2 text-sm sm:text-base text-green-600`}
                                 >
                                     <Add fontSize="small" className="mr-1" /> Add another Education
                                 </button>
@@ -1322,8 +1361,8 @@ export default function TrainerDetailsPage() {
                                 <button
                                     type="button"
                                     onClick={addCertification}
-                                    disabled={form.certificates.length >= 3}
-                                    className={`flex items-center font-medium mt-2 text-sm sm:text-base ${form.certificates.length >= 3 ? 'text-gray-400 cursor-not-allowed' : 'text-green-600'}`}
+                                    // disabled={form.certificates.length >= 3}
+                                    className={`flex items-center font-medium mt-2 text-sm sm:text-base text-green-600`}
                                 >
                                     <Add fontSize="small" className="mr-1" /> Add another Certificate
                                 </button>
@@ -1542,7 +1581,49 @@ export default function TrainerDetailsPage() {
                         </div>
                     </form>
                 </div>
+
+                
             </div>
+
+            {/* Preview Overlay */}
+            <Overlay
+                isOpen={previewState.isOpen}
+                onClose={() => setPreviewState({ isOpen: false })}
+            >
+                <div className="bg-white w-full max-w-4xl rounded-xl sm:rounded-2xl mt-2 sm:mt-4 mx-0 sm:mx-0 max-h-[90vh] overflow-y-auto" style={{ borderRadius: '12px' }}>
+                    <div className="p-4 sm:p-6 lg:p-8">
+                        <div className="flex justify-between items-center mb-6">
+                            <div></div>
+                            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">Sample Trainer Profile</h2>
+                            <button
+                                onClick={() => setPreviewState({ isOpen: false })}
+                                className="text-gray-500 hover:text-gray-700 transition"
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        {/* Preview Image */}
+                        <div className="flex justify-center overflow-y-auto" style={{ maxHeight: '80vh' }}>
+                            <img
+                                src="/assets/trainer-profile-preview.jpg"
+                                alt="Trainer Profile Preview"
+                                className="rounded-lg shadow-lg"
+                                style={{ 
+                                    maxWidth: '100%',
+                                    maxHeight: '75vh',
+                                    width: 'auto',
+                                    height: 'auto',
+                                    objectFit: 'contain'
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </Overlay>
+
             <Footer />
             {/* Global Popup for confirmations and alerts */}
             <Popup

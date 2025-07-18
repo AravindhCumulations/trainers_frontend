@@ -47,6 +47,14 @@ export default function Home() {
   const [wishlistedTrainers, setWishlistedTrainers] = useState<TrainerCardModel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // contact popup state
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+
 
   // helper variables
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -183,6 +191,36 @@ export default function Home() {
       }
     );
   }
+
+  // Contact popup functions
+  const showContactPopup = () => {
+    setShowContactForm(true);
+  };
+
+  const hideContactPopup = () => {
+    setShowContactForm(false);
+    setContactForm({ name: '', email: '', message: '' });
+  };
+
+  const handleContactFormChange = (field: string, value: string) => {
+    setContactForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Here you would typically send the form data to your backend
+    console.log('Contact form submitted:', contactForm);
+    
+    // Show success message
+    toastError('Thank you for your message! We will get back to you soon.');
+    
+    // Close popup and reset form
+    hideContactPopup();
+  };
 
 
   const handleWishlistUpdate = (trainer: TrainerCardModel, isWishlisted: boolean) => {
@@ -677,8 +715,17 @@ export default function Home() {
 
             <div className="flex flex-col sm:flex-row items-center gap-2 pt-4">
               <span className="text-sm text-blue-600 px-4">📩 Still have questions?</span>
-              <button
+              {/* Commented out original contact functionality */}
+              {/* <button
                 onClick={() => window.location.href = 'mailto:customer.support@trainersmart.com'}
+                className="bg-[#3B82F6] hover:scale-105 text-white px-4 py-2 rounded-lg text-sm w-full sm:w-auto"
+              >
+                Contact Us
+              </button> */}
+              
+              {/* New contact popup button */}
+              <button
+                onClick={showContactPopup}
                 className="bg-[#3B82F6] hover:scale-105 text-white px-4 py-2 rounded-lg text-sm w-full sm:w-auto"
               >
                 Contact Us
@@ -702,6 +749,70 @@ export default function Home() {
         {/* Footer - 3 columns, fixed height, exact spacing */}
         <Footer />
       </div>
+
+      {/* Contact Form Popup */}
+      {showContactForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Contact Us</h3>
+              <button
+                onClick={hideContactPopup}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleContactSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Name</label>
+                <input 
+                  type="text" 
+                  placeholder="Your Name"
+                  value={contactForm.name}
+                  onChange={(e) => handleContactFormChange('name', e.target.value)}
+                  className="w-full mt-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" 
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Email</label>
+                <input 
+                  type="email" 
+                  placeholder="you@example.com"
+                  value={contactForm.email}
+                  onChange={(e) => handleContactFormChange('email', e.target.value)}
+                  className="w-full mt-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" 
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Message</label>
+                <textarea 
+                  rows={4} 
+                  placeholder="Your message..."
+                  value={contactForm.message}
+                  onChange={(e) => handleContactFormChange('message', e.target.value)}
+                  className="w-full mt-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" 
+                  required
+                ></textarea>
+              </div>
+              
+              <button 
+                type="submit" 
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
+              >
+                Send Message
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

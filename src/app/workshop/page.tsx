@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Trash2, Plus, Edit, ArrowLeft } from 'lucide-react';
+import { Trash2, Plus, Edit, ArrowLeft, Eye } from 'lucide-react';
 import Image from 'next/image';
 import NavBar from '../../components/Navbar';
 import { Workshop } from '@/models/workshop.models';
@@ -26,9 +26,25 @@ export default function WorkshopsPage() {
     const { user } = useUser();
     const router = useRouter();
 
+    // Sample workshop data for preview
+    const sampleWorkshop: Workshop = {
+        idx: 'preview',
+        title: 'The Change Playbook: Leading with Agility',
+        objectives: 'Navigate change with our immersive program! Begin with expectation-setting, dive into activities like "Pass the Baton" and "Shuffle Pixel," explore Kotter\'s 8-Step Model, apply change initiatives in real time, and wrap up with shared takeaways for lasting impact.',
+        price: 50000,
+        target_audience: 'Business Unit Heads driving cultural or structural shifts, Team Leaders and Department Heads, Mid to Senior-Level Managers',
+        format: 'In-Person',
+        image: '/assets/edit_model.jpg',
+        outcomes: 'Understand the Psychology of Change, Apply Kotter\'s 8-Step Model, Enhance Adaptability and Agility, Improve Team Collaboration During Change, Develop Strategic Thinking for Change Initiatives, Translate Learning into Action, Build Leadership Behaviours for Change',
+        handouts: 'Participants receive structured handouts with Kotter\'s 8-Step Model, activity guides, reflection prompts, and space for insights, serving as practical takeaways to reinforce learning and apply change tools at work.',
+        program_flow: 'Begin with expectation setting, Experience activities like "Pass the Baton" & "Shuffle Pixel", Explore Kotter\'s 8-Step Model & apply real change scenarios, Wrap with powerful takeaways',
+        evaluation: 'Content Relevance, Facilitator Effectiveness, Learning Application, Participant Engagement, Overall Experience, Clarity of Learning Outcomes, Usefulness of Materials, Impact on Mindset',
+        type: 'Workshop'
+    };
+
     const [overlayState, setOverlayState] = useState<{
         isOpen: boolean;
-        type: 'details' | 'edit' | 'create' | null;
+        type: 'details' | 'edit' | 'create' | 'preview' | null;
         data?: Workshop;
     }>({
         isOpen: false,
@@ -191,6 +207,60 @@ export default function WorkshopsPage() {
         }
     };
 
+    const renderPreviewCard = () => {
+        return (
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-lg shadow-lg overflow-hidden relative group cursor-pointer flex flex-col h-full border-2 border-dashed border-blue-300"
+                onClick={() => setOverlayState({ isOpen: true, type: 'preview', data: sampleWorkshop })}
+            >
+                <div className="relative h-32 sm:h-40 lg:h-48">
+                    <Image
+                        src={sampleWorkshop.image}
+                        alt={sampleWorkshop.title}
+                        fill
+                        className="object-cover opacity-80"
+                    />
+                    <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">
+                        <div className="text-center text-white">
+                            <Eye className="w-8 h-8 mx-auto mb-2" />
+                            <p className="text-sm font-medium">Preview</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-3 sm:p-4 lg:p-6 flex flex-col flex-grow">
+                    <span className="whitespace-nowrap w-fit self-end text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        {sampleWorkshop.format}
+                    </span>
+                    <div className="flex justify-between items-start mb-2">
+                        <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold line-clamp-2">{sampleWorkshop.title}</h2>
+                    </div>
+                    <p className="text-gray-600 mb-3 sm:mb-4 flex-grow line-clamp-3 text-sm sm:text-base">{sampleWorkshop.objectives}</p>
+                    <div className="flex flex-col justify-end items-start gap-2 mt-auto">
+                        <div className="flex flex-wrap gap-1 sm:gap-2">
+                            <span className="text-xs sm:text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded-md">
+                                {sampleWorkshop.type}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <span className="text-xs sm:text-sm font-semibold text-[#111827] leading-tight sm:leading-[20px] trainer-card-price">
+                                ₹{sampleWorkshop.price}
+                            </span>
+                            <span
+                                className="text-blue-600 text-sm cursor-pointer"
+                                title={`₹${sampleWorkshop.price} per session for 50 pax`}
+                            >
+                                ⓘ
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+        );
+    };
+
     const renderCard = (item: Workshop) => {
 
 
@@ -329,7 +399,17 @@ export default function WorkshopsPage() {
 
                     {workshops.length === 0 && (
                         <div className="text-center py-8 sm:py-12">
-                            <p className="text-gray-500 text-sm sm:text-base">Add workshop or case study to display</p>
+                            <p className="text-gray-500 text-sm sm:text-base mb-6">Add workshop or case study to display</p>
+                            <div className="flex flex-col items-center justify-center">
+                                <button
+                                    onClick={() => setOverlayState({ isOpen: true, type: 'preview', data: sampleWorkshop })}
+                                    className="flex items-center justify-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition text-sm"
+                                >
+                                    <Eye className="w-4 h-4" />
+                                    Sample Workshop Layout
+                                </button>
+                                <p className="text-xs text-gray-400 mt-2">See how your workshop will look when listed</p>
+                            </div>
                         </div>
                     )}
 
@@ -362,6 +442,12 @@ export default function WorkshopsPage() {
                                     onUpdate={(workshopData) => handleWorkshopUpdate(workshopData, true)}
                                 />
                             </div>
+                        )}
+                        {overlayState.type === 'preview' && overlayState.data && (
+                            <WorkshopDetails
+                                workshop={overlayState.data}
+                                onClose={() => setOverlayState({ isOpen: false, type: null })}
+                            />
                         )}
                     </Overlay>
                 </div>

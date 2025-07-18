@@ -9,8 +9,8 @@ const Footer = () => {
                     Bridging the gap between talent and opportunities.
                 </div>
                 <div className="w-full flex flex-col gap-2 justify-center items-center md:flex-row md:gap-6 md:justify-end text-sm">
-                    <a href="#" className=" underline md:no-underline md:hover:underline">Privacy Policy</a>
-                    <a href="#" className="underline md:no-underline md:hover:underline">Terms and Conditions</a>
+                    <a href="/privacy" className=" underline md:no-underline md:hover:underline">Privacy Policy</a>
+                    <a href="/terms" className="underline md:no-underline md:hover:underline">Terms and Conditions</a>
                     <a href="#" className="underline md:no-underline md:hover:underline">Support</a>
                 </div>
             </div>

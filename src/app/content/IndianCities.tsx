@@ -1,5 +1,6 @@
 // List of major Indian cities
 export const indianCities = [
+    "New Delhi", "Gurugram", "Noida", "Mumbai", "Bengaluru", "Chennai", "Hyderabad", "Pune",
     "Adoni", "Agartala", "Ahmedabad", "Ahmednagar", "Aizawl", "Ajmer", "Akola", "Aligarh", "Alwar", "Ambernath",
     "Amravati", "Amritsar", "Anand", "Anantapur", "Anantnag", "Arrah", "Asansol", "Aurangabad", "Avadi", "Bahraich",
     "Bally", "Bengaluru", "Baranagar", "Barasat", "Bareilly", "Barrackpore", "Bathinda", "Begusarai", "Belgaum",

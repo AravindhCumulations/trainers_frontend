@@ -211,10 +211,7 @@ function TrainersPageContent() {
             }
         };
 
-        if (isFirstLoadRef.current) {
-            isFirstLoadRef.current = false;
-            initializeSearch();
-        }
+        initializeSearch();
     }, [searchParams]);
 
     useEffect(() => {
@@ -394,9 +391,9 @@ function TrainersPageContent() {
                     {getCategories("#3B82F6").map((category, index) => (
                         <button
                             onClick={() => {
-                                setSearchText(category.name);
+    
                                 setSelectedCategory(category.name); // Set selected category
-                                handleSearch(category.name, '', 1, itemsPerPage);
+                                handleSearch(searchText, '', 1, itemsPerPage, category.name);
                             }}
                             key={index}
                             className={`relative py-1.5 sm:py-2 px-3 sm:px-4 w-32 min-h-16

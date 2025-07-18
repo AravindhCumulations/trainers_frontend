@@ -641,11 +641,7 @@ const TrainerDetailsContent = () => {
                                             {isLoggedInUser && (
                                                 <button
                                                     onClick={() => {
-                                                        if (trainerData.workshop.length === 0) {
-                                                            handleNavigation(`/workshop?trainer=${user.name}&action=create`);
-                                                        } else {
-                                                            handleNavigation(`/workshop?trainer=${user.name}`);
-                                                        }
+                                                        handleNavigation(`/workshop?trainer=${user.name}`);
                                                     }}
                                                     className="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 text-sm sm:text-base"
                                                 >

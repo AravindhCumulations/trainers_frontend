@@ -13,6 +13,7 @@ export interface TrainerCardModel {
     status: 'active' | 'inactive' | 'pending';
     image: string;
     is_wishlisted: number;
+    is_unlocked: number;
 }
 
 export interface Expertise {
