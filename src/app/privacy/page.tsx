@@ -43,7 +43,7 @@ export default function PrivacyPage() {
                                 <strong>Website:</strong> trainersmart.com
                             </p>
                             <p className="text-gray-700">
-                                Get Pros ("we", "our", "us") is committed to protecting your privacy. This Privacy Policy outlines how we collect, use, and safeguard your personal information when you use our platform.
+                                Get Pros (&ldquo;we&rdquo;, &ldquo;our&rdquo;, &ldquo;us&rdquo;) is committed to protecting your privacy. This Privacy Policy outlines how we collect, use, and safeguard your personal information when you use our platform.
                             </p>
                         </div>
 
@@ -60,7 +60,7 @@ export default function PrivacyPage() {
                                     <li>Company Name (if applicable)</li>
                                     <li>Address</li>
                                     <li>Payment Information (for credit purchases by corporates)</li>
-                                    <li>Trainer's Profile</li>
+                                    <li>Trainer&apos;s Profile</li>
                                     <li>Qualifications</li>
                                     <li>Certifications</li>
                                 </ul>
@@ -112,12 +112,12 @@ export default function PrivacyPage() {
                             <section>
                                 <h3 className="text-xl font-semibold text-gray-900 mb-3">7. Marketing and Communication</h3>
                                 <p className="text-gray-700">
-                                    We may send occasional updates, promotional messages, and service-related communications. You can unsubscribe from marketing emails at any time using the "Unsubscribe" link in the email.
+                                    We may send occasional updates, promotional messages, and service-related communications. You can unsubscribe from marketing emails at any time using the &ldquo;Unsubscribe&rdquo; link in the email.
                                 </p>
                             </section>
 
                             <section>
-                                <h3 className="text-xl font-semibold text-gray-900 mb-3">8. Children's Privacy</h3>
+                                <h3 className="text-xl font-semibold text-gray-900 mb-3">8. Children&apos;s Privacy</h3>
                                 <p className="text-gray-700">
                                     Get Pros is not intended for individuals under the age of 18. We do not knowingly collect data from minors.
                                 </p>

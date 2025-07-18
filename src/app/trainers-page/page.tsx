@@ -32,8 +32,6 @@ function TrainersPageContent() {
 
     // Add state for selected category
     const [selectedCategory, setSelectedCategory] = useState('');
-    // Track first load 
-    const isFirstLoadRef = useRef(true);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
 
 
