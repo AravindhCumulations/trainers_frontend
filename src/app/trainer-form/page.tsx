@@ -32,6 +32,7 @@ import { usePopup } from '@/lib/hooks/usePopup';
 import Popup from '@/components/Popup';
 import Overlay from '@/components/Overlay';
 import { Eye } from 'lucide-react';
+import TrainerProfilePreview from '@/components/TrainerProfilePreview';
 
 // Add type for tracking modified fields
 type ModifiedTrainerFields = Partial<TrainerFormDto>;
@@ -1586,43 +1587,10 @@ export default function TrainerDetailsPage() {
             </div>
 
             {/* Preview Overlay */}
-            <Overlay
+            <TrainerProfilePreview
                 isOpen={previewState.isOpen}
                 onClose={() => setPreviewState({ isOpen: false })}
-            >
-                <div className="bg-white w-full max-w-4xl rounded-xl sm:rounded-2xl mt-2 sm:mt-4 mx-0 sm:mx-0 max-h-[90vh] overflow-y-auto" style={{ borderRadius: '12px' }}>
-                    <div className="p-4 sm:p-6 lg:p-8">
-                        <div className="flex justify-between items-center mb-6">
-                            <div></div>
-                            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">Sample Trainer Profile</h2>
-                            <button
-                                onClick={() => setPreviewState({ isOpen: false })}
-                                className="text-gray-500 hover:text-gray-700 transition"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-                        
-                        {/* Preview Image */}
-                        <div className="flex justify-center overflow-y-auto" style={{ maxHeight: '80vh' }}>
-                            <img
-                                src="/assets/trainer-profile-preview.jpg"
-                                alt="Trainer Profile Preview"
-                                className="rounded-lg shadow-lg"
-                                style={{ 
-                                    maxWidth: '100%',
-                                    maxHeight: '75vh',
-                                    width: 'auto',
-                                    height: 'auto',
-                                    objectFit: 'contain'
-                                }}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </Overlay>
+            />
 
             <Footer />
             {/* Global Popup for confirmations and alerts */}
