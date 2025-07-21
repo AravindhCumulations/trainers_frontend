@@ -8,11 +8,37 @@ interface TrainerProfilePreviewProps {
 }
 
 export default function TrainerProfilePreview({ isOpen, onClose }: TrainerProfilePreviewProps) {
+    // Prevent background scroll when overlay is open
+    React.useEffect(() => {
+        if (isOpen) {
+            // Disable body scroll
+            document.body.style.overflow = 'hidden';
+            // Also disable scroll on html element for better compatibility
+            document.documentElement.style.overflow = 'hidden';
+        } else {
+            // Re-enable body scroll
+            document.body.style.overflow = 'unset';
+            document.documentElement.style.overflow = 'unset';
+        }
+
+        // Cleanup function to ensure scroll is re-enabled when component unmounts
+        return () => {
+            document.body.style.overflow = 'unset';
+            document.documentElement.style.overflow = 'unset';
+        };
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white w-full max-w-7xl rounded-xl max-h-[95vh] overflow-y-auto">
+        <div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-hidden"
+            onClick={onClose}
+        >
+            <div 
+                className="bg-white w-full max-w-7xl rounded-xl max-h-[95vh] overflow-y-auto overscroll-contain"
+                onClick={(e) => e.stopPropagation()}
+            >
                 {/* Header */}
                 <div className="p-6 border-b border-gray-200">
                     <div className="flex items-center justify-between">
