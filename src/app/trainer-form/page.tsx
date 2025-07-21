@@ -30,7 +30,6 @@ import { useUser } from '@/context/UserContext';
 import { authApis } from '@/lib/apis/auth.apis';
 import { usePopup } from '@/lib/hooks/usePopup';
 import Popup from '@/components/Popup';
-import Overlay from '@/components/Overlay';
 import { Eye } from 'lucide-react';
 import TrainerProfilePreview from '@/components/TrainerProfilePreview';
 

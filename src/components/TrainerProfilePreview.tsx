@@ -181,7 +181,7 @@ export default function TrainerProfilePreview({ isOpen, onClose }: TrainerProfil
                                                     <h3 className="font-semibold mb-2">The Change Playbook: Leading...</h3>
                                                     <p className="text-sm text-gray-600 mb-4">
                                                         Navigate change with our immersive program! Begin with expectation-setting, dive into activities
-                                                        like 'Pass the Baton' &...
+                                                        like &apos;Pass the Baton&apos; &...
                                                     </p>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center text-green-600">
@@ -247,7 +247,7 @@ export default function TrainerProfilePreview({ isOpen, onClose }: TrainerProfil
                                         <h3 className="text-xl pb-2 border-b-2 border-blue-500 font-semibold">Training Approach</h3>
                                         <div className="mt-4">
                                             <p className="text-gray-700">
-                                                Arjun's approach is rooted in the experiential learning cycle—starting with immersive challenges,
+                                                Arjun&apos;s approach is rooted in the experiential learning cycle—starting with immersive challenges,
                                                 leading into deep reflection, group sharing, and real-world application. He uses simulations, team
                                                 games, visual thinking, and live coaching to anchor key concepts. His sessions skip the lecture-style
                                                 norm and instead create space for dialogue, creativity, and co-creation. The goal? To shift mindsets,
@@ -376,7 +376,7 @@ export default function TrainerProfilePreview({ isOpen, onClose }: TrainerProfil
                                                         <p className="text-xs text-gray-500 uppercase">THINGSWEKNOW COMPANY</p>
                                                     </div>
                                                     <p className="text-gray-700 text-sm">
-                                                        Arjun's Boot Camp was intense, impactful, and emotionally resonant. His engaging style turned
+                                                        Arjun&apos;s Boot Camp was intense, impactful, and emotionally resonant. His engaging style turned
                                                         leadership into a lived, lasting experience, not just a lesson.
                                                     </p>
                                                 </div>
