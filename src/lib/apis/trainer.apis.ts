@@ -246,6 +246,27 @@ export const trainerApis = {
         }
     },
 
+    // Edit Trainer First & Last name
+    updateUserNames: async (userEmail: string, firstName: string, lastName: string) => {
+        try {
+            const response = await axios.put(
+                `/api/resource/User/${encodeURIComponent(userEmail)}`,
+                {
+                    first_name: firstName,
+                    last_name: lastName
+                },
+                {
+                    headers: getAuthHeaders()
+                }
+            );
+            console.log("update user names response " + JSON.stringify(response.data));
+            
+            return response.data;
+        } catch (error) {
+            console.error('Error updating user names:', error);
+            throw error;
+        }
+    },
     fileUpload: {
         uploadProfilePicture: async (file: File): Promise<FileUploadResponse> => {
             const headers = getAuthHeaders('multipart/form-data');

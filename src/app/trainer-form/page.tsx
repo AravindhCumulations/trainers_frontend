@@ -73,6 +73,8 @@ export default function TrainerDetailsPage() {
     //form
     const [form, setForm] = useState<TrainerFormDto>({
         // personalInfo
+        first_name: '',
+        last_name: '',
         bio_line: '',
         training_approach: '',
         experience: 1,
@@ -112,7 +114,14 @@ export default function TrainerDetailsPage() {
 
     // Add initializeFormData method
     const initializeFormData = (trainerData: any) => {
+        console.log("initializeFormData called with:", trainerData);
+        
+        // Get first_name and last_name from localStorage
+        const userDetails = JSON.parse(localStorage.getItem("user_details") || "{}");
+        
         const formData = {
+            first_name: userDetails.first_name ?? '',
+            last_name: userDetails.last_name ?? '',
             bio_line: trainerData.bio_line ?? '',
             training_approach: trainerData.training_approach ?? '',
             experience: trainerData.experience ?? 1,
@@ -137,8 +146,10 @@ export default function TrainerDetailsPage() {
         };
 
         // Set both form and initial form state
+        console.log("Setting form data:", formData);
         setForm(formData);
         initialFormState.current = { ...formData };
+        console.log("Initial form state set:", initialFormState.current);
     };
 
     // 
@@ -264,6 +275,7 @@ export default function TrainerDetailsPage() {
             try {
                 showLoader();
                 const searchParams = new URLSearchParams(window.location.search);
+                
                 const trainerParam = searchParams.get('trainerData');
                 const trainerName = searchParams.get('trainer')
 
@@ -273,7 +285,8 @@ export default function TrainerDetailsPage() {
                     setIsEdit(true);
                     const trainerData = JSON.parse(decodeURIComponent(trainerParam));
 
-
+                    console.log("get by trainer param " + JSON.stringify(trainerData));
+                    
 
                     // Set the existing image URL as preview if available
                     if (trainerData.image) {
@@ -281,11 +294,14 @@ export default function TrainerDetailsPage() {
                     }
 
                     // Initialize form data using the new method
+                    console.log("About to initialize form data with:", trainerData);
                     initializeFormData(trainerData);
+                    console.log("Form initialized, current form state:", form);
                 } else if (trainerName) {
 
 
-
+                    console.log("get by trainer name " + trainerName);
+                    
                     // Get trainer data using API
                     const response = await trainerApis.getTrainerByName(trainerName);
 
@@ -297,10 +313,13 @@ export default function TrainerDetailsPage() {
                             setProfileImagePreview(response.data.image);
                         }
                         // Initialize form data using the new method
+                        console.log("About to initialize form data with API response:", response.data);
                         initializeFormData(response.data);
+                        console.log("Form initialized from API, current form state:", form);
                     }
 
                 }
+
 
 
             } catch (error) {
@@ -312,6 +331,31 @@ export default function TrainerDetailsPage() {
 
         fetchTrainerData();
     }, []);
+
+    // Populate first_name and last_name from localStorage for signup mode
+    useEffect(() => {
+        if (!isEdit) {
+            try {
+                const userDetails = JSON.parse(localStorage.getItem("user_details") || "{}");
+                if (userDetails.first_name || userDetails.last_name) {
+                    setForm(prev => ({
+                        ...prev,
+                        first_name: userDetails.first_name || '',
+                        last_name: userDetails.last_name || ''
+                    }));
+                    
+                    // Update initial form state to include the populated values
+                    initialFormState.current = {
+                        ...initialFormState.current,
+                        first_name: userDetails.first_name || '',
+                        last_name: userDetails.last_name || ''
+                    };
+                }
+            } catch (error) {
+                console.error('Error parsing user_details from localStorage:', error);
+            }
+        }
+    }, [isEdit]);
 
 
 
@@ -535,6 +579,31 @@ export default function TrainerDetailsPage() {
 
             // Clean client_worked before submission
             const cleanedClientWorked = form.client_worked.filter(client => client.company && client.company.trim() !== '');
+
+            // Update User first_name and last_name if changed
+            const userEmail = getCurrentUserMail();
+            if (modifiedFields.first_name || modifiedFields.last_name) {
+                try {
+                    await trainerApis.updateUserNames(
+                        userEmail,
+                        form.first_name || '',
+                        form.last_name || ''
+                    );
+                    
+                    // Update localStorage with new first_name and last_name
+                    const userDetails = JSON.parse(localStorage.getItem("user_details") || "{}");
+                    const updatedUserDetails = {
+                        ...userDetails,
+                        ...(modifiedFields.first_name && { first_name: form.first_name }),
+                        ...(modifiedFields.last_name && { last_name: form.last_name })
+                    };
+                    localStorage.setItem("user_details", JSON.stringify(updatedUserDetails));
+                    
+                } catch (error) {
+                    console.error('Error updating user name:', error);
+                    // Continue with trainer form submission even if user update fails
+                }
+            }
 
             let response;
             if (isEdit) {
@@ -821,6 +890,31 @@ export default function TrainerDetailsPage() {
                         <div className="rounded-xl p-4 sm:p-6 shadow-sm bg-white">
                             {/* Section Title */}
                             <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Personal Details</h3>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
+                                <div>
+                                    <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                                    <input
+                                        id="first_name"
+                                        type="text"
+                                        value={form.first_name}
+                                        onChange={e => handleChanges('first_name', e.target.value)}
+                                        placeholder="Enter first name"
+                                        className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                                    <input
+                                        id="last_name"
+                                        type="text"
+                                        value={form.last_name}
+                                        onChange={e => handleChanges('last_name', e.target.value)}
+                                        placeholder="Enter last name"
+                                        className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm sm:text-base"
+                                    />
+                                </div>
+                            </div>
 
                             {/* Bio */}
                             <div className="mb-4 sm:mb-6">

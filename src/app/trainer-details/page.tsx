@@ -161,7 +161,7 @@ const TrainerDetailsContent = () => {
                     setIsLoggedInUser(true);
 
                     const response = await trainerApis.getTrainerByName(trainerName);
-
+                    
                     setTrainerData(response.data);
                     setProfilePic(response.data.image);
                     setTrainerLocked(false);

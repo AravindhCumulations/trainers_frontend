@@ -54,7 +54,8 @@ export interface Client {
 
 export interface TrainerDetailsModel {
     // personalInfo
-
+    first_name: string;
+    last_name: string;
     bio_line: string;
     training_approach: string
     experience: number;
@@ -111,6 +112,8 @@ export interface TrainerDetailsModel {
 export interface TrainerFormDto {
     // personalInfo
     image: string;
+    first_name: string;
+    last_name: string;
     bio_line: string;
     training_approach: string
     experience: number;

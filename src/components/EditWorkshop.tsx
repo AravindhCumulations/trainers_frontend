@@ -290,6 +290,42 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                         </div>
                     )}
 
+                    {/* Type Selection (Workshop/Case Study) */}
+                    <div className="text-sm sm:text-base text-black font-normal">
+                            <p className='text-blue-700 font-normal text-sm sm:text-base'>Type</p>
+                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 text-sm sm:text-base text-gray-700">
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="radio"
+                                        id="workshop"
+                                        name="type"
+                                        checked={formData.type === 'Workshop'}
+                                        onChange={() => handleChange('type', 'Workshop')}
+                                        disabled={isEditMode}
+                                        className={`w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 ${isEditMode ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    />
+                                    <label htmlFor="workshop" className={`text-sm sm:text-base font-normal ${isEditMode ? 'text-gray-500' : ''}`}>Workshop</label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="radio"
+                                        id="case-study"
+                                        name="type"
+                                        checked={formData.type === 'Casestudy'}
+                                        onChange={() => handleChange('type', 'Casestudy')}
+                                        disabled={isEditMode}
+                                        className={`w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 ${isEditMode ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    />
+                                    <label htmlFor="case-study" className={`text-sm sm:text-base font-normal ${isEditMode ? 'text-gray-500' : ''}`}>Case Study</label>
+                                </div>
+                            </div>
+                            {isEditMode && (
+                                <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                                    Type cannot be changed in edit mode
+                                </p>
+                            )}
+                        </div>
+
                     <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:gap-4 text-sm sm:text-base font-normal">
                         {/* Workshop Title */}
                         <div className="flex flex-col gap-2">
@@ -586,42 +622,6 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                                     <label htmlFor="virtual" className="text-sm sm:text-base font-normal">Virtual</label>
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Type Selection (Workshop/Case Study) */}
-                        <div className="text-sm sm:text-base text-black font-normal">
-                            <p className='text-blue-700 font-normal text-sm sm:text-base'>Type</p>
-                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 text-sm sm:text-base text-gray-700">
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="radio"
-                                        id="workshop"
-                                        name="type"
-                                        checked={formData.type === 'Workshop'}
-                                        onChange={() => handleChange('type', 'Workshop')}
-                                        disabled={isEditMode}
-                                        className={`w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 ${isEditMode ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    />
-                                    <label htmlFor="workshop" className={`text-sm sm:text-base font-normal ${isEditMode ? 'text-gray-500' : ''}`}>Workshop</label>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="radio"
-                                        id="case-study"
-                                        name="type"
-                                        checked={formData.type === 'Casestudy'}
-                                        onChange={() => handleChange('type', 'Casestudy')}
-                                        disabled={isEditMode}
-                                        className={`w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 ${isEditMode ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    />
-                                    <label htmlFor="case-study" className={`text-sm sm:text-base font-normal ${isEditMode ? 'text-gray-500' : ''}`}>Case Study</label>
-                                </div>
-                            </div>
-                            {isEditMode && (
-                                <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                                    Type cannot be changed in edit mode
-                                </p>
-                            )}
                         </div>
 
                         {/* Save Button */}
