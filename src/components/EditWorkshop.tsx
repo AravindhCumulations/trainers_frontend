@@ -113,6 +113,16 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            // Check file size (10MB = 10 * 1024 * 1024 bytes)
+            const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+            
+            if (file.size > maxSize) {
+                setErrors(['Workshop image file size must be less than 10MB. Please select a smaller image.']);
+                // Clear the file input
+                e.target.value = '';
+                return;
+            }
+
             const sanitizedFileName = file.name.replace(/\s+/g, '');
             const sanitizedFile = new File([file], sanitizedFileName, { type: file.type });
             setSelectedImage(sanitizedFile);
@@ -127,6 +137,9 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                 }));
             };
             reader.readAsDataURL(sanitizedFile);
+            
+            // Clear any previous errors
+            setErrors([]);
         }
     };
 
@@ -377,6 +390,9 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                                            file:bg-blue-50 file:text-blue-700
                                            hover:file:bg-blue-100"
                                 />
+                                <p className="text-xs text-gray-500">
+                                    Maximum file size: 10MB. Supported formats: PNG, JPG, JPEG, GIF, WebP
+                                </p>
                             </div>
                         </div>
 
@@ -398,16 +414,16 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                                     className="min-h-[80px] sm:min-h-[100px] rounded-lg w-full p-2 sm:p-3 border border-blue-100 text-sm sm:text-base text-gray-700 font-normal leading-6 placeholder:text-gray-400 placeholder:text-sm sm:placeholder:text-base placeholder:font-light resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pb-8"
                                     placeholder="Enter workshop objectives"
                                 />
-                                <div className="flex justify-between items-center mt-1">
-                                    <div>
-                                        {objectivesError && (
+                                {objectivesError && (
+                                    <div className="flex justify-between items-center mt-1">
+                                        <div>
                                             <span className="text-xs text-red-500">{objectivesError}</span>
-                                        )}
+                                        </div>
+                                        <div className="text-xs sm:text-sm text-gray-500">
+                                            {formData.objectives.length}/{MAX_CHAR_LIMIT}
+                                        </div>
                                     </div>
-                                    <div className="text-xs sm:text-sm text-gray-500">
-                                        {formData.objectives.length}/{MAX_CHAR_LIMIT}
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         </div>
 
@@ -504,16 +520,16 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                                     className="min-h-[80px] sm:min-h-[100px] rounded-lg w-full p-2 sm:p-3 border border-blue-100 text-sm sm:text-base text-gray-700 font-normal leading-6 placeholder:text-gray-400 placeholder:text-sm sm:placeholder:text-base placeholder:font-light resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pb-8"
                                     placeholder="Enter workshop outcomes"
                                 />
-                                <div className="flex justify-between items-center mt-1">
-                                    <div>
-                                        {outcomesError && (
+                                {outcomesError && (
+                                    <div className="flex justify-between items-center mt-1">
+                                        <div>
                                             <span className="text-xs text-red-500">{outcomesError}</span>
-                                        )}
+                                        </div>
+                                        <div className="text-xs sm:text-sm text-gray-500">
+                                            {formData.outcomes.length}/{MAX_CHAR_LIMIT}
+                                        </div>
                                     </div>
-                                    <div className="text-xs sm:text-sm text-gray-500">
-                                        {formData.outcomes.length}/{MAX_CHAR_LIMIT}
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         </div>
 
@@ -535,16 +551,16 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                                     className="min-h-[80px] sm:min-h-[100px] rounded-lg w-full p-2 sm:p-3 border border-blue-100 text-sm sm:text-base text-gray-700 font-normal leading-6 placeholder:text-gray-400 placeholder:text-sm sm:placeholder:text-base placeholder:font-light resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pb-8"
                                     placeholder="Enter workshop handouts"
                                 />
-                                <div className="flex justify-between items-center mt-1">
-                                    <div>
-                                        {handoutsError && (
+                                {handoutsError && (
+                                    <div className="flex justify-between items-center mt-1">
+                                        <div>
                                             <span className="text-xs text-red-500">{handoutsError}</span>
-                                        )}
+                                        </div>
+                                        <div className="text-xs sm:text-sm text-gray-500">
+                                            {formData.handouts.length}/{MAX_CHAR_LIMIT}
+                                        </div>
                                     </div>
-                                    <div className="text-xs sm:text-sm text-gray-500">
-                                        {formData.handouts.length}/{MAX_CHAR_LIMIT}
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         </div>
 
@@ -566,16 +582,16 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                                     className="min-h-[80px] sm:min-h-[100px] rounded-lg w-full p-2 sm:p-3 border border-blue-100 text-sm sm:text-base text-gray-700 font-normal leading-6 placeholder:text-gray-400 placeholder:text-sm sm:placeholder:text-base placeholder:font-light resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pb-8"
                                     placeholder="Enter workshop evaluation criteria"
                                 />
-                                <div className="flex justify-between items-center mt-1">
-                                    <div>
-                                        {evaluationError && (
+                                {evaluationError && (
+                                    <div className="flex justify-between items-center mt-1">
+                                        <div>
                                             <span className="text-xs text-red-500">{evaluationError}</span>
-                                        )}
+                                        </div>
+                                        <div className="text-xs sm:text-sm text-gray-500">
+                                            {formData.evaluation.length}/{MAX_CHAR_LIMIT}
+                                        </div>
                                     </div>
-                                    <div className="text-xs sm:text-sm text-gray-500">
-                                        {formData.evaluation.length}/{MAX_CHAR_LIMIT}
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         </div>
 

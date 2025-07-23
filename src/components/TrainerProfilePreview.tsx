@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from "next/image"
-import { Star, MapPin, Clock, Users, ChevronLeft } from "lucide-react"
+import { MapPin, Clock, Users, ChevronLeft } from "lucide-react"
+import { RatingStars } from './RatingStars';
 
 interface TrainerProfilePreviewProps {
     isOpen: boolean;
@@ -72,13 +73,13 @@ export default function TrainerProfilePreview({ isOpen, onClose }: TrainerProfil
                                                 className="rounded-full"
                                             />
                                         </div>
-                                        <h2 className="text-xl font-semibold mb-2">Kalyan Raygalla</h2>
+                                        <h2 className="text-xl font-semibold mb-2">Arjun Kumar</h2>
 
-                                        <div className="flex items-center mb-4">
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <Star key={star} className="h-4 w-4 text-gray-300" />
-                                            ))}
-                                            <span className="text-sm text-gray-500 ml-1">0 (0)</span>
+                                        <div className="rating flex items-center justify-center text-sm sm:text-md gap-1 p-2">
+                                            <RatingStars rating={3} max={5} />
+                                            <span className="text-sm sm:text-[16px]">
+                                                {3} ({23})
+                                            </span>
                                         </div>
 
                                         <div className="flex flex-wrap justify-center gap-2 mb-4">
@@ -124,7 +125,7 @@ export default function TrainerProfilePreview({ isOpen, onClose }: TrainerProfil
                                                             strokeLinejoin="round"
                                                         />
                                                     </svg>
-                                                    <span>raygalla@gmail.com</span>
+                                                    <span>arjunkumar@gmail.com</span>
                                                 </div>
                                                 <div className="flex items-center text-sm">
                                                     <svg
@@ -141,7 +142,7 @@ export default function TrainerProfilePreview({ isOpen, onClose }: TrainerProfil
                                                             strokeLinejoin="round"
                                                         />
                                                     </svg>
-                                                    <span>+91-9999999999</span>
+                                                    <span>+91-xxxxxx</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -150,45 +151,30 @@ export default function TrainerProfilePreview({ isOpen, onClose }: TrainerProfil
                             </div>
 
                             {/* Analytics Card */}
-                            <div className="bg-white rounded-lg shadow-lg border border-gray-200">
-                                <div className="p-6">
-                                    <h3 className="text-lg pb-2 border-b-2 border-blue-500 font-semibold">Analytics</h3>
-                                    <div className="mt-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="bg-blue-50 p-3 rounded-lg">
-                                                <div className="text-sm text-gray-500 mb-1">Profile Views</div>
-                                                <div className="flex items-center mb-1">
-                                                    <span className="text-2xl font-bold">0</span>
-                                                </div>
-                                                <div className="flex items-center text-xs text-green-500">
-                                                    <span>↑ 12%</span>
-                                                    <span className="text-gray-400 ml-1">since last month</span>
-                                                </div>
+                            {/* Analytics */}
+                            <div className="col-span-1 row-span-1 bg-white w-full rounded-xl flex flex-col justify-start items-start text-base sm:text-lg font-semibold p-3 sm:p-5">
+                                    <p className="border-b-2 w-full border-blue-500 text-lg sm:text-xl font-semibold pb-3">Analytics</p>
+                                    <div className="flex flex-col sm:flex-row py-4 gap-3 sm:gap-2 w-full justify-start">
+                                        <div className="analytics-item flex flex-col items-start w-full sm:w-1/2 rounded-xl bg-blue-50 p-3 sm:p-4 border-1 border-blue-200 font-light text-xs sm:text-sm">
+                                            <p className="text-xs sm:text-sm text-gray-500 mb-1"> Profile Views</p>
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <p className="text-2xl sm:text-3xl font-semibold">78</p>
+                                                <span className="inline-block rounded-full bg-orange-100 p-1 sm:p-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" height="16px" width="16px" viewBox="0 -960 960 960" fill="#000" className="sm:h-6 sm:w-6"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z" /></svg>
+                                                </span>
                                             </div>
-                                            <div className="bg-pink-50 p-3 rounded-lg">
-                                                <div className="text-sm text-gray-500 mb-1">Contact Unlocked</div>
-                                                <div className="flex items-center mb-1">
-                                                    <span className="text-2xl font-bold">3</span>
-                                                    <svg
-                                                        className="h-4 w-4 ml-1 text-gray-500"
-                                                        viewBox="0 0 24 24"
-                                                        fill="none"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" strokeWidth="2" />
-                                                        <circle cx="12" cy="16" r="1" fill="currentColor" />
-                                                        <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="2" />
-                                                    </svg>
-                                                </div>
-                                                <div className="flex items-center text-xs text-green-500">
-                                                    <span>↑ 8%</span>
-                                                    <span className="text-gray-400 ml-1">since last month</span>
-                                                </div>
+                                        </div>
+                                        <div className="analytics-item flex flex-col items-start w-full sm:w-1/2 rounded-xl bg-pink-50 p-3 sm:p-4 border-1 border-pink-200 font-light text-xs sm:text-sm">
+                                            <p className="text-xs sm:text-sm text-gray-500 mb-1"> Contact Unlocked</p>
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <p className="text-2xl sm:text-3xl font-semibold">12</p>
+                                                <span className="inline-block rounded-full bg-pink-100 p-1 sm:p-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" height="16px" width="16px" viewBox="0 -960 960 960" fill="#000" className="sm:h-6 sm:w-6"><path d="M240-640h360v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85h-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640Zm0 480h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM240-160v-400 400Z" /></svg>
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                         </div>
 
                         {/* Main Content */}
@@ -340,8 +326,8 @@ export default function TrainerProfilePreview({ isOpen, onClose }: TrainerProfil
                                             <div className="border border-blue-100 rounded-lg p-4 bg-blue-50">
                                                 <div className="flex justify-between">
                                                     <div>
-                                                        <h3 className="font-medium">NOTHING YET</h3>
-                                                        <p className="text-gray-500 text-sm">WHOCNOWS</p>
+                                                        <h3 className="font-medium">Master Trainer Certification Program</h3>
+                                                        <p className="text-gray-500 text-sm">Indian Leadership Academy</p>
                                                     </div>
                                                     <div className="text-gray-500">(2018)</div>
                                                 </div>
@@ -350,28 +336,48 @@ export default function TrainerProfilePreview({ isOpen, onClose }: TrainerProfil
                                     </div>
                                 </div>
 
-                                {/* Post Your Review Card */}
+                                {/* Company Reviews Card */}
                                 <div className="bg-white rounded-lg shadow-lg border border-gray-200">
                                     <div className="p-6">
-                                        <h3 className="text-xl pb-2 border-b-2 border-blue-500 font-semibold">Post Your Review</h3>
+                                        <h3 className="text-xl pb-2 border-b-2 border-blue-500 font-semibold">Company Reviews</h3>
                                         <div className="mt-4 space-y-4">
-                                            <div className="flex items-center justify-between">
-                                                <p>Your rating</p>
-                                                <div className="flex">
-                                                    {[1, 2, 3, 4, 5].map((star) => (
-                                                        <Star key={star} className="h-6 w-6 text-gray-300 cursor-pointer hover:text-yellow-400" />
-                                                    ))}
+                                            {/* Review 1 */}
+                                            <div className="border border-gray-200 rounded-lg p-4">
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <div>
+                                                        <h4 className="font-semibold text-gray-800">TechCorp Solutions</h4>
+                                                        <p className="text-sm text-gray-500">Senior HR Manager</p>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <RatingStars rating={5} max={5} />
+                                                        <span className="text-sm text-gray-600">5.0</span>
+                                                    </div>
                                                 </div>
+                                                <p className="text-gray-700 text-sm">
+                                                    &ldquo;Arjun delivered an exceptional leadership workshop for our executive team. His experiential approach 
+                                                    and engaging facilitation style made complex concepts accessible and actionable. The team is still 
+                                                    implementing strategies from the session.&rdquo;
+                                                </p>
                                             </div>
 
-                                            <textarea
-                                                className="w-full border rounded-lg p-3 h-24 resize-none"
-                                                placeholder="Write your review here..."
-                                            ></textarea>
-
-                                            <button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-colors">
-                                                Submit Review
-                                            </button>
+                                            {/* Review 2 */}
+                                            <div className="border border-gray-200 rounded-lg p-4">
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <div>
+                                                        <h4 className="font-semibold text-gray-800">InnovateLabs</h4>
+                                                        <p className="text-sm text-gray-500">Learning & Development Head</p>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <RatingStars rating={4} max={5} />
+                                                        <span className="text-sm text-gray-600">4.0</span>
+                                                    </div>
+                                                </div>
+                                                <p className="text-gray-700 text-sm">
+                                                    &ldquo;Arjun&apos;s negotiation skills training was highly effective. His real-world examples and interactive 
+                                                    exercises helped our sales team improve their deal-closing rates by 25%. Highly recommend for 
+                                                    corporate training programs.&rdquo;
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

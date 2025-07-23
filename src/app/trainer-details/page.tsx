@@ -609,11 +609,11 @@ const TrainerDetailsContent = () => {
                                                     <svg xmlns="http://www.w3.org/2000/svg" height="16px" width="16px" viewBox="0 -960 960 960" fill="#000" className="sm:h-6 sm:w-6"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z" /></svg>
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-1 mb-1">
+                                            {/* <div className="flex items-center gap-1 mb-1">
                                                 <svg xmlns="http://www.w3.org/2000/svg" height="12px" width="12px" viewBox="0 -960 960 960" fill="#000" className="sm:h-5 sm:w-5"><path d="m147-209-51-51 281-281 152 152 212-211H624v-72h240v240h-72v-117L529-287 377-439 147-209Z" /></svg>
                                                 <p className="text-green-500 text-xs sm:text-sm">12%</p>
                                             </div>
-                                            <p className="text-gray-500 text-xs">since last month</p>
+                                            <p className="text-gray-500 text-xs">since last month</p> */}
                                         </div>
                                         <div className="analytics-item flex flex-col items-start w-full sm:w-1/2 rounded-xl bg-pink-50 p-3 sm:p-4 border-1 border-pink-200 font-light text-xs sm:text-sm">
                                             <p className="text-xs sm:text-sm text-gray-500 mb-1"> Contact Unlocked</p>
@@ -623,11 +623,11 @@ const TrainerDetailsContent = () => {
                                                     <svg xmlns="http://www.w3.org/2000/svg" height="16px" width="16px" viewBox="0 -960 960 960" fill="#000" className="sm:h-6 sm:w-6"><path d="M240-640h360v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85h-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640Zm0 480h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM240-160v-400 400Z" /></svg>
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-1 mb-1">
+                                            {/* <div className="flex items-center gap-1 mb-1">
                                                 <svg xmlns="http://www.w3.org/2000/svg" height="12px" width="12px" viewBox="0 -960 960 960" fill="#000" className="sm:h-5 sm:w-5"><path d="m147-209-51-51 281-281 152 152 212-211H624v-72h240v240h-72v-117L529-287 377-439 147-209Z" /></svg>
                                                 <p className="text-green-500 text-xs sm:text-sm">8%</p>
                                             </div>
-                                            <p className="text-gray-500 text-xs">since last month</p>
+                                            <p className="text-gray-500 text-xs">since last month</p> */}
                                         </div>
                                     </div>
                                 </div>
@@ -935,7 +935,7 @@ const TrainerDetailsContent = () => {
                                                                     &nbsp;&nbsp;
                                                                     <span className="text-[#F54900]">({education.year})</span>
                                                                 </p>
-                                                                <p className="text-sm sm:text-[16px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">{education.institution}</p>
+                                                                <p className="text-sm sm:text-[16px] font-normal text-[#4A5565] leading-tight sm:leading-[24px]">{education.institution}</p>
                                                             </div>
                                                         </div>
                                                     );

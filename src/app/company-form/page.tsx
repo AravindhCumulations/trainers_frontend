@@ -139,6 +139,16 @@ export default function CompanyFormPage() {
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Check file size (10MB = 10 * 1024 * 1024 bytes)
+      const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+      
+      if (file.size > maxSize) {
+        setErrors(['Logo file size must be less than 10MB. Please select a smaller image.']);
+        // Clear the file input
+        e.target.value = '';
+        return;
+      }
+
       setHasLogoChanged(true);
       // Remove spaces from the file name
       const sanitizedFileName = file.name.replace(/\s+/g, '');
@@ -149,6 +159,9 @@ export default function CompanyFormPage() {
         setLogoPreview(reader.result as string);
       };
       reader.readAsDataURL(sanitizedFile);
+      
+      // Clear any previous errors
+      setErrors([]);
     }
   };
 
@@ -270,6 +283,56 @@ export default function CompanyFormPage() {
             )}
 
             <form onSubmit={handleSubmit} className={`space-y-6 ${isSuccess ? 'pointer-events-none opacity-50' : ''}`}>
+              
+              {/* Company Logo Upload - At the top of the form */}
+              <div className="rounded-xl p-4 sm:p-6 shadow-sm bg-white">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Company Logo</h3>
+                <div className="flex flex-col items-center space-y-3 sm:space-y-4">
+                  <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-2 border-gray-200">
+                    {logoPreview ? (
+                      <img
+                        src={logoPreview}
+                        alt="Logo preview"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                        <span className="text-gray-400 text-xs sm:text-sm">No logo</span>
+                      </div>
+                    )}
+                    {logoPreview && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForm(prev => ({ ...prev, companyLogo: null }));
+                          setLogoPreview('');
+                          setHasLogoChanged(false);
+                        }}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    id="companyLogo"
+                    accept="image/*"
+                    onChange={handleLogoChange}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('companyLogo')?.click()}
+                    className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+                  >
+                    {form.companyLogo ? 'Change Logo' : 'Upload Logo'}
+                  </button>
+                  <p className="text-xs text-gray-500 text-center">
+                    Maximum file size: 10MB. Supported formats: PNG, JPG, JPEG, GIF, WebP
+                  </p>
+                </div>
+              </div>
               {/* Company Name */}
               <div>
                 <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-2">
@@ -456,44 +519,7 @@ export default function CompanyFormPage() {
                 />
               </div>
 
-              {/* Company Logo */}
-              <div>
-                <label htmlFor="companyLogo" className="block text-sm font-medium text-gray-700 mb-2">
-                  Company Logo
-                </label>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-4">
-                    <input
-                      type="file"
-                      id="companyLogo"
-                      accept="image/*"
-                      onChange={handleLogoChange}
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                    />
-                    {logoPreview && (
-                      <div className="relative w-20 h-20 rounded-lg overflow-hidden border-2 border-gray-200">
-                        <img src={logoPreview} alt="Logo preview" className="w-full h-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setForm(prev => ({ ...prev, companyLogo: null }));
-                            setLogoPreview('');
-                            setHasLogoChanged(false);
-                          }}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  {form.companyLogo && (
-                    <p className="text-xs text-gray-500">
-                      Selected: {form.companyLogo.name}
-                    </p>
-                  )}
-                </div>
-              </div>
+
 
               {/* Submit Button */}
               <div className="pt-6">

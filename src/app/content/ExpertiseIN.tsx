@@ -7,5 +7,18 @@ export const expertise_in: string[] = [
     "Executive Presence",
     "Coaching",
     "Customer Service",
-    "Wellbeing"
+    "Wellbeing",
+    "Conflict",
+    "Decision Making",
+    "Creativity",
+    "Innovation",
+    "Communication",
+    "Change",
+    "Inclusion",
+    "Strategy",
+    "Productivity",
+    "Finance",
+    "Mindfulness",
+    "Resilience",
+    "Custom"
 ]

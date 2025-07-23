@@ -6,8 +6,9 @@ import { SignupModel, User } from '@/models/auth.models';
 import { authApis } from "@/lib/apis/auth.apis"
 import { setUserDetailsToLocalStore } from '@/lib/utils/auth.utils';
 import { useNavigation } from "@/lib/hooks/useNavigation";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, X } from "lucide-react";
 import { useUser } from '@/context/UserContext';
+import { trainerTerms, companyTerms } from '../content/terms';
 
 
 export default function SignupPage() {
@@ -26,6 +27,8 @@ export default function SignupPage() {
     const { handleNavigation } = useNavigation();
     const [showPassword, setShowPassword] = useState(false);
     const [showRePassword, setShowRePassword] = useState(false);
+    const [showTermsPopup, setShowTermsPopup] = useState(false);
+    const [hasAgreedToTerms, setHasAgreedToTerms] = useState(false);
 
 
 
@@ -63,8 +66,14 @@ export default function SignupPage() {
             setError('Passwords do not match');
             return false;
         }
+        if (!hasAgreedToTerms) {
+            setError('Please agree to the terms and conditions');
+            return false;
+        }
         return true;
     };
+
+
 
 
 
@@ -331,20 +340,40 @@ export default function SignupPage() {
                             <p></p>
                         )}
 
-                        {/* <button
-                            type="button"
-                            onClick={handleSignup}
-                            // disabled={!isFormValid()}
-                            className={`w-full text-white px-4 py-2 rounded-lg transition-colors duration-300 bg-blue-500 hover:bg-blue-700 }`}
-                        >
-                            Continue
-                        </button> */}
+                        {/* Terms and Conditions */}
+                        <div className="flex items-start space-x-3">
+                            <input
+                                type="checkbox"
+                                id="terms"
+                                checked={hasAgreedToTerms}
+                                onChange={(e) => setHasAgreedToTerms(e.target.checked)}
+                                className="mt-1 w-4 h-4 text-blue-500 focus:ring-blue-500"
+                            />
+                            <div className="flex-1">
+                                <label htmlFor="terms" className="text-sm text-gray-700 cursor-pointer">
+                                    I agree to the{' '}
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowTermsPopup(true)}
+                                        className="text-blue-600 hover:text-blue-800 underline font-medium"
+                                    >
+                                        Terms and Conditions
+                                    </button>
+                                </label>
+                            </div>
+                        </div>
+
                         <motion.button
                             type="button"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="flex-1 w-full bg-primary hover:bg-primary-hover text-white px-4 py-3 rounded-lg font-semibold"
-                            onClick={handleSignup}
+                            whileHover={hasAgreedToTerms ? { scale: 1.05 } : {}}
+                            whileTap={hasAgreedToTerms ? { scale: 0.95 } : {}}
+                            className={`flex-1 w-full px-4 py-3 rounded-lg font-semibold transition-colors ${
+                                hasAgreedToTerms 
+                                    ? 'bg-primary hover:bg-primary-hover text-white cursor-pointer' 
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            }`}
+                            onClick={hasAgreedToTerms ? handleSignup : undefined}
+                            disabled={!hasAgreedToTerms}
                         >
                             Continue
                         </motion.button>
@@ -362,6 +391,56 @@ export default function SignupPage() {
                 >Go Back</a>
 
             </div>
+
+            {/* Terms and Conditions Popup */}
+            {showTermsPopup && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+                        {/* Header */}
+                        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                            <h2 className="text-xl font-bold text-gray-800">
+                                Terms and Conditions - {formData.roles[0] === 'Trainer' ? 'Trainer' : 'Company'}
+                            </h2>
+                            <button
+                                onClick={() => setShowTermsPopup(false)}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-6 overflow-y-auto max-h-[60vh]">
+                            <div className="prose prose-sm max-w-none">
+                                <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700 leading-relaxed">
+                                    {formData.roles[0] === 'Trainer' ? trainerTerms : companyTerms}
+                                </pre>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="p-6 border-t border-gray-200 bg-gray-50">
+                            <div className="flex justify-end space-x-3">
+                                <button
+                                    onClick={() => setShowTermsPopup(false)}
+                                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+                                >
+                                    Close
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setHasAgreedToTerms(true);
+                                        setShowTermsPopup(false);
+                                    }}
+                                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    I Agree
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
         </div >
     );

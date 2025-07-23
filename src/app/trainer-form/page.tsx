@@ -249,11 +249,7 @@ export default function TrainerDetailsPage() {
             // Remove expertise if already selected
             newExpertise = selectedExpertise.filter(e => e !== exp);
         } else {
-            // Check if we've reached the limit of 3
-            if (selectedExpertise.length >= 3) {
-                return; // Don't add more if we've reached the limit
-            }
-            // Add new expertise
+            // Add new expertise (no limit)
             newExpertise = [...selectedExpertise, exp];
         }
         handleChanges('expertise_in', newExpertise.join(', '));
@@ -262,11 +258,7 @@ export default function TrainerDetailsPage() {
         setSearchTerm('');
         setFilteredExpertise(expertise_in);
 
-        // Only close dropdown if 3 tags are now selected
-        if (newExpertise.length >= 3) {
-            setIsExpertiseDropdownOpen(false);
-        }
-        // Otherwise, keep it open
+        // Keep dropdown open for continued selection
     };
 
     // Add useEffect to fetch trainer data
@@ -530,6 +522,16 @@ export default function TrainerDetailsPage() {
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            // Check file size (10MB = 10 * 1024 * 1024 bytes)
+            const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+            
+            if (file.size > maxSize) {
+                setErrors(['Profile picture file size must be less than 10MB. Please select a smaller image.']);
+                // Clear the file input
+                e.target.value = '';
+                return;
+            }
+
             setHasImageChanged(true);
             // Remove spaces from the file name
             const sanitizedFileName = file.name.replace(/\s+/g, '');
@@ -540,6 +542,9 @@ export default function TrainerDetailsPage() {
                 setProfileImagePreview(reader.result as string);
             };
             reader.readAsDataURL(sanitizedFile);
+            
+            // Clear any previous errors
+            setErrors([]);
         }
     };
 
@@ -884,6 +889,9 @@ export default function TrainerDetailsPage() {
                                 >
                                     {profileImage ? 'Change Picture' : 'Upload Picture'}
                                 </button>
+                                <p className="text-xs text-gray-500 text-center">
+                                    Maximum file size: 10MB. Supported formats: PNG, JPG, JPEG, GIF, WebP
+                                </p>
                             </div>
                         </div>
 
@@ -1099,9 +1107,6 @@ export default function TrainerDetailsPage() {
                                 <div className="relative" ref={expertiseDropdownRef}>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         Expertise / tags
-                                        <span className="text-xs sm:text-sm text-gray-500 ml-1 sm:ml-2">
-                                            (Select up to 3)
-                                        </span>
                                     </label>
                                     <input
                                         type="text"
@@ -1123,20 +1128,15 @@ export default function TrainerDetailsPage() {
                                             />
                                             <div className="max-h-48 overflow-y-auto">
                                                 {filteredExpertise.map(exp => {
-                                                    const selectedExpertise = form.expertise_in.split(',').map(e => e.trim()).filter(e => e !== '');
-                                                    const isDisabled = !isExpertiseSelected(exp) && selectedExpertise.length >= 3;
-
                                                     return (
                                                         <div
                                                             key={exp}
                                                             className={`px-3 sm:px-4 py-2 cursor-pointer flex items-center justify-between text-sm sm:text-base
                                                                 ${isExpertiseSelected(exp)
                                                                     ? 'bg-blue-50 hover:bg-blue-100'
-                                                                    : isDisabled
-                                                                        ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                                                                        : 'hover:bg-gray-100'
+                                                                    : 'hover:bg-gray-100'
                                                                 }`}
-                                                            onClick={() => !isDisabled && handleExpertiseClick(exp)}
+                                                            onClick={() => handleExpertiseClick(exp)}
                                                         >
                                                             <span>{exp}</span>
                                                             {isExpertiseSelected(exp) && (
