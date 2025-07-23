@@ -134,6 +134,8 @@ export default function SignupPage() {
 
         if (data.user_details.role_user === "Trainer") {
             await handleNavigation('/trainer-form');
+        } else if (data.user_details.role_user === "user_role") {
+            await handleNavigation('/company-form');
         } else {
             await handleNavigation('/');
         }

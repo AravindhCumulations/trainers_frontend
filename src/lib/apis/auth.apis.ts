@@ -2,6 +2,20 @@ import axios from 'axios';
 import { getAuthHeaders } from '../utils/auth.utils';
 import { User } from "@/models/auth.models";
 
+interface CompanyFormData {
+    company_email: string;
+    address: string;
+    primary_contact_person: string;
+    official_email: string;
+    contact_number: string;
+    nature_of_business: string;
+    company_website: string;
+    number_of_employees: number;
+    tarining_needs: string;
+    gst_number: string;
+    company_logo?: string;
+}
+
 export const authApis = {
     // Login
     login: async (email: string, password: string) => {
@@ -35,6 +49,19 @@ export const authApis = {
             return response.data.data;
         } catch (error) {
             console.error('Error during signup:', error);
+            throw error;
+        }
+    },
+
+    // Company Registration
+    registerCompany: async (companyData: CompanyFormData) => {
+        try {
+            const response = await axios.post('/api/resource/Company/', companyData, {
+                headers: getAuthHeaders()
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error during company registration:', error);
             throw error;
         }
     },
