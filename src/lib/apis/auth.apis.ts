@@ -45,8 +45,8 @@ export const authApis = {
     },
     singUp: async (user: User) => {
         try {
-            const response = await axios.post('/api/method/trainer.api.signup_User', user);
-            return response.data.data;
+            const response = await axios.post('/api/method/trainer.api.signup_User', user);            
+            return response.data;
         } catch (error) {
             console.error('Error during signup:', error);
             throw error;

@@ -423,16 +423,16 @@ export default function CompanyFormPage() {
                   <div className="flex items-center px-3 py-2 bg-gray-50 border border-r-0 border-gray-300 rounded-l-md text-gray-600 text-sm font-medium">
                     +91
                   </div>
-                  <input
-                    type="tel"
-                    id="mobileNumber"
-                    value={form.mobileNumber}
+                <input
+                  type="tel"
+                  id="mobileNumber"
+                  value={form.mobileNumber}
                     onChange={handleMobileNumberChange}
                     onBlur={(e) => handleFieldBlur('mobileNumber', e.target.value)}
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Enter 10-digit mobile number"
                     maxLength={10}
-                  />
+                />
                 </div>
                 {fieldErrors.mobileNumber && (
                   <p className="text-xs text-red-500 mt-1">{fieldErrors.mobileNumber}</p>

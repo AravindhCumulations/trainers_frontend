@@ -305,5 +305,25 @@ export const trainerApis = {
                 }
             }
         }
+    },
+
+    // Contact Us API
+    contactUs: {
+        sendSupportEmail: async (data: {
+            email: string;
+            text: string;
+            name: string;
+        }) => {
+            try {
+                const response = await axios.post('/api/method/trainer.api.send_support_email', data, {
+                    headers: getAuthHeaders()
+                });
+                return response.data;
+            } catch (error) {
+                console.error('Error sending support email:', error);
+                throw error;
+            }
+        }
     }
+    
 }; 

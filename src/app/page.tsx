@@ -212,14 +212,27 @@ export default function Home() {
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Here you would typically send the form data to your backend
-    console.log('Contact form submitted:', contactForm);
-    
-    // Show success message
-    toastError('Thank you for your message! We will get back to you soon.');
-    
-    // Close popup and reset form
-    hideContactPopup();
+    try {
+      showLoader();
+      
+      // Call the contact us API
+      await trainerApis.contactUs.sendSupportEmail({
+        email: contactForm.email,
+        text: contactForm.message,
+        name: contactForm.name
+      });
+      
+      // Show success message
+      toastError('Thank you for your message! We will get back to you soon.');
+      
+      // Close popup and reset form
+      hideContactPopup();
+    } catch (error) {
+      console.error('Error sending contact form:', error);
+      toastError('Failed to send message. Please try again.');
+    } finally {
+      hideLoader();
+    }
   };
 
 

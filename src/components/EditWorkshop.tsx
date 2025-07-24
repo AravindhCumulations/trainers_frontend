@@ -304,7 +304,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                     )}
 
                     {/* Type Selection (Workshop/Case Study) */}
-                    <div className="text-sm sm:text-base text-black font-normal">
+                    <div className="text-sm sm:text-base text-black font-normal flex flex-col gap-2">
                             <p className='text-blue-700 font-normal text-sm sm:text-base'>Type</p>
                             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 text-sm sm:text-base text-gray-700">
                                 <div className="flex items-center gap-2">
@@ -430,7 +430,7 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                         {/* Target Audience */}
                         <div className="flex flex-col gap-2">
                             <p className="text-sm sm:text-base font-normal text-blue-700">Target Audience</p>
-                            <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
+                            <div className="flex flex-wrap gap-1 sm:gap-2">
                                 {formData.target_audience.split(',').map((audience, index) => (
                                     audience.trim() && (
                                         <Chip
