@@ -935,7 +935,7 @@ const TrainerDetailsContent = () => {
                                                                     &nbsp;&nbsp;
                                                                     <span className="text-[#F54900]">({education.year})</span>
                                                                 </p>
-                                                                <p className="text-sm sm:text-[16px] font-normal text-[#4A5565] leading-tight sm:leading-[24px]">{education.institution}</p>
+                                                                <p className="text-sm sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[24px]">{education.institution}</p>
                                                             </div>
                                                         </div>
                                                     );

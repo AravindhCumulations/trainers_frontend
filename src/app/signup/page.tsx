@@ -19,7 +19,7 @@ export default function SignupPage() {
         first_name: '',
         last_name: '',
         password: '',
-        roles: []
+        roles: ['Trainer']
     });
     const [rePassword, setRePassword] = useState<string>('');
     const [fullName, setFullName] = useState<string>('');

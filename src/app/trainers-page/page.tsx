@@ -95,7 +95,7 @@ function TrainersPageContent() {
             setTotalItems(total);
 
             if (searchValue || cityValue || category) {
-                setSearchTitle(`Search Results ${searchValue ? `for  "${searchValue}"` : ''}${cityValue ? ` in "${cityValue}"` : ''}${category ? ` in "${category}"` : ''}`);
+                setSearchTitle(`Search Results ${searchValue ? `for  "${searchValue}"` : ''}${category ? ` in "${category}"` : ''}${cityValue ? ` in "${cityValue}"` : ''}`);
             } else {
                 setSearchTitle('All Trainers');
             }
@@ -192,7 +192,7 @@ function TrainersPageContent() {
                     if (searchText) setSearchText(searchText);
                     if (category) setSelectedCategory(category);
                     if (searchText || city || category) {
-                        setSearchTitle(`Search Results for${searchText ? ` "${searchText}"` : ''}${city ? ` in "${city}"` : ''}${category ? ` in "${category}"` : ''}`);
+                        setSearchTitle(`Search Results for${searchText ? ` "${searchText}"` : ''}${category ? ` in "${category}"` : ''}${city ? ` in "${city}"` : ''}`);
                     }
                 }
                 await handleSearch(searchText, city, 1, itemsPerPage, selectedCategory);
