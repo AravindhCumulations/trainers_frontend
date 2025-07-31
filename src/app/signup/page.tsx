@@ -92,8 +92,6 @@ export default function SignupPage() {
         try {
             const newUser = SignupModel.createUser(signupData);
             const data = await authApis.singUp(newUser);
-
-
             await handleSignupResponse(data);
         } catch (err) {
             setError('Failed to create account. Please try again.');
@@ -116,24 +114,23 @@ export default function SignupPage() {
     };
 
     const handleSignupResponse = async (data: any) => {
-
-
-
-        if (data.status !== "success") {
-            if (data.message?.status === "error" && data.message.message) {
-                setError(data.message.message);
+        const responseData = data.data || data;
+        
+        if (responseData.status !== "success") {
+            if (responseData.message?.status === "error" && responseData.message.message) {
+                setError(responseData.message.message);
             }
             return;
         }
 
-        if (!data.user_details || !data.key_details) return;
+        if (!responseData.user_details || !responseData.key_details) return;
 
-        const success = setUserDetailsToLocalStore(data);
+        const success = setUserDetailsToLocalStore(responseData);
         resetUser();
         setUser({
-            name: data.user_details.name,
-            email: data.user_details.email,
-            role: data.user_details.role_user === "Trainer" ? "Trainer" : "user_role",
+            name: responseData.user_details.name,
+            email: responseData.user_details.email,
+            role: responseData.user_details.role_user === "Trainer" ? "Trainer" : "user_role",
             profilePic: '',
             isLoggedIn: true,
             credits: 0
@@ -141,9 +138,11 @@ export default function SignupPage() {
 
         if (!success) return;
 
-        if (data.user_details.role_user === "Trainer") {
+        const userRole = responseData.user_details.role_user;
+        
+        if (userRole === "Trainer" || userRole === "trainer" || userRole === "TRAINER") {
             await handleNavigation('/trainer-form');
-        } else if (data.user_details.role_user === "user_role") {
+        } else if (userRole === "user_role" || userRole === "User_Role" || userRole === "USER_ROLE") {
             await handleNavigation('/company-form');
         } else {
             await handleNavigation('/');
@@ -445,5 +444,6 @@ export default function SignupPage() {
         </div >
     );
 }
+
 
 
