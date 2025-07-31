@@ -75,6 +75,42 @@ export const getCurrentUserFullName = (): string => {
     }
 };
 
+export const getCurrentUserFirstName = (): string => {
+    try {
+        const raw = localStorage.getItem("user_details");
+        if (!raw) return "";
+
+        const userDetails = JSON.parse(raw);
+
+        if (userDetails && typeof userDetails === "object" && 'first_name' in userDetails) {
+            return userDetails.first_name || "";
+        }
+
+        return "";
+    } catch (error) {
+        console.error("Failed to parse user_details from localStorage:", error);
+        return "";
+    }
+};
+
+export const getCurrentUserLastName = (): string => {
+    try {
+        const raw = localStorage.getItem("user_details");
+        if (!raw) return "";
+
+        const userDetails = JSON.parse(raw);
+
+        if (userDetails && typeof userDetails === "object" && 'last_name' in userDetails) {
+            return userDetails.last_name || "";
+        }
+
+        return "";
+    } catch (error) {
+        console.error("Failed to parse user_details from localStorage:", error);
+        return "";
+    }
+};
+
 export const getCurrentUserName = (): string => {
     try {
         const raw = localStorage.getItem("user_details");

@@ -9,7 +9,7 @@ import TrainerGrid from "@/components/TrainerGrid";
 import { trainerApis } from '@/lib/apis/trainer.apis';
 import { TrainerDetailsModel } from '@/models/trainerDetails.model';
 import { useLoading } from '@/context/LoadingContext';
-import { getCurrentUserMail, getCurrentUserName, getCurrentUserRole } from '@/lib/utils/auth.utils'
+import { getCurrentUserMail, getCurrentUserName, getCurrentUserRole, getCurrentUserFirstName, getCurrentUserLastName } from '@/lib/utils/auth.utils'
 import { RatingStars } from "@/components/RatingStars";
 import { useNavigation } from "@/lib/hooks/useNavigation";
 
@@ -437,7 +437,12 @@ const TrainerDetailsContent = () => {
                                             <img src={trainerData.image} alt="img" className="w-full h-full object-cover rounded-full" />
                                         </div>
                                         <div className="flex flex-col gap-3 sm:gap-4">
-                                            <div className="trainer-name text-center text-lg sm:text-xl lg:text-[24px] font-bold leading-tight sm:leading-[32px] text-[#1E2939]">{trainerData.full_name}</div>
+                                            <div className="trainer-name text-center text-lg sm:text-xl lg:text-[24px] font-bold leading-tight sm:leading-[32px] text-[#1E2939]">
+                                                {isLoggedInUser 
+                                                    ? `${getCurrentUserFirstName()} ${getCurrentUserLastName()}`.trim() || trainerData.full_name
+                                                    : trainerData.full_name
+                                                }
+                                            </div>
                                             {isLoggedInUser && (
                                                 <div className="w-full flex justify-center">
                                                     <button onClick={() => {
