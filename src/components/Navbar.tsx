@@ -366,7 +366,7 @@ export default function Page({ bgColor = "bg-white", handleNavigation }: NavBarP
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="p-4 border-b">
-                        <h2 className="text-xl font-bold text-gray-800">Trainer&apos;s Mart</h2>
+                        <h2 className="text-xl font-bold text-gray-800">Get Pros</h2>
                     </div>
 
                     <div className="p-4">

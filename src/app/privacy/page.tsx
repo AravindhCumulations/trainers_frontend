@@ -40,7 +40,7 @@ export default function PrivacyPage() {
                         <div className="mb-6">
                             <p className="text-gray-700 mb-4">
                                 <strong>Platform:</strong> Get Pros<br />
-                                <strong>Website:</strong> trainersmart.com
+                                <strong>Website:</strong> getpros.com
                             </p>
                             <p className="text-gray-700">
                                 Get Pros (&ldquo;we&rdquo;, &ldquo;our&rdquo;, &ldquo;us&rdquo;) is committed to protecting your privacy. This Privacy Policy outlines how we collect, use, and safeguard your personal information when you use our platform.

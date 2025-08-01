@@ -40,7 +40,7 @@ export default function TermsPage() {
                         <div className="mb-6">
                             <p className="text-gray-700 mb-4">
                                 <strong>Platform:</strong> Get Pros<br />
-                                <strong>Website:</strong> trainersmart.com
+                                <strong>Website:</strong> getpros.com
                             </p>
                             <p className="text-gray-700">
                                 These Terms and Conditions (&ldquo;Terms&rdquo;) govern your use of the Get Pros platform, operated by THOUGHT BULB RESEARCH AND DEVELOPMENT LLP. By registering as a trainer or corporate user, you agree to these terms. Please read them carefully.

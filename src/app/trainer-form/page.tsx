@@ -69,6 +69,7 @@ export default function TrainerDetailsPage() {
 
     const cityDropdownRef = useRef<HTMLDivElement>(null);
     const languageDropdownRef = useRef<HTMLDivElement>(null);
+    const companyInputRef = useRef<HTMLInputElement>(null);
 
     //form
     const [form, setForm] = useState<TrainerFormDto>({
@@ -517,6 +518,29 @@ export default function TrainerDetailsPage() {
                 testimonials: updated
             }));
         }
+    };
+
+    const addCompany = (companyName: string) => {
+        const company = companyName.trim();
+        if (company && !form.client_worked.some(client => client.company === company)) {
+            const newClient = {
+                company,
+                idx: form.client_worked.length + 1
+            };
+            const newClients = [...form.client_worked, newClient];
+            setForm(prev => ({
+                ...prev,
+                client_worked: newClients
+            }));
+            if (!isEqual(newClients, initialFormState.current.client_worked)) {
+                setModifiedFields(prev => ({
+                    ...prev,
+                    client_worked: newClients
+                }));
+            }
+            return true; // Return true if company was added
+        }
+        return false; // Return false if company was not added
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1282,38 +1306,39 @@ export default function TrainerDetailsPage() {
                                             />
                                         ))}
                                     </div>
-                                    <TextField
-                                        fullWidth
-                                        size="small"
-                                        placeholder="Type company name and press Enter"
-                                        variant="outlined"
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault();
-                                                const input = e.target as HTMLInputElement;
-                                                const company = input.value.trim();
-
-                                                if (company && !form.client_worked.some(client => client.company === company)) {
-                                                    const newClient = {
-                                                        company,
-                                                        idx: form.client_worked.length + 1
-                                                    };
-                                                    const newClients = [...form.client_worked, newClient];
-                                                    setForm(prev => ({
-                                                        ...prev,
-                                                        client_worked: newClients
-                                                    }));
-                                                    if (!isEqual(newClients, initialFormState.current.client_worked)) {
-                                                        setModifiedFields(prev => ({
-                                                            ...prev,
-                                                            client_worked: newClients
-                                                        }));
+                                    <div className="flex gap-2">
+                                        <TextField
+                                            fullWidth
+                                            size="small"
+                                            placeholder="Type company name and press Enter or click Add"
+                                            variant="outlined"
+                                            inputRef={companyInputRef}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    const input = e.target as HTMLInputElement;
+                                                    const company = input.value.trim();
+                                                    if (addCompany(company)) {
+                                                        input.value = '';
                                                     }
-                                                    input.value = '';
                                                 }
-                                            }
-                                        }}
-                                    />
+                                            }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (companyInputRef.current) {
+                                                    const company = companyInputRef.current.value.trim();
+                                                    if (addCompany(company)) {
+                                                        companyInputRef.current.value = '';
+                                                    }
+                                                }
+                                            }}
+                                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
+                                        >
+                                            Add
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
