@@ -326,10 +326,39 @@ export default function TrainerProfilePreview({ isOpen, onClose }: TrainerProfil
                                             <div className="border border-blue-100 rounded-lg p-4 bg-blue-50">
                                                 <div className="flex justify-between">
                                                     <div>
-                                                        <h3 className="font-medium">Master Trainer Certification Program</h3>
+                                                        <h3 className="font-medium">Certified Professional Coach (CPC)</h3>
+                                                        <p className="text-gray-500 text-sm">International Coach Federation</p>
+                                                    </div>
+                                                    <div className="text-gray-500">(2023)</div>
+                                                </div>
+                                            </div>
+                                            <div className="border border-blue-100 rounded-lg p-4 bg-blue-50 mt-4">
+                                                <div className="flex justify-between">
+                                                    <div>
+                                                        <h3 className="font-medium">Advanced Leadership Development</h3>
+                                                        <p className="text-gray-500 text-sm">Harvard Business School</p>
+                                                    </div>
+                                                    <div className="text-gray-500">(2021)</div>
+                                                </div>
+                                            </div>
+
+                                            <div className="border border-blue-100 rounded-lg p-4 bg-blue-50 mt-4">
+                                                <div className="flex justify-between">
+                                                    <div>
+                                                        <h3 className="font-medium">Negotiation Mastery Program</h3>
+                                                        <p className="text-gray-500 text-sm">Dale Carnegie Training</p>
+                                                    </div>
+                                                    <div className="text-gray-500">(2020)</div>
+                                                </div>
+                                            </div>
+
+                                            <div className="border border-blue-100 rounded-lg p-4 bg-blue-50 mt-4">
+                                                <div className="flex justify-between">
+                                                    <div>
+                                                        <h3 className="font-medium">Corporate Training Excellence</h3>
                                                         <p className="text-gray-500 text-sm">Indian Leadership Academy</p>
                                                     </div>
-                                                    <div className="text-gray-500">(2018)</div>
+                                                    <div className="text-gray-500">(2019)</div>
                                                 </div>
                                             </div>
                                         </div>

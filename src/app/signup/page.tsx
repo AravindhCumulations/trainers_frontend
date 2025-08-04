@@ -30,7 +30,10 @@ export default function SignupPage() {
     const [showTermsPopup, setShowTermsPopup] = useState(false);
     const [hasAgreedToTerms, setHasAgreedToTerms] = useState(false);
 
-
+    // Reset terms agreement when role changes
+    useEffect(() => {
+        setHasAgreedToTerms(false);
+    }, [formData.roles]);
 
     const handleFullNameChange = (value: string) => {
         setFullName(value);
