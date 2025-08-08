@@ -59,6 +59,18 @@ export default function Home() {
   // helper variables
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // Sliding animation state
+  const [currentSlide, setCurrentSlide] = useState<'trainer' | 'company'>('trainer');
+
+  // Auto-slide effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide(prev => prev === 'trainer' ? 'company' : 'trainer');
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Update isLoggedIn and isCompany when user context changes
   useEffect(() => {
     setIsLoggedIn(user.isLoggedIn);
@@ -337,28 +349,58 @@ export default function Home() {
           !isLoggedIn && (
             <section className="relative -mt-[30px]  md:-mt-[50px]  z-1 w-full are-you-a-trainer-section">
               <div className="z-1 relative w-full h-[250px] md:h-[390px] flex items-center justify-start overflow-hidden are-you-a-trainer-bg shadow-lg">
-                <Image
-                  src="/assets/hero.jpg"
-                  alt="Trainer background"
-                  fill
-                  priority
-                  className="absolute inset-0 w-full h-full object-cover object-top  are-you-a-trainer-img"
-                  placeholder="blur"
-                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                />
-
-                <div className="absolute inset-0 bg-black/40 h-[180px] md:h-[220px] z-2 are-you-a-trainer-overlay flex flex-col md:flex-row justify-around px-4 md:px-8 lg:px-16 items-center self-end">
-                  <div className="flex flex-col w-full md:w-[60%] text-white mb-4 md:mb-0">
-                    <div className="font-arial font-bold text-2xl md:text-[36px] leading-tight md:leading-[54px] tracking-[0] are-you-a-trainer-title break-words">Are you a Trainer?</div>
-                    <div className="font-arial font-normal text-lg md:text-[32px] leading-tight md:leading-[48px] tracking-[0] break-words">Make your FREE Profile and get discovered by Corporate Business</div>
+                {/* Trainer Slide */}
+                <div className={`absolute inset-0 transition-transform duration-1000 ease-in-out ${
+                  currentSlide === 'trainer' ? 'translate-x-0' : '-translate-x-full'
+                }`}>
+                  <Image
+                    src="/assets/hero.jpg"
+                    alt="Trainer background"
+                    fill
+                    priority
+                    className="absolute inset-0 w-full h-full object-cover object-top are-you-a-trainer-img"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                  />
+                  <div className="absolute inset-0 bg-black/40 h-[180px] md:h-[220px] z-2 are-you-a-trainer-overlay flex flex-col md:flex-row justify-around px-4 md:px-8 lg:px-16 items-center self-end">
+                    <div className="flex flex-col w-full md:w-[60%] text-white mb-4 md:mb-0">
+                      <div className="font-arial font-bold text-2xl md:text-[36px] leading-tight md:leading-[54px] tracking-[0] are-you-a-trainer-title break-words">Are you a Trainer?</div>
+                      <div className="font-arial font-normal text-lg md:text-[32px] leading-tight md:leading-[48px] tracking-[0] break-words">Make your FREE Profile and get discovered by Corporate Business</div>
+                    </div>
+                    <button
+                      className="w-full md:w-fit h-[50px] md:h-[60px] border border-white text-white px-4 md:px-6 py-2 rounded-xl md:rounded-2xl font-semibold text-sm md:text-base bg-transparent hover:bg-white hover:text-blue-700 text-base transition are-you-a-trainer-btn whitespace-nowrap"
+                      onClick={() => handleNavigation('/signup')}
+                    >
+                      Create a Profile
+                    </button>
                   </div>
-                  <button
-                    className="w-full md:w-fit h-[50px] md:h-[60px] border border-white text-white px-4 md:px-6 py-2 rounded-xl md:rounded-2xl font-semibold text-sm md:text-base bg-transparent hover:bg-white hover:text-blue-700 text-base transition are-you-a-trainer-btn whitespace-nowrap"
-                    onClick={() => handleNavigation('/signup')}
+                </div>
 
-                  >
-                    Create a Profile
-                  </button>
+                {/* Company Slide */}
+                <div className={`absolute inset-0 transition-transform duration-1000 ease-in-out ${
+                  currentSlide === 'company' ? 'translate-x-0' : 'translate-x-full'
+                }`}>
+                  <Image
+                    src="/assets/hero_company.jpeg"
+                    alt="Company background"
+                    fill
+                    priority
+                    className="absolute inset-0 w-full h-full object-cover object-center are-you-a-trainer-img"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPj4+ODhAQEA4QEBAPj4+ODg4ODg4ODg4ODj/2wBDAR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                  />
+                  <div className="absolute inset-0 bg-black/40 h-[180px] md:h-[220px] z-2 are-you-a-trainer-overlay flex flex-col md:flex-row justify-around px-4 md:px-8 lg:px-16 items-center self-end">
+                    <div className="flex flex-col w-full md:w-[60%] text-white mb-4 md:mb-0">
+                      <div className="font-arial font-bold text-2xl md:text-[36px] leading-tight md:leading-[54px] tracking-[0] are-you-a-trainer-title break-words">Want to Simplify Your Trainer Search?</div>
+                      <div className="font-arial font-normal text-lg md:text-[32px] leading-tight md:leading-[48px] tracking-[0] break-words">GetPros connects you with professionals across domains - no middlemen.</div>
+                    </div>
+                    <button
+                      className="w-full md:w-fit h-[50px] md:h-[60px] border border-white text-white px-4 md:px-6 py-2 rounded-xl md:rounded-2xl font-semibold text-sm md:text-base bg-transparent hover:bg-white hover:text-blue-700 text-base transition are-you-a-trainer-btn whitespace-nowrap"
+                      onClick={() => handleNavigation('/signup')}
+                    >
+                      Find Trainers
+                    </button>
+                  </div>
                 </div>
               </div>
             </section>
