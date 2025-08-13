@@ -579,6 +579,9 @@ export default function TrainerDetailsPage() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        // Mark form as submitting to prevent navigation blocking
+        e.currentTarget.setAttribute('data-submitting', 'true');
+
         setErrors([]);
         setCaptchaError('');
         // Require captcha only in create mode
@@ -737,6 +740,11 @@ export default function TrainerDetailsPage() {
             }, 100);
         } finally {
             hideLoader();
+            // Remove submitting attribute to re-enable navigation blocking
+            const form = document.querySelector('form');
+            if (form) {
+                form.removeAttribute('data-submitting');
+            }
         }
     };
 
@@ -820,6 +828,11 @@ export default function TrainerDetailsPage() {
 
     // Block navigation if there are unsaved changes in create mode
     const blockNavigation = () => {
+        // Don't block navigation during form submission
+        if (document.querySelector('form[data-submitting="true"]')) {
+            return true;
+        }
+        
         if (!isEdit && hasFormChanges) {
             return new Promise<boolean>((resolve) => {
                 showConfirmation(

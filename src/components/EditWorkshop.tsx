@@ -446,46 +446,73 @@ const EditWorkshop: React.FC<EditWorkshopProps> = ({ onClose, initialData, onUpd
                                     )
                                 ))}
                             </div>
-                            <TextField
-                                fullWidth
-                                size="small"
-                                placeholder="Type target audience and press Enter"
-                                variant="outlined"
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        e.preventDefault();
-                                        const input = e.target as HTMLInputElement;
-                                        const audience = input.value.trim();
+                            <div className="flex gap-2">
+                                <TextField
+                                    fullWidth
+                                    size="small"
+                                    placeholder="Type target audience and press Enter or click Add"
+                                    variant="outlined"
+                                    inputRef={(input) => {
+                                        if (input) {
+                                            (input as any).audienceInput = input;
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            const input = e.target as HTMLInputElement;
+                                            const audience = input.value.trim();
 
-                                        if (audience) {
-                                            const currentAudiences = formData.target_audience ? formData.target_audience.split(',').map(a => a.trim()) : [];
-                                            if (!currentAudiences.includes(audience)) {
-                                                const newAudiences = [...currentAudiences, audience];
-                                                handleChange('target_audience', newAudiences.join(', '));
+                                            if (audience) {
+                                                const currentAudiences = formData.target_audience ? formData.target_audience.split(',').map(a => a.trim()) : [];
+                                                if (!currentAudiences.includes(audience)) {
+                                                    const newAudiences = [...currentAudiences, audience];
+                                                    handleChange('target_audience', newAudiences.join(', '));
+                                                }
+                                                input.value = '';
                                             }
-                                            input.value = '';
                                         }
-                                    }
-                                }}
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: '0.5rem',
-                                        fontSize: '0.875rem',
-                                        '@media (min-width: 640px)': {
-                                            fontSize: '1rem',
-                                        },
-                                        '& fieldset': {
-                                            borderColor: '#E5E7EB'
-                                        },
-                                        '&:hover fieldset': {
-                                            borderColor: '#93C5FD'
-                                        },
-                                        '&.Mui-focused fieldset': {
-                                            borderColor: '#3B82F6'
+                                    }}
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '0.5rem',
+                                            fontSize: '0.875rem',
+                                            '@media (min-width: 640px)': {
+                                                fontSize: '1rem',
+                                            },
+                                            '& fieldset': {
+                                                borderColor: '#E5E7EB'
+                                            },
+                                            '&:hover fieldset': {
+                                                borderColor: '#93C5FD'
+                                            },
+                                            '&.Mui-focused fieldset': {
+                                                borderColor: '#3B82F6'
+                                            }
                                         }
-                                    }
-                                }}
-                            />
+                                    }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const input = document.querySelector('input[placeholder*="target audience"]') as HTMLInputElement;
+                                        if (input) {
+                                            const audience = input.value.trim();
+                                            if (audience) {
+                                                const currentAudiences = formData.target_audience ? formData.target_audience.split(',').map(a => a.trim()) : [];
+                                                if (!currentAudiences.includes(audience)) {
+                                                    const newAudiences = [...currentAudiences, audience];
+                                                    handleChange('target_audience', newAudiences.join(', '));
+                                                }
+                                                input.value = '';
+                                            }
+                                        }
+                                    }}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
+                                >
+                                    Add
+                                </button>
+                            </div>
                         </div>
 
                         {/* Program Flow */}
