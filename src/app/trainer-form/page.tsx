@@ -199,6 +199,9 @@ export default function TrainerDetailsPage() {
         isOpen: false
     });
 
+    // Track form submission state to prevent navigation blocking during submit
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     // Function to handle changes with deep comparison
     const handleChanges = (field: keyof TrainerFormDto, value: string | number) => {
         setForm(prev => ({
@@ -261,6 +264,13 @@ export default function TrainerDetailsPage() {
 
         // Keep dropdown open for continued selection
     };
+
+    // Cleanup effect to reset submission state on unmount
+    useEffect(() => {
+        return () => {
+            setIsSubmitting(false);
+        };
+    }, []);
 
     // Add useEffect to fetch trainer data
     useEffect(() => {
@@ -579,7 +589,8 @@ export default function TrainerDetailsPage() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // Mark form as submitting to prevent navigation blocking
+        // Set submitting state to prevent navigation blocking
+        setIsSubmitting(true);
         e.currentTarget.setAttribute('data-submitting', 'true');
 
         setErrors([]);
@@ -741,7 +752,8 @@ export default function TrainerDetailsPage() {
             }, 100);
         } finally {
             hideLoader();
-            // Remove submitting attribute to re-enable navigation blocking
+            // Reset submitting state and remove attribute to re-enable navigation blocking
+            setIsSubmitting(false);
             const form = document.querySelector('form');
             if (form) {
                 form.removeAttribute('data-submitting');
@@ -829,10 +841,12 @@ export default function TrainerDetailsPage() {
 
     // Block navigation if there are unsaved changes in create mode
     const blockNavigation = () => {
-        if (document.querySelector('form[data-submitting="true"]')) {
+        // Don't block navigation during form submission
+        if (isSubmitting) {
             return true; // Allow navigation during submission
         }
         
+        // Only show confirmation for unsaved changes when NOT submitting
         if (!isEdit && hasFormChanges) {
             return new Promise<boolean>((resolve) => {
                 showConfirmation(
