@@ -115,7 +115,6 @@ export default function TrainerDetailsPage() {
 
     // Add initializeFormData method
     const initializeFormData = (trainerData: any) => {
-        console.log("initializeFormData called with:", trainerData);
         
         // Get first_name and last_name from localStorage
         const userDetails = JSON.parse(localStorage.getItem("user_details") || "{}");
@@ -147,16 +146,9 @@ export default function TrainerDetailsPage() {
         };
 
         // Set both form and initial form state
-        console.log("Setting form data:", formData);
         setForm(formData);
         initialFormState.current = { ...formData };
-        console.log("Initial form state set:", initialFormState.current);
     };
-
-    // 
-
-
-
 
     // Function to check if form has changes
 
@@ -198,9 +190,6 @@ export default function TrainerDetailsPage() {
     }>({
         isOpen: false
     });
-
-    // Track form submission state to prevent navigation blocking during submit
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Function to handle changes with deep comparison
     const handleChanges = (field: keyof TrainerFormDto, value: string | number) => {
@@ -265,13 +254,6 @@ export default function TrainerDetailsPage() {
         // Keep dropdown open for continued selection
     };
 
-    // Cleanup effect to reset submission state on unmount
-    useEffect(() => {
-        return () => {
-            setIsSubmitting(false);
-        };
-    }, []);
-
     // Add useEffect to fetch trainer data
     useEffect(() => {
         const fetchTrainerData = async () => {
@@ -286,24 +268,14 @@ export default function TrainerDetailsPage() {
 
                 if (trainerParam) {
                     setIsEdit(true);
-                    const trainerData = JSON.parse(decodeURIComponent(trainerParam));
-
-                    console.log("get by trainer param " + JSON.stringify(trainerData));
-                    
+                    const trainerData = JSON.parse(decodeURIComponent(trainerParam));                    
 
                     // Set the existing image URL as preview if available
                     if (trainerData.image) {
                         setProfileImagePreview(trainerData.image);
                     }
-
-                    // Initialize form data using the new method
-                    console.log("About to initialize form data with:", trainerData);
                     initializeFormData(trainerData);
-                    console.log("Form initialized, current form state:", form);
                 } else if (trainerName) {
-
-
-                    console.log("get by trainer name " + trainerName);
                     
                     // Get trainer data using API
                     const response = await trainerApis.getTrainerByName(trainerName);
@@ -316,9 +288,7 @@ export default function TrainerDetailsPage() {
                             setProfileImagePreview(response.data.image);
                         }
                         // Initialize form data using the new method
-                        console.log("About to initialize form data with API response:", response.data);
                         initializeFormData(response.data);
-                        console.log("Form initialized from API, current form state:", form);
                     }
 
                 }
@@ -589,10 +559,6 @@ export default function TrainerDetailsPage() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // Set submitting state to prevent navigation blocking
-        setIsSubmitting(true);
-        e.currentTarget.setAttribute('data-submitting', 'true');
-
         setErrors([]);
         setCaptchaError('');
         // Require captcha only in create mode
@@ -722,7 +688,7 @@ export default function TrainerDetailsPage() {
             // Use setTimeout to ensure state updates are processed before navigation
             setTimeout(async () => {
                 try {
-                    await handleNavigation('/trainer-details', { 'trainer': getCurrentUserName() });
+                    handleFormNavigation('/trainer-details', { 'trainer': getCurrentUserName() });
                 } catch (navError) {
                     console.error('Navigation error:', navError);
                     // Fallback navigation
@@ -752,12 +718,6 @@ export default function TrainerDetailsPage() {
             }, 100);
         } finally {
             hideLoader();
-            // Reset submitting state and remove attribute to re-enable navigation blocking
-            setIsSubmitting(false);
-            const form = document.querySelector('form');
-            if (form) {
-                form.removeAttribute('data-submitting');
-            }
         }
     };
 
@@ -841,10 +801,6 @@ export default function TrainerDetailsPage() {
 
     // Block navigation if there are unsaved changes in create mode
     const blockNavigation = () => {
-        // Don't block navigation during form submission
-        if (isSubmitting) {
-            return true; // Allow navigation during submission
-        }
         
         // Only show confirmation for unsaved changes when NOT submitting
         if (!isEdit && hasFormChanges) {
@@ -865,6 +821,9 @@ export default function TrainerDetailsPage() {
 
     // Use enhanced navigation hook
     const { handleNavigation } = useNavigationBase(blockNavigation);
+    
+    // Create a navigation hook instance that bypasses blocking
+    const { handleNavigation: handleFormNavigation } = useNavigationBase(() => true);
 
     return (
 
@@ -1708,7 +1667,7 @@ export default function TrainerDetailsPage() {
                             {isEdit && (
                                 <button
                                     type="button"
-                                    onClick={() => handleNavigation('/trainer-details', { 'trainer': getCurrentUserName() })}
+                                    onClick={() => handleFormNavigation('/trainer-details', { 'trainer': getCurrentUserName() })}
                                     className="w-full px-4 sm:px-6 py-2.5 sm:py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm sm:text-base"
                                 >
                                     Cancel
