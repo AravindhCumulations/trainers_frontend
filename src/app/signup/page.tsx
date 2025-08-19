@@ -9,13 +9,14 @@ import { useNavigation } from "@/lib/hooks/useNavigation";
 import { Eye, EyeOff, X } from "lucide-react";
 import { useUser } from '@/context/UserContext';
 import { trainerTerms, companyTerms } from '../content/terms';
-import { useSearchParams } from 'next/navigation';
+// import { useSearchParams } from 'next/navigation';
 
 
 export default function SignupPage() {
 
     const { setUser, resetUser } = useUser();
-    const searchParams = useSearchParams();
+    // const searchParams = useSearchParams();
+    const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
     const [formData, setFormData] = useState<User>({
         email: '',
         first_name: '',
@@ -32,14 +33,23 @@ export default function SignupPage() {
     const [showTermsPopup, setShowTermsPopup] = useState(false);
     const [hasAgreedToTerms, setHasAgreedToTerms] = useState(false);
 
+    // Initialize searchParams on client side
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setSearchParams(new URLSearchParams(window.location.search));
+        }
+    }, []);
+
     // Handle URL parameters for role selection
     useEffect(() => {
-        const roleParam = searchParams.get('role');
-        if (roleParam === 'company') {
-            setFormData(prev => ({
-                ...prev,
-                roles: ['user_role']
-            }));
+        if (searchParams) {
+            const roleParam = searchParams.get('role');
+            if (roleParam === 'company') {
+                setFormData(prev => ({
+                    ...prev,
+                    roles: ['user_role']
+                }));
+            }
         }
     }, [searchParams]);
 
