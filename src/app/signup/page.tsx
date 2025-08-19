@@ -9,11 +9,13 @@ import { useNavigation } from "@/lib/hooks/useNavigation";
 import { Eye, EyeOff, X } from "lucide-react";
 import { useUser } from '@/context/UserContext';
 import { trainerTerms, companyTerms } from '../content/terms';
+import { useSearchParams } from 'next/navigation';
 
 
 export default function SignupPage() {
 
     const { setUser, resetUser } = useUser();
+    const searchParams = useSearchParams();
     const [formData, setFormData] = useState<User>({
         email: '',
         first_name: '',
@@ -29,6 +31,17 @@ export default function SignupPage() {
     const [showRePassword, setShowRePassword] = useState(false);
     const [showTermsPopup, setShowTermsPopup] = useState(false);
     const [hasAgreedToTerms, setHasAgreedToTerms] = useState(false);
+
+    // Handle URL parameters for role selection
+    useEffect(() => {
+        const roleParam = searchParams.get('role');
+        if (roleParam === 'company') {
+            setFormData(prev => ({
+                ...prev,
+                roles: ['user_role']
+            }));
+        }
+    }, [searchParams]);
 
     // Reset terms agreement when role changes
     useEffect(() => {

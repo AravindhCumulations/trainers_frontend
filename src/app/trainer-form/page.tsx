@@ -663,6 +663,7 @@ export default function TrainerDetailsPage() {
                 // Backend verification
                 try {
                     showLoader();
+                    
                     const verifyRes = await authApis.captcha.verifyCaptcha(captchaToken);
                     if (!verifyRes.data || !verifyRes.data.success) {
                         setCaptchaError('Captcha verification failed. Please try again.');
@@ -828,9 +829,8 @@ export default function TrainerDetailsPage() {
 
     // Block navigation if there are unsaved changes in create mode
     const blockNavigation = () => {
-        // Don't block navigation during form submission
         if (document.querySelector('form[data-submitting="true"]')) {
-            return true;
+            return true; // Allow navigation during submission
         }
         
         if (!isEdit && hasFormChanges) {
