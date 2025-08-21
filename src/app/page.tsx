@@ -39,7 +39,7 @@ export default function Home() {
   const locations = [
     { name: 'Hyderabad', image: '/assets/hydrabad.jpg' },
     { name: 'Bengaluru', image: '/assets/Bangalore.jpg' },
-    { name: 'Delhi', image: '/assets/delhi.jpg' },
+    { name: 'New Delhi', image: '/assets/delhi.jpg' },
     { name: 'Chennai', image: '/assets/chennai.jpg' },
     { name: 'Kochi', image: '/assets/kochi.jpg' },
     { name: 'Mumbai', image: '/assets/mumbai.jpg' },

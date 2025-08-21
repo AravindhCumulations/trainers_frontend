@@ -112,3 +112,28 @@ export class SignupModel {
         };
     }
 } 
+
+export const validatePasswordReset = (newPassword: string, confirmPassword: string): string | null => {
+    if (!newPassword) {
+        return 'New password is required';
+    }
+    if (newPassword.length < 8) {
+        return 'Password must be at least 8 characters';
+    }
+    if (!/[A-Z]/.test(newPassword)) {
+        return 'Password must contain at least one uppercase letter';
+    }
+    if (!/[a-z]/.test(newPassword)) {
+        return 'Password must contain at least one lowercase letter';
+    }
+    if (!/\d/.test(newPassword)) {
+        return 'Password must contain at least one number';
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+        return 'Password must contain at least one special character';
+    }
+    if (newPassword !== confirmPassword) {
+        return 'Passwords do not match';
+    }
+    return null;
+};

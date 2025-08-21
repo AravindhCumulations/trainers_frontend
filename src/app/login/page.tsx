@@ -10,6 +10,7 @@ import { setUserDetailsToLocalStore } from '@/lib/utils/auth.utils';
 import { useLoading } from '@/context/LoadingContext';
 import { useNavigation } from "@/lib/hooks/useNavigation";
 import { useUser } from '@/context/UserContext';
+import { validatePasswordReset } from '@/models/auth.models';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -35,6 +36,8 @@ export default function LoginPage() {
     });
     // Add state for 4-digit OTP
     const [otpDigits, setOtpDigits] = useState(['', '', '', '']);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     // handles
     const handleLogin = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
@@ -113,10 +116,14 @@ export default function LoginPage() {
                     setError(response.message.message);
                 }
             } else if (forgotPasswordStep === 'reset') {
-                if (forgotPasswordData.newPassword !== forgotPasswordData.confirmPassword) {
-                    setError('Passwords do not match');
+                // Validate password before resetting
+                const validationError = validatePasswordReset(forgotPasswordData.newPassword, forgotPasswordData.confirmPassword);
+                if (validationError) {
+                    setError(validationError);
+                    hideLoader();
                     return;
                 }
+                
                 await authApis.Password.resetPassword(forgotPasswordData.email, forgotPasswordData.newPassword);
                 setShowForgotPassword(false);
                 setForgotPasswordStep('email');
@@ -130,6 +137,8 @@ export default function LoginPage() {
                 setError(null);
             }
         } catch (err) {
+            console.log(err);
+            
             setError('Operation failed. Please try again.');
         } finally {
             hideLoader();
@@ -318,8 +327,19 @@ export default function LoginPage() {
                                                         }
                                                     }}
                                                     onKeyDown={e => {
-                                                        if (e.key === 'Backspace' && !otpDigits[idx] && idx > 0) {
-                                                            document.getElementById(`otp-input-${idx - 1}`)?.focus();
+                                                        if (e.key === 'Backspace') {
+                                                            if (otpDigits[idx]) {
+                                                                // If current input has value, clear it
+                                                                const newOtp = [...otpDigits];
+                                                                newOtp[idx] = '';
+                                                                setOtpDigits(newOtp);
+                                                            } else if (idx > 0) {
+                                                                // If current input is empty, move to previous and clear it
+                                                                const newOtp = [...otpDigits];
+                                                                newOtp[idx - 1] = '';
+                                                                setOtpDigits(newOtp);
+                                                                document.getElementById(`otp-input-${idx - 1}`)?.focus();
+                                                            }
                                                         }
                                                     }}
                                                     id={`otp-input-${idx}`}
@@ -334,28 +354,86 @@ export default function LoginPage() {
                                 {forgotPasswordStep === 'reset' && (
                                     <>
                                         <div>
-                                            <label className="block text-gray-700  font-semibold mb-1">New Password</label>
-                                            <input
-                                                type="password"
-                                                name="newPassword"
-                                                value={forgotPasswordData.newPassword}
-                                                onChange={handleForgotPasswordInputChange}
-                                                placeholder="Enter new password"
-                                                className="w-full px-4 py-3 border border-gray-300  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                required
-                                            />
+                                            <label className="block text-gray-700 font-semibold mb-1">New Password</label>
+                                            <div className="relative">
+                                                <input
+                                                    type={showNewPassword ? "text" : "password"}
+                                                    name="newPassword"
+                                                    value={forgotPasswordData.newPassword}
+                                                    onChange={handleForgotPasswordInputChange}
+                                                    placeholder="Enter new password"
+                                                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    required
+                                                />
+                                                {
+                                                    showNewPassword ?
+                                                        <div className="absolute right-4 top-6">
+                                                            <EyeOff
+                                                                size={24}
+                                                                className="transform -translate-y-1/2 cursor-pointer text-gray-500  transition-colors duration-300"
+                                                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                                            />
+                                                        </div> :
+                                                        <div className="absolute right-4 top-6">
+                                                            <Eye
+                                                                size={24}
+                                                                className="transform -translate-y-1/2 cursor-pointer text-gray-500  transition-colors duration-300"
+                                                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                                            />
+                                                        </div>
+                                                }
+                                            </div>
                                         </div>
                                         <div>
-                                            <label className="block text-gray-700  font-semibold mb-1">Confirm Password</label>
-                                            <input
-                                                type="password"
-                                                name="confirmPassword"
-                                                value={forgotPasswordData.confirmPassword}
-                                                onChange={handleForgotPasswordInputChange}
-                                                placeholder="Confirm new password"
-                                                className="w-full px-4 py-3 border border-gray-300  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                required
-                                            />
+                                            <label className="block text-gray-700 font-semibold mb-1">Confirm Password</label>
+                                            <div className="relative">
+                                                <input
+                                                    type={showConfirmPassword ? "text" : "password"}
+                                                    name="confirmPassword"
+                                                    value={forgotPasswordData.confirmPassword}
+                                                    onChange={handleForgotPasswordInputChange}
+                                                    placeholder="Confirm new password"
+                                                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    required
+                                                />
+                                                {
+                                                    showConfirmPassword ?
+                                                        <div className="absolute right-4 top-6">
+                                                            <EyeOff
+                                                                size={24}
+                                                                className="transform -translate-y-1/2 cursor-pointer text-gray-500  transition-colors duration-300"
+                                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                            />
+                                                        </div> :
+                                                        <div className="absolute right-4 top-6">
+                                                            <Eye
+                                                                size={24}
+                                                                className="transform -translate-y-1/2 cursor-pointer text-gray-500  transition-colors duration-300"
+                                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                            />
+                                                        </div>
+                                                }
+                                            </div>
+                                            {/* Password matching validation */}
+                                            {forgotPasswordData.confirmPassword && (
+                                                <div className={`mt-2 text-sm ${forgotPasswordData.newPassword === forgotPasswordData.confirmPassword ? 'text-green-600' : 'text-red-600'}`}>
+                                                    {forgotPasswordData.newPassword === forgotPasswordData.confirmPassword ? (
+                                                        <span className="flex items-center">
+                                                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                            </svg>
+                                                            Passwords match
+                                                        </span>
+                                                    ) : (
+                                                        <span className="flex items-center">
+                                                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                            </svg>
+                                                            Passwords do not match
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     </>
                                 )}
