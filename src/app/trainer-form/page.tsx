@@ -676,6 +676,38 @@ export default function TrainerDetailsPage() {
                 setName(responseName)
             }
 
+            // Build and send trainer email payload (best-effort; ignore failures)
+            try {
+                const trainerId = getCurrentUserName();
+                const fullName = `${form.first_name} ${form.last_name}`.trim();
+                const payload = {
+                    trainer: trainerId,
+                    bio_line: form.bio_line,
+                    full_name: fullName,
+                    experience: form.experience,
+                    city: form.city,
+                    expertise_in: form.expertise_in,
+                    language: form.language,
+                    charge: Number(form.charge) || 0,
+                    profile_views: 0,
+                    avg_rating: 0,
+                    image: imageUrl,
+                    dob: form.dob,
+                    phone: form.phone ? `+91-${form.phone.replace(/^\+91-/, '')}` : '',
+                    education: form.education,
+                    certificates: form.certificates,
+                    testimonials: form.testimonials.map(t => ({ client_name: t.client_name, testimonials: t.testimonials })),
+                    facebook: form.facebook,
+                    instagram: form.instagram,
+                    twitter: form.twitter,
+                    linkedin: form.linkedin,
+                    personal_website: form.personal_website,
+                };
+                await trainerApis.sendTrainerEmail(payload);
+            } catch (err) {
+                console.error('Error sending trainer email notification:', err);
+            }
+
             // Reset image change state after successful submission
             setHasImageChanged(false);
             

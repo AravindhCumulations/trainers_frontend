@@ -324,6 +324,19 @@ export const trainerApis = {
                 throw error;
             }
         }
+    },
+
+    // Send Trainer Email Notification
+    sendTrainerEmail: async (payload: any) => {
+        try {
+            const response = await axios.post('/api/method/trainer.api.send_trainer_email', payload, {
+                headers: getAuthHeaders()
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error sending trainer email:', error);
+            throw error;
+        }
     }
     
 }; 
