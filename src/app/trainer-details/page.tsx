@@ -147,10 +147,6 @@ const TrainerDetailsContent = () => {
                 const userRole = getCurrentUserRole() || 'guest';
                 const userMail = getCurrentUserMail() || 'guest';
 
-                console.log("get the mail here : ", userMail);
-
-
-
                 if (!trainerName) {
                     showError('Trainer not found');
                     return;
@@ -161,7 +157,7 @@ const TrainerDetailsContent = () => {
                     setIsLoggedInUser(true);
 
                     const response = await trainerApis.getTrainerByName(trainerName);
-                    
+
                     setTrainerData(response.data);
                     setProfilePic(response.data.image);
                     setTrainerLocked(false);
@@ -755,7 +751,7 @@ const TrainerDetailsContent = () => {
                                             <p className="w-full border-b-2 border-blue-500 text-base sm:text-[18px] font-bold leading-tight sm:leading-[28px] text-[#1E2939] pb-3">Training Approach</p>
                                         </div>
 
-                                        {(!isLoggedInUser && trainerLocked) ? (
+                                        {/* {(!isLoggedInUser && trainerLocked) ? (
                                             <div className="relative group">
                                                 <p className="font-normal text-sm sm:text-[16px] leading-relaxed sm:leading-[26px] py-3 sm:py-4 break-words select-none bg-blue-50 rounded-md px-4 py-6">
                                                     Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officiis odio eaque in obcaecati, ipsa at! Itaque molestias odit cumque maxime laborum explicabo sequi voluptatibus.
@@ -766,7 +762,11 @@ const TrainerDetailsContent = () => {
                                             <p className="font-normal text-sm sm:text-[16px] leading-relaxed sm:leading-[26px] py-3 sm:py-4  break-words">
                                                 {trainerData.training_approach}
                                             </p>
-                                        )}
+                                        )} */}
+
+                                        <p className="font-normal text-sm sm:text-[16px] leading-relaxed sm:leading-[26px] py-3 sm:py-4  break-words">
+                                            {trainerData.training_approach}
+                                        </p>
                                     </div>
 
                                     {/* Certifications */}
@@ -775,7 +775,7 @@ const TrainerDetailsContent = () => {
                                             <p className="w-full border-b-2 border-blue-500 text-base sm:text-[18px] font-bold leading-tight sm:leading-[28px] pb-3">Certifications</p>
                                         </div>
                                         <div className="pt-3 sm:pt-4">
-                                            {(!isLoggedInUser && trainerLocked) ? (
+                                            {/* {(!isLoggedInUser && trainerLocked) ? (
                                                 <div className="relative group">
                                                     <div className={`border-l-4 border-blue-500 bg-[#EDF1FF] rounded-xl p-3 sm:p-4 mb-3 sm:mb-4`}>
                                                         <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
@@ -808,7 +808,22 @@ const TrainerDetailsContent = () => {
                                                         </div>);
                                                     }) : null}
                                                 </div>
-                                            )}
+                                            )} */}
+
+                                            <div className="">
+                                                {trainerData.certificates?.map ? trainerData.certificates.map((certificate, index) => {
+                                                    const isLast = index === trainerData.certificates.length - 1;
+
+                                                    return (<div key={index}
+                                                        className={`border-l-4 border-blue-500 bg-[#EDF1FF] rounded-xl p-3 sm:p-4 ${isLast ? '' : 'mb-3 sm:mb-4'}`}>
+                                                        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                                                            <p className="text-sm sm:text-[15.88px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">{certificate.certificate_name}</p>
+                                                            <p className="text-xs sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[20px]">({certificate.issued_date})</p>
+                                                        </div>
+                                                        <p className="text-xs sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[20px]">{certificate.issued_by}</p>
+                                                    </div>);
+                                                }) : null}
+                                            </div>
                                         </div>
                                     </div>
 
@@ -892,7 +907,7 @@ const TrainerDetailsContent = () => {
                                             <p className="w-full border-b-2 border-blue-500 text-base sm:text-[18px] font-bold leading-tight sm:leading-[28px] pb-3">Education</p>
                                         </div>
                                         <div className="relative gap-2 pt-3 sm:pt-4">
-                                            {(!isLoggedInUser && trainerLocked) ? (
+                                            {/* {(!isLoggedInUser && trainerLocked) ? (
                                                 <div className="relative group">
                                                     <div className="space-y-2  select-none">
                                                         <div className="relative text-sm sm:text-md font-thin flex justify-start gap-2 mb-2">
@@ -945,7 +960,33 @@ const TrainerDetailsContent = () => {
                                                         </div>
                                                     );
                                                 })
-                                            )}
+                                            )} */}
+
+                                            {(trainerData.education || []).map((education, index) => {
+                                                const isLast = index === trainerData.education.length - 1;
+
+                                                return (
+                                                    <div
+                                                        key={index}
+                                                        className="relative text-sm sm:text-md font-thin flex justify-start gap-2 mb-2"
+                                                    >
+                                                        {!isLast && (
+                                                            <div className="absolute left-1 md:left-2 top-0 bottom-1 w-[2.5px] bg-blue-300 z-0"></div>
+                                                        )}
+
+                                                        <span className="flex-shrink-0 w-3 h-3 md:w-4 md:h-4 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold z-10 text-xs sm:text-sm"></span>
+
+                                                        <div className={`pt-1 ${isLast ? 'pb-0' : 'pb-6 sm:pb-8'} pl-2 pr-2 sm:pr-4`}>
+                                                            <p className="text-sm sm:text-[16px] font-normal text-[#1E2939] leading-tight sm:leading-[24px]">
+                                                                {education.course}
+                                                                &nbsp;&nbsp;
+                                                                <span className="text-[#F54900]">({education.year})</span>
+                                                            </p>
+                                                            <p className="text-sm sm:text-[14px] font-normal text-[#4A5565] leading-tight sm:leading-[24px]">{education.institution}</p>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
 
