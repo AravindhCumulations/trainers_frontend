@@ -307,9 +307,9 @@ const TrainerDetailsContent = () => {
 
     const handleWorkshopClick = (type: 'details' | 'edit' | 'create', item: Workshop) => {
 
-        if (trainerLocked) {
-            return;
-        }
+        // if (trainerLocked) {
+        //     return;
+        // }
 
         if (!item) {
             showError("Failed to load Data")
@@ -434,10 +434,7 @@ const TrainerDetailsContent = () => {
                                         </div>
                                         <div className="flex flex-col gap-3 sm:gap-4">
                                             <div className="trainer-name text-center text-lg sm:text-xl lg:text-[24px] font-bold leading-tight sm:leading-[32px] text-[#1E2939]">
-                                                {isLoggedInUser 
-                                                    ? `${getCurrentUserFirstName()} ${getCurrentUserLastName()}`.trim() || trainerData.full_name
-                                                    : trainerData.full_name
-                                                }
+                                                   {trainerData.full_name}    
                                             </div>
                                             {isLoggedInUser && (
                                                 <div className="w-full flex justify-center">
@@ -689,11 +686,11 @@ const TrainerDetailsContent = () => {
                                                                     handleWorkshopClick('details', workshop);
                                                                 }}
                                                             />
-                                                            {trainerLocked && (
+                                                            {/* {trainerLocked && (
                                                                 <div className="absolute inset-0 z-30 opacity-0 group-hover:opacity-100 transition-opacity">
                                                                     <LockOverlay message="Kindly unlock to access this workshop." />
                                                                 </div>
-                                                            )}
+                                                            )} */}
                                                         </div>
                                                     ))}
                                                 </>
