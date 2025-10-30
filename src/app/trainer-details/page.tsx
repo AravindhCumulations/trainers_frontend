@@ -9,7 +9,7 @@ import TrainerGrid from "@/components/TrainerGrid";
 import { trainerApis } from '@/lib/apis/trainer.apis';
 import { TrainerDetailsModel } from '@/models/trainerDetails.model';
 import { useLoading } from '@/context/LoadingContext';
-import { getCurrentUserMail, getCurrentUserName, getCurrentUserRole, getCurrentUserFirstName, getCurrentUserLastName } from '@/lib/utils/auth.utils'
+import { getCurrentUserMail, getCurrentUserName, getCurrentUserRole } from '@/lib/utils/auth.utils'
 import { RatingStars } from "@/components/RatingStars";
 import { useNavigation } from "@/lib/hooks/useNavigation";
 
@@ -25,30 +25,30 @@ import Popup from '@/components/Popup';
 import { Workshop } from "@/models/workshop.models";
 import { useRouter } from "next/navigation";
 
-// Add this LockOverlay component near the top (after imports, before TrainerDetailsContent)
-const LockOverlay = ({ message = "Kindly unlock to access these details." }) => (
-    <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
-        {/* Blurred background */}
-        <div className="absolute inset-0 backdrop-blur-sm  rounded-xl" />
-        {/* Centered lock icon and tooltip, not blurred */}
-        <div className=" w-full h-full  relative flex flex-col items-center justify-center rounded">
-            <svg
-                className="w-8 h-8 text-gray-700 drop-shadow"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                style={{ marginBottom: '0.5rem' }}
-            >
-                <rect width="18" height="11" x="3" y="11" rx="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-            <span className="bg-blue-100 text-gray-800 text-xs px-3 py-2 rounded shadow sm:opacity-0 sm:group-hover:opacity-100 opacity-100 transition-opacity mt-1 whitespace-nowrap">
-                {message}
-            </span>
-        </div>
-    </div>
-);
+// // Add this LockOverlay component near the top (after imports, before TrainerDetailsContent)
+// const LockOverlay = ({ message = "Kindly unlock to access these details." }) => (
+//     <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
+//         {/* Blurred background */}
+//         <div className="absolute inset-0 backdrop-blur-sm  rounded-xl" />
+//         {/* Centered lock icon and tooltip, not blurred */}
+//         <div className=" w-full h-full  relative flex flex-col items-center justify-center rounded">
+//             <svg
+//                 className="w-8 h-8 text-gray-700 drop-shadow"
+//                 fill="none"
+//                 stroke="currentColor"
+//                 strokeWidth="2"
+//                 viewBox="0 0 24 24"
+//                 style={{ marginBottom: '0.5rem' }}
+//             >
+//                 <rect width="18" height="11" x="3" y="11" rx="2" />
+//                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+//             </svg>
+//             <span className="bg-blue-100 text-gray-800 text-xs px-3 py-2 rounded shadow sm:opacity-0 sm:group-hover:opacity-100 opacity-100 transition-opacity mt-1 whitespace-nowrap">
+//                 {message}
+//             </span>
+//         </div>
+//     </div>
+// );
 
 // Main Content
 const TrainerDetailsContent = () => {
