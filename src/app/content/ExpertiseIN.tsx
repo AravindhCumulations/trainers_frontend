@@ -20,5 +20,22 @@ export const expertise_in: string[] = [
     "Finance",
     "Mindfulness",
     "Resilience",
-    "Custom"
+    "Custom",
+    "AI",
+    "Fitness",
+    "Public Speaking",
+    "LGBTQIA+",
+    "Marketing",
+   "Communication",
+    "Life Coach",
+    "Team Building",
+    "Learning & Development",
+    "Diversity & Inclusion",
+    "Public Speaker",
+    "Interview Specialist",
+    "Resume Writing",
+    "Time Management",
+    "Personality Development",
+    "Career Coach"
+ 
 ]
