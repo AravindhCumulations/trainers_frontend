@@ -184,9 +184,6 @@ export class TrainerFormValidator {
             if (!cert.issued_by.trim()) {
                 errors.push(`Issuing organization is required for certification ${index + 1}`);
             }
-            if (!cert.issued_date.trim()) {
-                errors.push(`Year is required for certification ${index + 1}`);
-            }
         });
 
         return errors;

@@ -32,6 +32,7 @@ import { usePopup } from '@/lib/hooks/usePopup';
 import Popup from '@/components/Popup';
 import { Eye } from 'lucide-react';
 import TrainerProfilePreview from '@/components/TrainerProfilePreview';
+import ImageCropModal from '@/components/ImageCropModal';
 
 // Add type for tracking modified fields
 type ModifiedTrainerFields = Partial<TrainerFormDto>;
@@ -159,6 +160,7 @@ export default function TrainerDetailsPage() {
     const [profileImagePreview, setProfileImagePreview] = useState<string>('');
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [hasImageChanged, setHasImageChanged] = useState(false);
+    const [imageToCrop, setImageToCrop] = useState<string | null>(null);
 
     // Function to check if form has changes
     const hasFormChanges = useMemo(() => {
@@ -526,29 +528,45 @@ export default function TrainerDetailsPage() {
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            // Check file size (10MB = 10 * 1024 * 1024 bytes)
-            const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+            const maxSize = 10 * 1024 * 1024;
             
             if (file.size > maxSize) {
                 setErrors(['Profile picture file size must be less than 10MB. Please select a smaller image.']);
-                // Clear the file input
                 e.target.value = '';
                 return;
             }
 
-            setHasImageChanged(true);
-            // Remove spaces from the file name
-            const sanitizedFileName = file.name.replace(/\s+/g, '');
-            const sanitizedFile = new File([file], sanitizedFileName, { type: file.type });
-            setProfileImage(sanitizedFile);
             const reader = new FileReader();
             reader.onloadend = () => {
-                setProfileImagePreview(reader.result as string);
+                setImageToCrop(reader.result as string);
             };
-            reader.readAsDataURL(sanitizedFile);
-            
-            // Clear any previous errors
+            reader.readAsDataURL(file);
             setErrors([]);
+        }
+    };
+
+    const handleCropComplete = (croppedFile: File) => {
+        setHasImageChanged(true);
+        const sanitizedFileName = croppedFile.name.replace(/\s+/g, '');
+        const sanitizedFile = new File([croppedFile], sanitizedFileName, { type: croppedFile.type });
+        setProfileImage(sanitizedFile);
+        
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setProfileImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(sanitizedFile);
+        setImageToCrop(null);
+        
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+    const handleCropCancel = () => {
+        setImageToCrop(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
         }
     };
 
@@ -1727,6 +1745,15 @@ export default function TrainerDetailsPage() {
                 isOpen={previewState.isOpen}
                 onClose={() => setPreviewState({ isOpen: false })}
             />
+
+            {/* Image Crop Modal */}
+            {imageToCrop && (
+                <ImageCropModal
+                    image={imageToCrop}
+                    onCropComplete={handleCropComplete}
+                    onCancel={handleCropCancel}
+                />
+            )}
 
             <Footer />
             {/* Global Popup for confirmations and alerts */}
