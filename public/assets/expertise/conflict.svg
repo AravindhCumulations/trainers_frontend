@@ -3,12 +3,12 @@
     Fencing Swords Streamline Icon: https://streamlinehq.com
   </desc>
   <defs></defs>
-  <path d="M7.4971479376875 14.999047261687501a3.31875 3.31875 0 0 1 0.01325825221875 4.680163008L2.8169849296875 14.9857890095625a3.31875 3.31875 0 0 1 4.693421260125 0Z" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="M21.5625 0.9375 7.5 15" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="M5.15625 17.34375 0.9375 21.5625" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="m0.9375 16.875 1.875 -1.875" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="m19.696455991125003 14.99851968496875 -4.6867921340625 4.6867921340625a3.31875 3.31875 0 0 1 0.0066291260625 -4.6735338819375 3.31875 3.31875 0 0 1 4.693421260125 0Z" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="M15 15 0.9375 0.9375" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="m21.5625 21.5625 -4.21875 -4.21875" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="m21.5625 16.875 -1.875 -1.875" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
+  <path d="M7.4971479376875 14.999047261687501a3.31875 3.31875 0 0 1 0.01325825221875 4.680163008L2.8169849296875 14.9857890095625a3.31875 3.31875 0 0 1 4.693421260125 0Z" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="M21.5625 0.9375 7.5 15" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="M5.15625 17.34375 0.9375 21.5625" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="m0.9375 16.875 1.875 -1.875" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="m19.696455991125003 14.99851968496875 -4.6867921340625 4.6867921340625a3.31875 3.31875 0 0 1 0.0066291260625 -4.6735338819375 3.31875 3.31875 0 0 1 4.693421260125 0Z" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="M15 15 0.9375 0.9375" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="m21.5625 21.5625 -4.21875 -4.21875" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="m21.5625 16.875 -1.875 -1.875" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
 </svg>

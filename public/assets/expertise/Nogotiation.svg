@@ -3,11 +3,11 @@
     Checkmark Handshake Streamline Icon: https://streamlinehq.com
   </desc>
   <defs></defs>
-  <path d="M1.40625 17.5125h1.790625l4.6875 2.6906250000000003a6.76875 6.76875 0 0 0 3.3656249999999996 0.890625" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="m17.9625 18.28125 1.340625 -0.7687499999999999 1.790625 0" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="M11.25 21.09375a6.675 6.675 0 0 0 3.346875 -0.890625l1.875 -1.0875 -3.45 -5.184375 -2.475 0.61875a2.8875 2.8875 0 0 1 -0.75 0.09375A3.065625 3.065625 0 0 1 8.4375 14.315624999999999a1.3875 1.3875 0 0 1 -0.778125 -1.2468750000000002 1.40625 1.40625 0 0 1 0.853125 -1.29375l4.753125000000001 -2.0250000000000004a3.46875 3.46875 0 0 1 1.3875 -0.290625 3.50625 3.50625 0 0 1 1.9500000000000002 0.590625L18.4125 11.25h2.68125" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="M1.40625 11.25h2.68125l1.7999999999999998 -1.2a3.50625 3.50625 0 0 1 1.9500000000000002 -0.590625 3.46875 3.46875 0 0 1 1.3875 0.290625l2.0250000000000004 0.8625" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="m21.09375 9.459375 0 9.84375" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="m1.40625 9.459375 0 9.84375" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="m7.668749999999999 3.1968750000000004 2.68125 2.68125 4.48125 -4.471875" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
+  <path d="M1.40625 17.5125h1.790625l4.6875 2.6906250000000003a6.76875 6.76875 0 0 0 3.3656249999999996 0.890625" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="m17.9625 18.28125 1.340625 -0.7687499999999999 1.790625 0" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="M11.25 21.09375a6.675 6.675 0 0 0 3.346875 -0.890625l1.875 -1.0875 -3.45 -5.184375 -2.475 0.61875a2.8875 2.8875 0 0 1 -0.75 0.09375A3.065625 3.065625 0 0 1 8.4375 14.315624999999999a1.3875 1.3875 0 0 1 -0.778125 -1.2468750000000002 1.40625 1.40625 0 0 1 0.853125 -1.29375l4.753125000000001 -2.0250000000000004a3.46875 3.46875 0 0 1 1.3875 -0.290625 3.50625 3.50625 0 0 1 1.9500000000000002 0.590625L18.4125 11.25h2.68125" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="M1.40625 11.25h2.68125l1.7999999999999998 -1.2a3.50625 3.50625 0 0 1 1.9500000000000002 -0.590625 3.46875 3.46875 0 0 1 1.3875 0.290625l2.0250000000000004 0.8625" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="m21.09375 9.459375 0 9.84375" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="m1.40625 9.459375 0 9.84375" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="m7.668749999999999 3.1968750000000004 2.68125 2.68125 4.48125 -4.471875" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
 </svg>

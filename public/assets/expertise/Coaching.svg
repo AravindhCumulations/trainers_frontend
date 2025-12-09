@@ -3,8 +3,8 @@
     Target Arrow Bullseye Streamline Icon: https://streamlinehq.com
   </desc>
   <defs></defs>
-  <path d="M19.321875 7.5A8.896875 8.896875 0 1 1 15 3.178125" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="M15.39375 9.61875a4.3125 4.3125 0 0 1 0.309375 1.63125A4.453125 4.453125 0 1 1 11.25 6.796875a4.3125 4.3125 0 0 1 1.63125 0.309375" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="m11.25 11.25 5.34375 -5.34375 0 -1.78125 1.78125 -1.78125 0 1.78125 1.78125 0 -1.78125 1.78125 -1.78125 0" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
-  <path d="M10.359375 11.25a0.890625 0.890625 0 1 0 1.78125 0 0.890625 0.890625 0 1 0 -1.78125 0" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" stroke-width="1.5"></path>
+  <path d="M19.321875 7.5A8.896875 8.896875 0 1 1 15 3.178125" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="M15.39375 9.61875a4.3125 4.3125 0 0 1 0.309375 1.63125A4.453125 4.453125 0 1 1 11.25 6.796875a4.3125 4.3125 0 0 1 1.63125 0.309375" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="m11.25 11.25 5.34375 -5.34375 0 -1.78125 1.78125 -1.78125 0 1.78125 1.78125 0 -1.78125 1.78125 -1.78125 0" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
+  <path d="M10.359375 11.25a0.890625 0.890625 0 1 0 1.78125 0 0.890625 0.890625 0 1 0 -1.78125 0" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" strokeWidth="1.5"></path>
 </svg>
