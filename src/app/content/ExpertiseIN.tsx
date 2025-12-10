@@ -20,7 +20,6 @@ export const expertise_in: string[] = [
     "Mindfulness",
     "Resilience",
     "Custom",
-    "AI",
     "Fitness",
     "Public Speaking",
     "LGBTQIA+",
