@@ -12,7 +12,6 @@ export const expertise_in: string[] = [
     "Decision Making",
     "Creativity",
     "Innovation",
-    "Communication",
     "Change",
     "Inclusion",
     "Strategy",
