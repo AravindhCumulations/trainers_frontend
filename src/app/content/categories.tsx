@@ -32,7 +32,7 @@ export const getCategories = (color: string) => [
         )
     },
     {
-        name: 'Artificial Intelligence',
+        name: 'AI',
         icon: (
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-0.855 -0.855 24 24" id="Artificial-Intelligence-Spark--Streamline-Core" height="24" width="24">
                 <desc>
