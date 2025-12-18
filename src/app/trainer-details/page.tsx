@@ -450,10 +450,7 @@ const TrainerDetailsContent = () => {
                                         <div className="rating flex items-center justify-center text-sm sm:text-md gap-1 p-2">
                                             <RatingStars rating={trainerData.avg_rating} max={5} />
                                             <span className="text-sm sm:text-[16px]">
-                                                {trainerData.avg_rating} ({trainerData.total_reviews > 0 
-                                                    ? ` (${trainerData.total_reviews})` 
-                                                    : ""
-                                                })
+                                                {trainerData.avg_rating} {trainerData.total_reviews > 0 ? '('+trainerData.total_reviews+')': ''}  
                                             </span>
                                         </div>
                                         <div className="flex flex-row flex-wrap gap-2 justify-center items-center text-black-500">
