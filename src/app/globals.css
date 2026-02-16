@@ -411,7 +411,10 @@ h2 {
 }
 
 .trainer-card-image {
-  @apply rounded-xl sm:rounded-2xl overflow-hidden mb-2 sm:mb-3 flex items-center justify-center bg-gray-100 relative h-32 sm:h-40 lg:h-48 w-full;
+  @apply rounded-xl sm:rounded-2xl overflow-hidden mb-2 sm:mb-3 flex items-center justify-center bg-gray-100 relative w-full;
+  aspect-ratio: 1 / 1;
+  height: auto;
+  min-height: 0;
 }
 
 /* Hide scrollbar for elements with .scrollbar-hidden, but allow scrolling */
